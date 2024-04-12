@@ -5,11 +5,24 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Upload Excel Sheet</title>
         <style>
+            html,
+            body {
+                margin: 0;
+                padding: 0;
+                height: 100%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
             #dropArea {
                 border: 2px dashed #ccc;
-                padding: 20px;
+                /* padding: 20px; */
                 text-align: center;
                 cursor: pointer;
+                width: 90%; /* 100% of the viewport width */
+                height: 90%; /* 100% of the viewport height */
+                background-color: lightblue; /* Just for demonstration */
+                /* margin: 20px; Add margin around the div */
             }
         </style>
     </head>
@@ -19,9 +32,6 @@
         </div>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
         <script src="script.js"></script>
-        <script>
-
-     
-        </script>
+        <script></script>
     </body>
 </html>

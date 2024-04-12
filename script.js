@@ -76,13 +76,27 @@ function standardTestIsTrue(valueToTest) {
 
 /** @type {Row} */
 class Row {
-    constructor(id, name=null, type=null, dataForThisType=null) {
+    constructor(id, name = null, type = null, dataForThisType = null) {
         this.id = id;
         this.name = name;
     }
 }
 
-const allowedHeaderKeys = ['PARTCODE'];
+const allowedHeaderKeys = ['PARTCODE', 'Product ID'];
+
+const ING = 'ING';
+const NUT = 'NUT';
+const OTHER = 'OTHER';
+
+function LABEL_formatter(type, data) {
+    let mapp = new Map([
+        ['type', type],
+        ['data', data],
+        ['error', null],
+    ]);
+    // console.log(mapp);
+    return mapp;
+}
 
 /**
  * @param {array} data
@@ -95,6 +109,9 @@ function parseSalsifyExport(data) {
             obj['salsify:data_inheritance_hierarchy_level_id'] === 'variant'
     );
 
+    let allowedHeaders = [];
+    let disallowedHeaders = [];
+    let finale = [];
     //
     varientsOnly.forEach((row_of_data) => {
         // console.log(item);
@@ -102,8 +119,7 @@ function parseSalsifyExport(data) {
         let LABEL_DATASET_INGREDIENTS_A = [];
         let LABEL_DATASET_OTHER_INGREDS_A = [];
 
-        let allowedHeaders = [];
-        let disallowedHeaders = [];
+        const ALL_INGS = [];
 
         // populate the allowedHeaders
         for (let key in row_of_data) {
@@ -115,31 +131,37 @@ function parseSalsifyExport(data) {
                 // console.log(key, ' :', value);
                 // Push unique column headers into array AND add nut/ing/other to their respective arrays.
                 if (key.startsWith('LABEL_DATASET_NUTRIENT_A')) {
-                    LABEL_DATASET_NUTRIENT_A.push(value);
+                    // LABEL_DATASET_NUTRIENT_A.push(value);
+                    ALL_INGS.push(LABEL_formatter(NUT, value));
 
                     if (!allowedHeaders.includes('LABEL_DATASET_NUTRIENT_A')) {
-                        allowedHeaders.push('LABEL_DATASET_NUTRIENT_A');
+                        // allowedHeaders.push('LABEL_DATASET_NUTRIENT_A');
                     }
                 } else if (key.startsWith('LABEL_DATASET_INGREDIENTS_A')) {
-                    LABEL_DATASET_INGREDIENTS_A.push(value);
-
+                    // LABEL_DATASET_INGREDIENTS_A.push(value);
+                    ALL_INGS.push(LABEL_formatter(ING, value));
                     if (
                         !allowedHeaders.includes('LABEL_DATASET_INGREDIENTS_A')
                     ) {
-                        allowedHeaders.push('LABEL_DATASET_INGREDIENTS_A');
+                        // allowedHeaders.push('LABEL_DATASET_INGREDIENTS_A');
                     }
                 } else if (key.startsWith('LABEL_DATASET_OTHER_INGREDS_A')) {
-                    LABEL_DATASET_OTHER_INGREDS_A.push(value);
+                    // LABEL_DATASET_OTHER_INGREDS_A.push(value);
+                    ALL_INGS.push(LABEL_formatter(OTHER, value));
 
                     if (
                         !allowedHeaders.includes(
                             'LABEL_DATASET_OTHER_INGREDS_A'
                         )
                     ) {
-                        allowedHeaders.push('LABEL_DATASET_OTHER_INGREDS_A');
+                        // allowedHeaders.push('LABEL_DATASET_OTHER_INGREDS_A');
                     }
-                } else if (allowedHeaderKeys.includes(key)) {
+                } else if (
+                    allowedHeaderKeys.includes(key) &
+                    !allowedHeaders.includes(key)
+                ) {
                     // push all allowed headers into allowedHeaders
+
                     allowedHeaders.push(key);
                 } else {
                     disallowedHeaders.push(key);
@@ -154,29 +176,17 @@ function parseSalsifyExport(data) {
         // console.log(LABEL_DATASET_NUTRIENT_A);
         // console.log(LABEL_DATASET_OTHER_INGREDS_A);
 
-        // let nutsMap = new Map();
-        // function logMapElements(value, key) {
-        //     console.log(`m[${key}] = ${value}`);
-        // }
-        // allowedHeaders.forEach((header) => {
-        //     nutsMap.set(header, null);
-        // });
-        // nutsMap.forEach(logMapElements);
-        // const concatenatedArray = [
-        // // const numRowsPerVarient =
-        //     ...LABEL_DATASET_NUTRIENT_A,
-        //     ...LABEL_DATASET_INGREDIENTS_A,
-        //     ...LABEL_DATASET_OTHER_INGREDS_A
-        // ].map(row => {
-        //     const row = Row(row_of_data.PARTCODE);
-        //     console.log(row);
-        // })
-        // console.log('numRowsPerVarient', numRowsPerVarient);
+        const concatenatedArray = ALL_INGS.map((sheetRow, index) => {
+            let shit = allowedHeaders.map((key) => row_of_data[key]);
 
-        for (let i = 0; i < numRowsPerVarient; i++) {
-            
-            
-        }
+            shit.push(sheetRow.get('type'), sheetRow.get('data'));
+            // console.log(shit);
+
+            return shit;
+        });
+
+        finale.push(...concatenatedArray);
+        // console.log('numRowsPerVarient', numRowsPerVarient);
 
         //TODO: Error objects
         const cleanNuts = LABEL_DATASET_NUTRIENT_A.map((row) => {
@@ -222,24 +232,44 @@ function parseSalsifyExport(data) {
         // TODO: Get this to export now....
     });
 
+    allowedHeaders.push(...['TYPE', 'DATA']);
+    // console.log(allowedHeaders);
+    let grass = [allowedHeaders, ...finale];
+    // console.log(...grass);
+    xlsx_export_file(grass);
+
     // console.log(varientsOnly);
 }
 
 // XLSX & DOM Stuff ***************************************************************
 
-function xlsx_export_file() {
+function xlsx_export_file(data) {
     // Sample data
-    let data = [
-        ['Name', 'Age', 'City'],
-        ['John', 30, 'New York'],
-        ['Alice', 25, 'Los Angeles'],
-        ['Bob', 35, 'Chicago'],
-    ];
+    // let data = [
+    //     ['Name', 'Age', 'City'],
+    //     ['John', 30, 'New York'],
+    //     ['Alice', 25, 'Los Angeles'],
+    //     ['Bob', 35, 'Chicago'],
+    // ];
 
     let workbook = XLSX.utils.book_new();
 
     let worksheet = XLSX.utils.aoa_to_sheet(data);
 
+    const numberOfColumns = data[0].length;
+    // worksheet['!cols'] = [
+    //     { wch: 10 }, // Column A width
+    //     { wch: 10 }, // Column B width
+    //     { wch: 5 }, // Column C width
+    //     { wch: 5 }, // Column C width
+    // ];
+    let cols = new Array(numberOfColumns).fill({ wch: 10 })
+
+    // set the last column (data) to be wider
+    cols[numberOfColumns - 1] = { wch: 30 };
+
+    worksheet['!cols'] = cols
+    // console.log(worksheet['!cols']);
     // Add the worksheet to the workbook
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
 
