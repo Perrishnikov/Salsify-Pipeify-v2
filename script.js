@@ -1,3 +1,7 @@
+const RAW = 'Raw';
+const CLEAN = 'Clean Pipes';
+const PARSE = 'Parse Columns';
+
 function formatter(desc, amount, uom, dv, percent, symbol) {
     return `${desc}|${amount}|${uom}|${dv}|${percent}|${symbol}~`;
 }
@@ -68,20 +72,6 @@ function standardTestIsTrue(valueToTest) {
 //     return uom;
 // }
 
-/**
- * @typedef {object} Row
- * @property {string} id an id
- * @property {string} name
- */
-
-/** @type {Row} */
-class Row {
-    constructor(id, name = null, type = null, dataForThisType = null) {
-        this.id = id;
-        this.name = name;
-    }
-}
-
 const allowedHeaderKeys = ['PARTCODE', 'Product ID'];
 
 const ING = 'ING';
@@ -115,9 +105,9 @@ function parseSalsifyExport(data) {
     //
     varientsOnly.forEach((row_of_data) => {
         // console.log(item);
-        let LABEL_DATASET_NUTRIENT_A = [];
-        let LABEL_DATASET_INGREDIENTS_A = [];
-        let LABEL_DATASET_OTHER_INGREDS_A = [];
+        // let LABEL_DATASET_NUTRIENT_A = [];
+        // let LABEL_DATASET_INGREDIENTS_A = [];
+        // let LABEL_DATASET_OTHER_INGREDS_A = [];
 
         const ALL_INGS = [];
 
@@ -189,44 +179,44 @@ function parseSalsifyExport(data) {
         // console.log('numRowsPerVarient', numRowsPerVarient);
 
         //TODO: Error objects
-        const cleanNuts = LABEL_DATASET_NUTRIENT_A.map((row) => {
-            let header = row.split('|');
+        // const cleanNuts = LABEL_DATASET_NUTRIENT_A.map((row) => {
+        //     let header = row.split('|');
 
-            const shortDesc = header[1].trim();
-            const longDesc = header[2].trim();
-            let desc = coalesce(longDesc, shortDesc).trim();
-            let amount = header[3].trim();
-            let uom = header[4].trim();
-            let dv = header[5].trim();
-            const percent = header[6].trim(); // % or ''
-            const symbol = header[7].trim(); // † or **
-            // let definition = header[8].trim()
+        //     const shortDesc = header[1].trim();
+        //     const longDesc = header[2].trim();
+        //     let desc = coalesce(longDesc, shortDesc).trim();
+        //     let amount = header[3].trim();
+        //     let uom = header[4].trim();
+        //     let dv = header[5].trim();
+        //     const percent = header[6].trim(); // % or ''
+        //     const symbol = header[7].trim(); // † or **
+        //     // let definition = header[8].trim()
 
-            if (standardTestIsTrue(desc)) {
-                return;
-            }
-            //amount
-            if (amount === '') {
-                amount = 'ERROR';
-            } else if (isNaN(parseInt(amount.replace(/,/g, ''), 10))) {
-                //should be number
-                amount = 'ERROR';
-            }
-            //uom
-            if (uom === '') {
-                uom = 'ERROR';
-            } else if (!isNaN(parseInt(uom.replace(/,/g, ''), 10))) {
-                //should NOT be number
-                uom = 'ERROR';
-            }
-            //dv
-            if (isNaN(parseInt(dv.replace(/[,<]/g, ''), 10))) {
-                //should be number
-                dv = 'ERROR';
-            }
+        //     if (standardTestIsTrue(desc)) {
+        //         return;
+        //     }
+        //     //amount
+        //     if (amount === '') {
+        //         amount = 'ERROR';
+        //     } else if (isNaN(parseInt(amount.replace(/,/g, ''), 10))) {
+        //         //should be number
+        //         amount = 'ERROR';
+        //     }
+        //     //uom
+        //     if (uom === '') {
+        //         uom = 'ERROR';
+        //     } else if (!isNaN(parseInt(uom.replace(/,/g, ''), 10))) {
+        //         //should NOT be number
+        //         uom = 'ERROR';
+        //     }
+        //     //dv
+        //     if (isNaN(parseInt(dv.replace(/[,<]/g, ''), 10))) {
+        //         //should be number
+        //         dv = 'ERROR';
+        //     }
 
-            return formatter(desc, amount, uom, dv, percent, symbol);
-        });
+        //     return formatter(desc, amount, uom, dv, percent, symbol);
+        // });
 
         // console.log('cleanNuts', cleanNuts);
         // TODO: Get this to export now....
@@ -236,49 +226,48 @@ function parseSalsifyExport(data) {
     // console.log(allowedHeaders);
     let grass = [allowedHeaders, ...finale];
     // console.log(...grass);
-    xlsx_export_file(grass);
 
-    // console.log(varientsOnly);
+    const checkedRadioButton = getCheckedRadioButtonId();
+
+    const htmlTable = xlsx_export_file(grass, checkedRadioButton);
+
+    // Get container element to append the table
+    const tableContainer = document.getElementById('table-container');
+    // Clear any old table
+    tableContainer.innerHTML = '';
+    tableContainer.appendChild(htmlTable);
 }
 
-// XLSX & DOM Stuff ***************************************************************
-
-function xlsx_export_file(data) {
-    // Sample data
-    // let data = [
-    //     ['Name', 'Age', 'City'],
-    //     ['John', 30, 'New York'],
-    //     ['Alice', 25, 'Los Angeles'],
-    //     ['Bob', 35, 'Chicago'],
-    // ];
-
-    let workbook = XLSX.utils.book_new();
-
-    let worksheet = XLSX.utils.aoa_to_sheet(data);
-
-    const numberOfColumns = data[0].length;
-    // worksheet['!cols'] = [
-    //     { wch: 10 }, // Column A width
-    //     { wch: 10 }, // Column B width
-    //     { wch: 5 }, // Column C width
-    //     { wch: 5 }, // Column C width
-    // ];
-    let cols = new Array(numberOfColumns).fill({ wch: 10 })
-
-    // set the last column (data) to be wider
-    cols[numberOfColumns - 1] = { wch: 30 };
-
-    worksheet['!cols'] = cols
-    // console.log(worksheet['!cols']);
-    // Add the worksheet to the workbook
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
-
-    // Write the workbook to a file
-    XLSX.writeFile(workbook, 'example.xlsx');
+/* ONCHAGE - RADIO BUTTON LISTENER */
+const radioButtonsDiv = document.getElementById('radioButtons');
+if (radioButtonsDiv) {
+    radioButtonsDiv.addEventListener('change', function (e) {
+        const selectedOption = e.target.id;
+        console.log(`change table columns to ${selectedOption}`);
+    });
 }
 
+/* CHECKED - RADIO BUTTON */
+function getCheckedRadioButtonId() {
+    const radioButtons = document.querySelectorAll(
+        'input[name="parsingOptions"]'
+    );
+
+    let checkedRadioButton = null;
+
+    radioButtons.forEach((radioButton) => {
+        if (radioButton.checked) {
+            checkedRadioButton = radioButton;
+
+            return;
+        }
+    });
+
+    return checkedRadioButton.id;
+}
+
+/* DROP BOX LISTENER */
 const dropArea = document.getElementById('dropArea');
-
 if (dropArea) {
     // Prevent default behavior (opening file in browser) when dragging over drop area
     dropArea.addEventListener('dragover', function (e) {
@@ -292,6 +281,7 @@ if (dropArea) {
         // Check if files were dropped
         if (e.dataTransfer) {
             const file = e.dataTransfer.files[0];
+            // xlsx.js
             xlsx_process_file(file);
         } else {
             console.log('No files were dropped.');
@@ -314,19 +304,23 @@ if (dropArea) {
         fileInput.click();
         document.body.removeChild(fileInput);
     });
-
-    function xlsx_process_file(file) {
-        let reader = new FileReader();
-
-        reader.onload = function (e) {
-            const data = new Uint8Array(e.target.result);
-            const workbook = XLSX.read(data, { type: 'array' });
-            const sheet = workbook.Sheets[workbook.SheetNames[0]];
-            const jsonData = XLSX.utils.sheet_to_json(sheet);
-
-            parseSalsifyExport(jsonData);
-        };
-
-        reader.readAsArrayBuffer(file);
-    }
 }
+
+const button_download = document.getElementById('download-btn');
+
+// Add event listener for button press event
+button_download.addEventListener('click', (e) => {
+    
+    // Retrieve the binary string from localStorage
+    const retrievedWbString = localStorage.getItem('workbook');
+
+    // Convert the binary string back to a workbook
+    const workbook = XLSX.read(retrievedWbString, { type: 'binary' });
+    
+    const currentDate = new Date();
+    const options = { day: '2-digit', month: '2-digit', year: '2-digit' };
+    const formattedDate = currentDate.toLocaleDateString('en-GB', options);
+
+    // Write the workbook to a file
+    XLSX.writeFile(workbook, `pipeify - ingedients - ${formattedDate}.xlsx`);
+});

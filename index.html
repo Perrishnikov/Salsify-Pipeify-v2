@@ -3,34 +3,59 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="styles.css" />
         <title>Upload Excel Sheet</title>
-        <style>
-            html,
-            body {
-                margin: 0;
-                padding: 0;
-                height: 100%;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-            }
-            #dropArea {
-                border: 2px dashed #ccc;
-                /* padding: 20px; */
-                text-align: center;
-                cursor: pointer;
-                width: 90%; /* 100% of the viewport width */
-                height: 90%; /* 100% of the viewport height */
-                background-color: lightblue; /* Just for demonstration */
-                /* margin: 20px; Add margin around the div */
-            }
-        </style>
+        <style></style>
     </head>
     <body>
-        <div id="dropArea">
-            Drag and drop a Salsify export (Excel) file here, or click to select
+        <div>
+            <div id="dropArea" class="margin-below">
+                Drag and drop a Salsify export (Excel) file here, or click to
+                select
+            </div>
+            <div id="radioButtons" class="margin-below">
+                <legend for="parsingOptions">Parsing Options:</legend><br>
+                <input
+                    type="radio"
+                    id="option1"
+                    name="parsingOptions"
+                    value="option1"
+                    class="radio-button"
+                    checked
+                />
+                <label for="option1" class="radio-label">Raw</label>
+                <br />
+                <input
+                    type="radio"
+                    id="option2"
+                    name="parsingOptions"
+                    value="option2"
+                    class="radio-button"
+                />
+                <label for="option2" class="radio-label">Clean Pipes</label>
+                <br />
+                <input
+                    type="radio"
+                    id="option3"
+                    name="parsingOptions"
+                    value="option3"
+                    class="radio-button"
+                />
+                <label for="option3" class="radio-label">Parse Columns</label>
+            </div>
+            <div class="margin-below">
+                <button id="download-btn" class="drag-drop-btn">
+                    Download Parsed File
+                </button>
+            </div>
         </div>
+
+        <div id="table-container">
+            <!-- <table id="my-table"></table> -->
+        </div>
+
         <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+        <script src="xlsx.js"></script>
         <script src="script.js"></script>
         <script></script>
     </body>
