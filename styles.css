@@ -11,7 +11,8 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    font-family: Arial, sans-serif;
+    /* font-family: Arial, sans-serif; */
+    font-family: 'Roboto', sans-serif;
     font-size: var(--font-size);
 }
 .margin-below {
@@ -20,6 +21,11 @@ body {
 .hidden {
     display: none;
 }
+/* .flex-row {
+    display: flex;
+    flex-direction: row;
+} */
+
 /* DROP */
 #dropArea {
     border: 2px dashed #ccc;
@@ -32,15 +38,24 @@ body {
     font-size: var(--font-size);
     color: var(--primary-color);
 }
+
+/* RADIO & CHECKBOXES */
+.option-div {
+    padding-top: calc(var(--padding-margin) / 8);
+    padding-bottom: calc(var(--padding-margin) / 8);
+}
+.subtitle {
+    margin-bottom: calc(var(--padding-margin) / 2);
+    font-weight: 500;
+}
+
 /* RADIO */
-/* Style for the custom radio button */
 input[type='radio'] {
-    width: 20px;
-    height: 20px;
+    width: var(--padding-margin);
+    height: var(--padding-margin);
     cursor: pointer;
 }
-.radio-label {
-    margin-left: calc(var(--padding-margin) / 8);
+.radio-checkbox-label {
     font-size: var(--font-size);
     color: #333;
     cursor: pointer;
@@ -49,14 +64,29 @@ input[type='radio']:checked + .radio-label {
     color: #28a745;
     font-weight: bold;
 }
-/* DOWNLOAD BUTTON */
-#download-btn {
-    padding: calc(var(--padding-margin) / 2);
-    font-size: var(--font-size);
-    border-radius: calc(var(--padding-margin) / 2);
-    border: 1px solid #000;
+
+/* CHECKBOXES */
+.checkbox-container {
+    display: inline-block;
+    position: relative;
     cursor: pointer;
 }
+input[type='checkbox'] {
+    width: var(--padding-margin);
+    height: var(--padding-margin);
+    cursor: pointer;
+    margin-right: calc(var(--padding-margin) /2);
+}
+.checkbox-label {
+    font-size: var(--font-size);
+    color: #333;
+    cursor: pointer;
+}
+
+/* input[type='checkbox']:checked + .checkbox-container {
+    background-color: #28a745; 
+    border-color: #28a745; 
+} */
 
 /* TABLE */
 #table-container {
@@ -64,32 +94,36 @@ input[type='radio']:checked + .radio-label {
     /* border-collapse: collapse; */
     /* border: 1px solid #ddd; */
 }
-
 /* Style for the table */
 table {
     border-collapse: collapse;
     border: 1px solid #ddd;
 }
-
 /* Style for table header */
 th {
     background-color: #f2f2f2;
     border: 1px solid #ddd;
     padding: calc(var(--padding-margin) / 2);
 }
-
 /* Style for table cells */
 td {
     border: 1px solid #ddd;
     padding: calc(var(--padding-margin) / 2);
 }
-
 /* Alternate row color */
 tr:nth-child(even) {
     background-color: #f9f9f9;
 }
-
 /* Hover effect on rows */
 tr:hover {
     background-color: #f2f2f2;
+}
+
+/* DOWNLOAD BUTTON */
+#download-btn {
+    padding: calc(var(--padding-margin) / 2);
+    font-size: var(--font-size);
+    border-radius: calc(var(--padding-margin) / 2);
+    border: 1px solid #000;
+    cursor: pointer;
 }

@@ -1,10 +1,14 @@
-function xlsx_export_file(data, checkedRadioButton) {
+/**
+ * Creates a workbook from the provided data and returns JSON data and binary string representations.
+ * @param {Array<Array<*>>} data - The data to be included in the workbook. Each inner array represents a row of data.
+ * @returns {{jsonData: Object[], wbString: string}} An object containing JSON data and a binary string representation of the workbook.
+ */
+function xlsx_create_workbook(data) {
     // Specify metadata properties
     const props = {
         Title: 'Pipeify Export',
-        // Author: 'John Doe',
         CreatedDate: new Date(),
-        Company: 'Nature\'s Way',
+        Company: "Nature's Way",
         Comments: '...',
     };
 
@@ -16,9 +20,10 @@ function xlsx_export_file(data, checkedRadioButton) {
     //     ['Bob', 35, 'Chicago'],
     // ];
 
-    let workbook = XLSX.utils.book_new();
-
-    let worksheet = XLSX.utils.aoa_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    
+    // Convert data to a worksheet
+    const worksheet = XLSX.utils.aoa_to_sheet(data);
 
     const numberOfColumns = data[0].length;
     // worksheet['!cols'] = [
@@ -31,32 +36,32 @@ function xlsx_export_file(data, checkedRadioButton) {
 
     // set the last column (data) to be wider
     cols[numberOfColumns - 1] = { wch: 30 };
-    // console.log(cols);
+
     worksheet['!cols'] = cols;
-    // console.log(worksheet['!cols']);
+
     // Add the worksheet to the workbook
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Pipeify');
 
-    // Write the workbook to a file
-    // moved to scripts.js
-    // XLSX.writeFile(workbook, 'example.xlsx');
     // Convert the workbook to a binary string
-    const wbString = XLSX.write(workbook, { type: 'binary', bookType: 'xlsx', props: props });
-
-    // Store the binary string in localStorage
-    localStorage.setItem('workbook', wbString);
+    const wbString = XLSX.write(workbook, {
+        type: 'binary',
+        bookType: 'xlsx',
+        props: props,
+    });
 
     // Convert data to JSON object
     const jsonData = XLSX.utils.sheet_to_json(worksheet);
 
-    // Generate HTML table
-    const htmlTable = generateTable(jsonData, checkedRadioButton);
-
-    return htmlTable;
+    return { jsonData, wbString };
 }
 
 /* XLSX Processing */
-function xlsx_process_file(file) {
+/**
+ * Processes an Excel file.
+ * @param {File} file - The Excel file to be processed.
+ * @returns {void}
+ */
+function xlsx_import_file(file) {
     let reader = new FileReader();
 
     reader.onload = function (e) {
@@ -65,36 +70,9 @@ function xlsx_process_file(file) {
         const sheet = workbook.Sheets[workbook.SheetNames[0]];
         const jsonData = XLSX.utils.sheet_to_json(sheet);
 
-        parseSalsifyExport(jsonData);
+        // parseSalsifyExport(jsonData);
+        salsify_preprocess(jsonData);
     };
 
     reader.readAsArrayBuffer(file);
-}
-
-/* Function to generate HTML table from JSON data */
-function generateTable(data, radioOption = null) {
-    const myTable = document.createElement('table');
-    myTable.setAttribute('id', 'my-table');
-
-    // Add table header
-    const headerRow = document.createElement('tr');
-    for (const key in data[0]) {
-        const th = document.createElement('th');
-        th.textContent = key;
-        headerRow.appendChild(th);
-    }
-    myTable.appendChild(headerRow);
-
-    // Add table rows
-    data.forEach((item) => {
-        const row = document.createElement('tr');
-        for (const key in item) {
-            const cell = document.createElement('td');
-            cell.textContent = item[key];
-            row.appendChild(cell);
-        }
-        myTable.appendChild(row);
-    });
-
-    return myTable;
 }
