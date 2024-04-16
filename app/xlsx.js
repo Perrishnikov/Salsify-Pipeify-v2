@@ -32,6 +32,7 @@ function xlsx_create_workbook(data) {
     //     { wch: 5 }, // Column C width
     //     { wch: 5 }, // Column C width
     // ];
+    // TODO: create option for [line breaks] instead of new rows for data with the same partcode
     let cols = new Array(numberOfColumns).fill({ wch: 15 });
 
     // set the last column (data) to be wider

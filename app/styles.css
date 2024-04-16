@@ -80,7 +80,7 @@ input[type='checkbox'] {
 .checkbox-label {
     font-size: var(--font-size);
     color: #333;
-    cursor: pointer;
+    /* cursor: pointer; */
 }
 
 /* input[type='checkbox']:checked + .checkbox-container {

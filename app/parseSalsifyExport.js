@@ -91,7 +91,79 @@ function removeUnderscoreAndNumber(str) {
     // Use a regular expression to match '_' followed by one or more digits at the end of the string
     const regex = /_\d+$/;
     // Replace the matched pattern with an empty string
+
     return str.replace(regex, '');
+}
+
+function hasUnderscoreAndNumber(str) {
+    // Use a regular expression to match '_' followed by one or more digits at the end of the string
+    const regex = /_\d+$/;
+
+    return regex.test(str);
+}
+
+/**
+ * Removes elements from the first array that exist in the second array.
+ * @param {Array} arr1 - The array to modify.
+ * @param {Array} arr2 - The array containing elements to remove.
+ */
+function removeElementsFromArray(arr1, arr2) {
+    arr1.forEach((item, index) => {
+        if (arr2.includes(item)) {
+            arr1.splice(index, 1);
+        }
+    });
+}
+
+/**
+ * Extracts clean headers from a row of data, excluding Salsify generated headers,
+ * and converts headers with underscores and numbers to arrays.
+ * @param {Object[]} row - The row of data containing headers.
+ * @returns {Object} An object containing clean headers and headers as arrays.
+ * @returns {string[]} Object.clean_headers - An array of clean headers.
+ * @returns {string[]} Object.headers_as_arrays - An array of headers as arrays.
+ */
+function makeHeaders(row) {
+    // other headers
+    const clean_headers = [];
+    // only clean _1
+    const headers_as_arrays = [];
+
+    row.forEach((row_of_data) => {
+        for (let key in row_of_data) {
+            // key: 'PARTCODE', value: '10078'
+
+            if (row_of_data.hasOwnProperty(key)) {
+                // console.log(`key: ${key}, value: ${row_of_data[key]}`);
+
+                const clean_key = removeUnderscoreAndNumber(key);
+
+                // push all underscores with number to become arrays
+                if (hasUnderscoreAndNumber(key)) {
+                    if (!headers_as_arrays.includes(clean_key)) {
+                        headers_as_arrays.push(clean_key);
+                    }
+                    continue;
+                }
+
+                // exclude Salsify generated headers
+                if (key.startsWith('salsify:')) {
+                    continue;
+                }
+
+                // include only unique keys
+                if (!clean_headers.includes(key)) {
+                    if (!headers_as_arrays.includes(clean_key)) {
+                        clean_headers.push(key);
+                    }
+                }
+            }
+        }
+    });
+    // the first LABEL_DATASET_NUTRIENT_A - en-US without underscore and numbers
+    removeElementsFromArray(clean_headers, headers_as_arrays);
+
+    return { clean_headers, headers_as_arrays };
 }
 
 /**
@@ -100,8 +172,7 @@ function removeUnderscoreAndNumber(str) {
  * @param {string[]} dirty_headers - Array of dirty headers.
  * @param {string[]} clean_headers - Array of clean headers.
  */
-function mergeNutIngOther(varientsOnly, dirty_headers, clean_headers) {
-    // dirty_headers.forEach((dirty_header_str) => {
+function mergeNutIngOther(varientsOnly, clean_headers, headers_as_arrays) {
     // varientsOnly.forEach()
     for (let index = 0; index < varientsOnly.length; index++) {
         const item = new Map();
@@ -145,48 +216,11 @@ function mergeNutIngOther(varientsOnly, dirty_headers, clean_headers) {
             }
         });
 
-        console.log('item', item);
+        // console.log('item', item);
     }
 }
 
-/**
- * Extracts clean column headers from a row of data, ignoring headers starting with 'salsify:'.
- * @param {Object[]} row - The row of data containing column headers.
- * @returns {{ clean_headers: string[], dirty_headers: string[] }} An object containing arrays of clean and dirty column headers.
- */
-function getHeaders(row) {
-    const clean_headers = [];
-    const dirty_headers = [];
-    // const dirty_values = [];
-
-    row.forEach((row_of_data) => {
-        for (let key in row_of_data) {
-            // key: 'PARTCODE', value: '10078'
-
-            if (row_of_data.hasOwnProperty(key)) {
-                // const dirty_value = row_of_data[key];
-
-                const clean_key = removeUnderscoreAndNumber(key);
-
-                // exclude Salsify generated headers
-                if (clean_key.startsWith('salsify:')) {
-                    continue;
-                }
-
-                // dirty_values.push(dirty_value);
-                // include only unique keys
-                if (!clean_headers.includes(clean_key)) {
-                    clean_headers.push(clean_key);
-                } else if (!dirty_headers.includes(key)) {
-                    dirty_headers.push(key);
-                }
-            }
-        }
-    });
-    // console.log(clean_headers);
-    return { clean_headers, dirty_headers };
-}
-
+/** MAIN */
 function salsify_preprocess(jsonData) {
     // returns only the EA's, no parents
     const varientsOnly = jsonData.filter(
@@ -194,20 +228,47 @@ function salsify_preprocess(jsonData) {
             obj['salsify:data_inheritance_hierarchy_level_id'] === 'variant'
     );
 
-    // clean_headers has headers without '_1' from LABEL_DATASET_INGREDIENTS_A
-    const { clean_headers, dirty_headers } = getHeaders(varientsOnly);
-    // console.log(dirty_headers);
+    // These .startwith's become arrays
+    // dynamically, any header that is true in removeUnderscoreAndNumber()
+    const LABEL_DATASET_INGREDIENTS_A = 'LABEL_DATASET_INGREDIENTS_A';
+    const LABEL_DATASET_NUTRIENT_A = 'LABEL_DATASET_NUTRIENT_A';
 
-    dom_generateCheckboxes(clean_headers);
+    // clean_headers has headers without '_1' from LABEL_DATASET_INGREDIENTS_A
+    const { clean_headers, headers_as_arrays } = makeHeaders(varientsOnly, [
+        LABEL_DATASET_INGREDIENTS_A,
+        LABEL_DATASET_NUTRIENT_A,
+    ]);
+
+    console.log(headers_as_arrays);
+    console.log(clean_headers);
 
     /**
      *
      * TODO: create table with only selected keys and values
      *
      * TODO:combine nuts, ings, other into DATA column header, and change TYPE to user friendly (for download)
+     *
+     * arrays as DATA in DOM
+     *
+     * convert consts to arrays in Map (convert columns to rows)
      */
 
-    mergeNutIngOther(varientsOnly, dirty_headers, clean_headers);
+    const headersToMerge = {
+        mergeAs: 'INGREDIENT INFO',
+        headers: [...headers_as_arrays, 'LABEL_DATASET_OTHER_INGREDS_A'],
+    };
+
+    // console.log(headersToMerge);
+    dom_generateCheckboxes(
+        [...clean_headers, ...headers_as_arrays],
+        headersToMerge
+    );
+    // mergeNutIngOther(
+    //     varientsOnly,
+    //     // dirty_headers,
+    //     clean_headers,
+    //     headers_as_arrays
+    // );
     // let grass = [allowedHeaders, ...finale];
     // // console.log(...grass);
 
@@ -220,12 +281,13 @@ function salsify_preprocess(jsonData) {
 }
 
 /**
- * Generates HTML checkboxes for each string in an array.
- * @param {string[]} stringsArray - The array of strings.
- * @param {HTMLElement} container - The container element to append the checkboxes to.
- * @returns {void}
+ * Generates checkboxes dynamically based on the clean headers array and appends them to the DOM.
+ * @param {string[]} all_the_headers - An array of clean header names.
+ * @param {object} headersToMerge - An object containing information about headers to merge.
+ * @param {string[]} headersToMerge.headers - An array of headers to merge.
+ * @param {string} headersToMerge.mergeAs - A message to append to the label for headers to merge.
  */
-function dom_generateCheckboxes(stringsArray) {
+function dom_generateCheckboxes(all_the_headers, headersToMerge) {
     const headerCheckboxes = document.getElementById('headerCheckboxes');
 
     // Store the reference to the first child element
@@ -235,7 +297,7 @@ function dom_generateCheckboxes(stringsArray) {
     headerCheckboxes.appendChild(subtitleDiv);
 
     // Iterate through the array of strings
-    stringsArray.forEach((header_name) => {
+    all_the_headers.forEach((header_name) => {
         const container = document.createElement('div');
         container.classList.add('option-div');
 
@@ -248,20 +310,23 @@ function dom_generateCheckboxes(stringsArray) {
         // Add event listener to log value when clicked
         checkbox.addEventListener('click', (e) => {
             console.log(e.target.value);
-            // console.dir(e)
         });
 
         // Create a label element for the checkbox
         const label = document.createElement('label');
         label.classList.add('radio-checkbox-label');
-        label.appendChild(document.createTextNode(header_name));
+
+        const labelName = headersToMerge.headers.includes(header_name)
+            ? `${header_name} as (${headersToMerge.mergeAs})`
+            : header_name;
+
+        label.appendChild(document.createTextNode(labelName));
 
         // Append checkbox and label to container
         container.appendChild(checkbox);
         container.appendChild(label);
 
         headerCheckboxes.appendChild(container);
-        // headerCheckboxes.appendChild(document.createElement('br')); // Add line break for spacing
     });
 }
 
