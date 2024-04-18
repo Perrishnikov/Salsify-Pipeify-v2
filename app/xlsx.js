@@ -73,7 +73,7 @@ function xlsx_import_file(file) {
 
         // parseSalsifyExport(jsonData);
         salsify_preprocess(jsonData);
-        console.dir(jsonData);
+        // console.dir(jsonData);
     };
 
     reader.readAsArrayBuffer(file);

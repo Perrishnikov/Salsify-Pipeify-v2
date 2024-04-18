@@ -286,30 +286,41 @@ function mapValuesToColumns(varientsOnly, clean_headers, headersToMerge) {
 }
 
 class Header {
-    constructor(id, name, types = null) {
+    constructor(id, name, type = null) {
         this.id = id;
         this.name = name;
-        this.types = types;
+        this.type = type;
     }
 }
 class Entity extends Header {
-    constructor(id, name, types, value) {
-        super(id, name, types);
+    constructor(id, name, type, value) {
+        super(id, name, type);
         this.value = value;
     }
 }
 
-function perry_extract_headers(rows_of_each_data, merge_ingredients) {
-    const headers_row = [];
+/**
+ * Extracts headers from rows of data and matches them with merge ingredients.
+ * @param {Object[]} rows_of_each_data - An array of objects, each representing a row of data.
+ * @param {Object} merge_ingredients - An object containing merge ingredients information.
+ * @param {string} merge_ingredients.id - The ID for merged ingredients.
+ * @param {string} merge_ingredients.name - The name for merged ingredients.
+ * @param {string[]} merge_ingredients.merge_these - An array of keys to be merged with the rows of data.
+ * @returns {Entity[]} An array of arrays, where each inner array contains Entity objects representing the merged rows.
+ */
+function clean_extract(rows_of_each_data, merge_ingredients) {
+    // const headers_row = [];
     const entity_rows = [];
 
     rows_of_each_data.forEach((row_of_data) => {
+        const newRow = [];
+
         Object.entries(row_of_data).forEach(([key, value]) => {
             // key: 'PARTCODE', value: '10078'
 
             /* ignore headers that start with "salsify:"*/
             if (!key.startsWith('salsify:')) {
-                console.log(`key: ${key}, value: ${value}`);
+                // console.log(`key: ${key}, value: ${value}`);
 
                 /* remove headers that end with _n */
                 const clean_key = removeUnderscoreAndNumber(key);
@@ -324,42 +335,33 @@ function perry_extract_headers(rows_of_each_data, merge_ingredients) {
                 );
 
                 if (key_matches) {
-                    console.log(`key_matches: `, key_matches, value);
-                    /* is there already a MERGED_INGREDIENT Header? */
-                    const header_exists = headers_row.find(
-                        //'MERGED_INGREDIENT'
-                        (obj) => obj.id === merge_ingredients.id
-                    );
+                    // console.log(`key_matches: `, key_matches, value);
 
-                    if (!header_exists) {
-                        const merged_ingredient_header = new Header(
-                            merge_ingredients.id,
-                            merge_ingredients.name,
-                            merge_ingredients.merge_these
-                        );
-                        headers_row.push(merged_ingredient_header);
-                    }
+                    const merged_ingredient = new Entity(
+                        merge_ingredients.id, // 'MERGED_INGREDIENTS'
+                        merge_ingredients.name, // 'Ingredient Info'
+                        key_matches, // 'LABEL_DATASET_INGREDIENTS_A - en-US'
+                        value // 'Microcrystalline cellulose, corn starch,...'
+                    );
+                    newRow.push(merged_ingredient);
                 } else {
                     /* add the non-ingredient headers like PARTCODE */
-                    const header_exists = headers_row.find(
-                        (obj) => obj.id === clean_key
+                    const entity = new Entity(
+                        clean_key,
+                        clean_key,
+                        clean_key,
+                        value
                     );
 
-                    if (!header_exists) {
-                        const standard_header = new Header(
-                            clean_key,
-                            clean_key,
-                            [clean_key]
-                        );
-                        headers_row.push(standard_header);
-                    }
+                    newRow.push(entity);
                 }
             }
         });
+        entity_rows.push(newRow);
     });
 
-    console.log(headers_row);
-    return headers_row;
+    // console.log(entity_rows);
+    return entity_rows;
 }
 
 /**
@@ -379,57 +381,26 @@ function perry_extract_headers(rows_of_each_data, merge_ingredients) {
  }
  */
 
-/** Creating a new row for every ingredient */
-function perry_extract_ingredients(
-    rows_of_each_data,
-    merge_ingredients,
-    headers_row
-) {
-    const ingredient_rows = [];
+/**
+ * Extracts unique IDs from an array of arrays.
+ * @param {Array<Array<{ id: string }>>} arrayOfArrays - An array of arrays, each containing objects with an `id` property.
+ * @returns {string[]} An array of unique IDs extracted from the input array of arrays.
+ */
+function getUniqueIds(arrayOfArrays) {
+    /** @type {string[]} */
+    const uniqueIds = [];
 
-    rows_of_each_data.forEach((row) => {
-        console.log(`row: `, row);
-        const newRow = new Map();
-
-        headers_row.forEach((header) => {
-            const header_id = header.id;
-            const header_name = header.name;
-            const header_types = header.types;
-
-            console.log(
-                `id: ${header_id}, name: ${header_name}, types: [${header.types}]`
-            );
-
-            header_types.forEach(type => {
-                const key = ''
-                const value = ''
-            })
-            // let keyToFind = row[header_id];
-            // // Check if the key exists in the array
-            // const keyExists = header_types.includes(keyToFind);
-
-            // if (keyExists) {
-            //     console.log(`The key "${keyToFind}" exists in the array.`);
-            // } else {
-            //     console.log(
-            //         `The key "${keyToFind}" does not exist in the array.`
-            //     );
-            // }
-
-            // if(row[header_id]){
-            // console.log(`row[header_id]: ${row[header_id]}`);
-            // newRow.set(header_id, );
-            // }
+    arrayOfArrays.forEach((array) => {
+        // console.log(array);
+        array.forEach((subArray) => {
+            // console.log(subArray.id);
+            if (!uniqueIds.includes(subArray.id)) {
+                uniqueIds.push(subArray.id);
+            }
         });
-
-        //    Object.entries(row_of_data).forEach(([key, value]) => {
-        // key: 'PARTCODE', value: '10078'
-        /* ignore headers that start with "salsify:"*/
-        //    if (!key.startsWith('salsify:')) {
-        //        // console.log(`key: ${key}, value: ${row_of_data[key]}`);
-        //        /* remove headers that end with _n */
-        // const clean_key = removeUnderscoreAndNumber(key);
     });
+
+    return uniqueIds;
 }
 
 /** MAIN */
@@ -440,62 +411,29 @@ function salsify_preprocess(original_jsonData) {
             obj['salsify:data_inheritance_hierarchy_level_id'] === 'variant'
     );
     // console.log(rows_of_each_data);
-    /** If present, add these values to the clean headers instead of the _1, _2, etc values */
-    const LABEL_DATASET_INGREDIENTS_A = 'LABEL_DATASET_INGREDIENTS_A - en-US';
-    const LABEL_DATASET_NUTRIENT_A = 'LABEL_DATASET_NUTRIENT_A - en-US';
-    const LABEL_DATASET_OTHER_INGREDS_A = 'LABEL_DATASET_OTHER_INGREDS_A';
-    const merge_these_columns = [
-        LABEL_DATASET_INGREDIENTS_A,
-        LABEL_DATASET_NUTRIENT_A,
-        LABEL_DATASET_OTHER_INGREDS_A,
-    ];
+
     const merge_ingredients = {
-        merge_these: merge_these_columns,
+        merge_these: [
+            'LABEL_DATASET_OTHER_INGREDS_A',
+            'LABEL_DATASET_NUTRIENT_A - en-US',
+            'LABEL_DATASET_INGREDIENTS_A - en-US',
+        ],
         id: 'MERGED_INGREDIENTS',
         name: 'Ingredient Info',
     };
 
-    const headers_row = perry_extract_headers(
-        rows_of_each_data,
-        merge_ingredients
-    );
+    const clean_rows = clean_extract(rows_of_each_data, merge_ingredients);
 
-    // const ingredients_rows = perry_extract_ingredients(
-    //     rows_of_each_data,
-    //     merge_ingredients,
-    //     headers_row
-    // );
-
-    // takes all the "good" column headers and includes the merged ones if present.
-    // const { clean_headers, headers_as_arrays } = extractColumnHeadersFrom(
-    //     rows_of_each_data,
-    //     merge_these_columns
-    // );
-
-    // console.log(headers_as_arrays);
-    // console.log(clean_headers);
+    // clean_rows.forEach((row) => console.log(row));
 
     /**
      *
      * TODO: create table with only selected keys and values
      *
-     * TODO:combine nuts, ings, other into DATA column header, and change TYPE to user friendly (for download)
-     *
-     * arrays as DATA in DOM
-     *
-     * convert consts to arrays in Map (convert columns to rows)
      */
 
-    // const headersToMerge = {
-    //     mergeAs: 'INGREDIENT INFO',
-    //     mergeAsId: 'MERGED_INGREDIENTS',
-    //     mergeAsName: 'Ingredient Info',
-    //     headers: [...merge_these_columns, 'LABEL_DATASET_OTHER_INGREDS_A'],
-    // };
-
-    // console.log(headersToMerge);
-    // removeElementsFromArray(clean_headers, headersToMerge.headers);
-
+    const uniqueIds = getUniqueIds(clean_rows);
+    console.log(uniqueIds);
     // dom_generateCheckboxes(
     //     [...clean_headers, ...merge_these_columns],
     //     headersToMerge
