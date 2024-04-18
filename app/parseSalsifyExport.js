@@ -286,20 +286,20 @@ function mapValuesToColumns(varientsOnly, clean_headers, headersToMerge) {
 }
 
 class Header {
-    constructor(id, name, type = null) {
+    constructor(id, name, types = null) {
         this.id = id;
         this.name = name;
-        this.type = type;
+        this.types = types;
     }
 }
 class Entity extends Header {
-    constructor(id, name, type, value) {
-        super(id, name, type);
+    constructor(id, name, types, value) {
+        super(id, name, types);
         this.value = value;
     }
 }
 
-function perry_extract_headers(rows_of_each_data, merge_these_columns) {
+function perry_extract_headers(rows_of_each_data, merge_ingredients) {
     const headers_row = [];
     const entity_rows = [];
 
@@ -309,14 +309,14 @@ function perry_extract_headers(rows_of_each_data, merge_these_columns) {
 
             /* ignore headers that start with "salsify:"*/
             if (!key.startsWith('salsify:')) {
-                // console.log(`key: ${key}, value: ${row_of_data[key]}`);
+                console.log(`key: ${key}, value: ${value}`);
 
                 /* remove headers that end with _n */
                 const clean_key = removeUnderscoreAndNumber(key);
                 // console.log('clean_key: ', clean_key);
 
                 /* does the clean_key match a merged_ingredient? */
-                const key_matches = merge_these_columns.find(
+                const key_matches = merge_ingredients.merge_these.find(
                     (obj) => {
                         // console.log(obj);
                         return obj === clean_key;
@@ -324,20 +324,23 @@ function perry_extract_headers(rows_of_each_data, merge_these_columns) {
                 );
 
                 if (key_matches) {
-                    /* is there already a Header? */
+                    console.log(`key_matches: `, key_matches, value);
+                    /* is there already a MERGED_INGREDIENT Header? */
                     const header_exists = headers_row.find(
-                        (obj) => obj.id === 'MERGED_INGREDIENT'
+                        //'MERGED_INGREDIENT'
+                        (obj) => obj.id === merge_ingredients.id
                     );
 
                     if (!header_exists) {
                         const merged_ingredient_header = new Header(
-                            'MERGED_INGREDIENT',
-                            'Ingredient Info',
-                            null
+                            merge_ingredients.id,
+                            merge_ingredients.name,
+                            merge_ingredients.merge_these
                         );
                         headers_row.push(merged_ingredient_header);
                     }
                 } else {
+                    /* add the non-ingredient headers like PARTCODE */
                     const header_exists = headers_row.find(
                         (obj) => obj.id === clean_key
                     );
@@ -346,7 +349,7 @@ function perry_extract_headers(rows_of_each_data, merge_these_columns) {
                         const standard_header = new Header(
                             clean_key,
                             clean_key,
-                            null
+                            [clean_key]
                         );
                         headers_row.push(standard_header);
                     }
@@ -356,16 +359,87 @@ function perry_extract_headers(rows_of_each_data, merge_these_columns) {
     });
 
     console.log(headers_row);
+    return headers_row;
+}
+
+/**
+ { 
+    "LABEL_DATASET_INGREDIENTS_A - en-US": "6|Black Elder (Sambucus nigra L.) Extract (berry) standardized to anthocyanins from 3,200 mg of premium cultivar elderberries per teaspoon|100|mg|||**||"
+    "LABEL_DATASET_NUTRIENT_A - en-US": "1|Calories||25| |||"
+    "LABEL_DATASET_NUTRIENT_A - en-US_1": "2|Total Carbohydrate||8|g|3|%|†"
+    "LABEL_DATASET_NUTRIENT_A - en-US_2": "3|Total Sugars||0|g|**||"
+    "LABEL_DATASET_NUTRIENT_A - en-US_3": "4|Includes 0 g Added Sugars||0||||"
+    "LABEL_DATASET_NUTRIENT_A - en-US_4": "5|Sugar Alcohol||8|g|**||"    ​​
+    LABEL_DATASET_OTHER_INGREDS_A: "sorbitol, purified water, glycerin, natural flavor, preservatives to maintain freshness (citric acid, potassium sorbate"
+    PARTCODE: "6971"
+    "Product ID": "00033674069714"
+    __rowNum__: 1
+    "salsify:data_inheritance_hierarchy_level_id": "variant"
+    "salsify:parent_id": "6971"
+ }
+ */
+
+/** Creating a new row for every ingredient */
+function perry_extract_ingredients(
+    rows_of_each_data,
+    merge_ingredients,
+    headers_row
+) {
+    const ingredient_rows = [];
+
+    rows_of_each_data.forEach((row) => {
+        console.log(`row: `, row);
+        const newRow = new Map();
+
+        headers_row.forEach((header) => {
+            const header_id = header.id;
+            const header_name = header.name;
+            const header_types = header.types;
+
+            console.log(
+                `id: ${header_id}, name: ${header_name}, types: [${header.types}]`
+            );
+
+            header_types.forEach(type => {
+                const key = ''
+                const value = ''
+            })
+            // let keyToFind = row[header_id];
+            // // Check if the key exists in the array
+            // const keyExists = header_types.includes(keyToFind);
+
+            // if (keyExists) {
+            //     console.log(`The key "${keyToFind}" exists in the array.`);
+            // } else {
+            //     console.log(
+            //         `The key "${keyToFind}" does not exist in the array.`
+            //     );
+            // }
+
+            // if(row[header_id]){
+            // console.log(`row[header_id]: ${row[header_id]}`);
+            // newRow.set(header_id, );
+            // }
+        });
+
+        //    Object.entries(row_of_data).forEach(([key, value]) => {
+        // key: 'PARTCODE', value: '10078'
+        /* ignore headers that start with "salsify:"*/
+        //    if (!key.startsWith('salsify:')) {
+        //        // console.log(`key: ${key}, value: ${row_of_data[key]}`);
+        //        /* remove headers that end with _n */
+        // const clean_key = removeUnderscoreAndNumber(key);
+    });
 }
 
 /** MAIN */
 function salsify_preprocess(original_jsonData) {
     /** Filter out parents - EA only */
-    const rows_of_each_data = original_jsonData.filter(
+    const rows_of_each_data = [...original_jsonData].filter(
         (obj) =>
             obj['salsify:data_inheritance_hierarchy_level_id'] === 'variant'
     );
-
+    // console.log(rows_of_each_data);
     /** If present, add these values to the clean headers instead of the _1, _2, etc values */
     const LABEL_DATASET_INGREDIENTS_A = 'LABEL_DATASET_INGREDIENTS_A - en-US';
     const LABEL_DATASET_NUTRIENT_A = 'LABEL_DATASET_NUTRIENT_A - en-US';
@@ -375,11 +449,22 @@ function salsify_preprocess(original_jsonData) {
         LABEL_DATASET_NUTRIENT_A,
         LABEL_DATASET_OTHER_INGREDS_A,
     ];
+    const merge_ingredients = {
+        merge_these: merge_these_columns,
+        id: 'MERGED_INGREDIENTS',
+        name: 'Ingredient Info',
+    };
 
     const headers_row = perry_extract_headers(
         rows_of_each_data,
-        merge_these_columns
+        merge_ingredients
     );
+
+    // const ingredients_rows = perry_extract_ingredients(
+    //     rows_of_each_data,
+    //     merge_ingredients,
+    //     headers_row
+    // );
 
     // takes all the "good" column headers and includes the merged ones if present.
     // const { clean_headers, headers_as_arrays } = extractColumnHeadersFrom(
@@ -401,12 +486,12 @@ function salsify_preprocess(original_jsonData) {
      * convert consts to arrays in Map (convert columns to rows)
      */
 
-    const headersToMerge = {
-        mergeAs: 'INGREDIENT INFO',
-        mergeAsId: 'MERGED_INGREDIENTS',
-        mergeAsName: 'Ingredient Info',
-        headers: [...merge_these_columns, 'LABEL_DATASET_OTHER_INGREDS_A'],
-    };
+    // const headersToMerge = {
+    //     mergeAs: 'INGREDIENT INFO',
+    //     mergeAsId: 'MERGED_INGREDIENTS',
+    //     mergeAsName: 'Ingredient Info',
+    //     headers: [...merge_these_columns, 'LABEL_DATASET_OTHER_INGREDS_A'],
+    // };
 
     // console.log(headersToMerge);
     // removeElementsFromArray(clean_headers, headersToMerge.headers);
