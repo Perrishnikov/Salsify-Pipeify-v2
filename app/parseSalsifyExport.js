@@ -60,28 +60,6 @@ function standardTestIsTrue(valueToTest) {
     }
 }
 
-const allowedHeaderKeys = ['PARTCODE', 'Product ID'];
-
-const ING = 'ING';
-const NUT = 'NUT';
-const OTHER = 'OTHER';
-
-/**
- * Formats the given type and data into a Map object.
- * @param {string} type - The type to be formatted.
- * @param {*} data - The data to be formatted.
- * @returns {Map} A Map object containing the formatted type and data.
- */
-function LABEL_formatter(type, data) {
-    let mapp = new Map([
-        ['type', type],
-        ['data', data],
-        ['error', null],
-    ]);
-    // console.log(mapp);
-    return mapp;
-}
-
 /**
  * Removes '_' followed by a number from the end of a string.
  * @param {string} str - The string to remove '_' and number from.
@@ -115,176 +93,6 @@ function removeElementsFromArray(arr1, arr2) {
     });
 }
 
-/**
- * Extracts clean headers from a row of data, excluding Salsify generated headers,
- * and converts headers with underscores and numbers to arrays.
- * @param {Object[]} row - The row of data containing headers.
- * @returns {Object} An object containing clean headers and headers as arrays.
- * @returns {string[]} Object.clean_headers - An array of clean headers.
- * @returns {string[]} Object.headers_as_arrays - An array of headers as arrays.
- */
-function extractColumnHeadersFrom(row, rows_to_columns) {
-    // other headers
-    const clean_headers = [];
-    // only clean _1
-    const headers_as_arrays = [];
-
-    row.forEach((row_of_data) => {
-        outerLoop: for (let key in row_of_data) {
-            // key: 'PARTCODE', value: '10078'
-
-            if (row_of_data.hasOwnProperty(key)) {
-                // console.log(`key: ${key}, value: ${row_of_data[key]}`);
-
-                // exclude Salsify generated headers
-                if (key.startsWith('salsify:')) {
-                    continue;
-                }
-
-                // const clean_key = removeUnderscoreAndNumber(key);
-
-                innerLoop: for (let i = 0; i < rows_to_columns.length; i++) {
-                    // if key starts with
-                    if (key.startsWith(rows_to_columns[i])) {
-                        if (!headers_as_arrays.includes(rows_to_columns[i])) {
-                            headers_as_arrays.push(rows_to_columns[i]);
-                        }
-                        // Skip potentially adding this to the clean_headers later
-                        continue outerLoop;
-                    }
-                }
-
-                // include only unique keys to clean_headers
-                if (!clean_headers.includes(key)) {
-                    // and only add it if headers_as_arrays doesn't have it
-                    if (!headers_as_arrays.includes(key)) {
-                        clean_headers.push(key);
-                    }
-                }
-            }
-        }
-    });
-    // the first LABEL_DATASET_NUTRIENT_A - en-US without underscore and numbers
-    // removeElementsFromArray(clean_headers, headers_as_arrays);
-
-    return { clean_headers, headers_as_arrays };
-}
-
-/**
- * Merges variant data with dirty headers into a map, updating clean headers accordingly.
- * @param {Object[]} varientsOnly - Array of variant objects.
- * @param {string[]} clean_headers - Array of clean headers.
- * @param {string[]} headersToMerge - Array of dirty headers.
- */
-function mapValuesToColumns(varientsOnly, clean_headers, headersToMerge) {
-    // varientsOnly.forEach()
-    const array_of_maps = [];
-
-    for (let index = 0; index < varientsOnly.length; index++) {
-        const row_of_data = varientsOnly[index];
-        // console.log('row_of_data: ', row_of_data);
-        const keys_values = new Map();
-
-        Object.entries(row_of_data).forEach(([item_key, item_value]) => {
-            if (!item_key.startsWith('salsify:')) {
-                console.log(`item_key: ${item_key}, item_value: ${item_value}`);
-
-                innerLoop: for (
-                    let i = 0;
-                    i < headersToMerge.headers.length;
-                    i++
-                ) {
-                    const merged_header = headersToMerge.headers[i];
-                    const merged_key = headersToMerge.mergeAs;
-
-                    console.log(
-                        `merged_key: ${merged_key}, merged_header: ${merged_header}`
-                    );
-
-                    // Check if the string value starts with the current element in the array
-                    if (item_key.startsWith(merged_header)) {
-                        const ingredientMap = new Map();
-                        /**
-                         {
-                            type: LABEL_DATASET_INGREDIENTS_A,
-                            value: "5|Proprietary Blend: Echinacea angustifolia (root) extract and Echinacea purpurea (flower) extract; Propolis|239|mg|||**||"
-                         }
-                         */
-
-                        //
-                        if (!keys_values.has(merged_key)) {
-                            // INGREDIENT INFO, 5|Proprietary Blend: Echinacea angustifolia (root) extract and Echinacea purpurea (flower) extract; Propolis|239|mg|||**||
-                            ingredientMap.set('type', merged_header);
-                            ingredientMap.set('value', item_value);
-
-                            keys_values.set(merged_key, [ingredientMap]);
-                            // keys_values.set(merged_key, [item_value]);
-                            //
-                        } else if (keys_values.has(merged_key)) {
-                            const existing_map = keys_values.get(merged_key);
-
-                            ingredientMap.set('type', merged_header);
-                            ingredientMap.set('value', item_value);
-
-                            keys_values.set(merged_key, [ingredientMap]);
-
-                            keys_values.set(merged_key, [
-                                ...existing_map,
-                                ingredientMap,
-                            ]);
-                            // keys_values.set(merged_key, [
-                            //     ...existing_ingred,
-                            //     item_value,
-                            // ]);
-                        }
-                        // Skip potentially adding this to the clean_headers later
-                        continue innerLoop;
-                    } else if (clean_headers.includes(item_key)) {
-                        /** Other Column headers like Partcode and Product ID */
-                        // PRODUCT_NAME, Sambucus Immune Syrup For Kids 4 oz
-                        keys_values.set(item_key, item_value);
-                    }
-                }
-            }
-
-            // else if (item_key.startsWith('LABEL_DATASET_INGREDIENTS_A')) {
-            //     if (item.has('LABEL_DATASET_INGREDIENTS_A - en-US')) {
-            //         const currently = item.get(
-            //             'LABEL_DATASET_INGREDIENTS_A - en-US'
-            //         );
-
-            //         item.set('LABEL_DATASET_INGREDIENTS_A - en-US', [
-            //             currently,
-            //             item_value,
-            //         ]);
-            //     } else {
-            //         item.set('LABEL_DATASET_INGREDIENTS_A - en-US', [
-            //             item_value,
-            //         ]);
-            //     }
-            // } else if (item_key.startsWith('LABEL_DATASET_NUTRIENT_A')) {
-            //     if (item.has('LABEL_DATASET_NUTRIENT_A - en-US')) {
-            //         const currently = item.get(
-            //             'LABEL_DATASET_NUTRIENT_A - en-US'
-            //         );
-
-            //         item.set('LABEL_DATASET_NUTRIENT_A - en-US', [
-            //             currently,
-            //             item_value,
-            //         ]);
-            //     } else {
-            //         item.set('LABEL_DATASET_NUTRIENT_A - en-US', [item_value]);
-            //     }
-            // }
-        });
-
-        // console.log('item', keys_values);
-        array_of_maps.push(keys_values);
-    }
-    // console.log(keys_values);
-    return array_of_maps;
-}
-
 class Header {
     constructor(id, name, type = null) {
         this.id = id;
@@ -300,16 +108,34 @@ class Entity extends Header {
 }
 
 /**
+ * Sorts an array of objects by the `id` property in reverse alphabetical order.
+ * @param {Object[]} arrayOfObjects - The array of objects to be sorted.
+ * @returns {Object[]} The sorted array of objects.
+ */
+function sortObjectsByIdReverseAlphabetical(arrayOfObjects) {
+    return arrayOfObjects.sort((a, b) => {
+        // Compare the `id` properties of the objects in reverse alphabetical order
+        if (a.id < b.id) {
+            return 1; // `b` should come before `a`
+        } else if (a.id > b.id) {
+            return -1; // `a` should come before `b`
+        } else {
+            return 0; // `a` and `b` have equal `id` properties
+        }
+    });
+}
+/**
  * Extracts headers from rows of data and matches them with merge ingredients.
  * @param {Object[]} rows_of_each_data - An array of objects, each representing a row of data.
  * @param {Object} merge_ingredients - An object containing merge ingredients information.
  * @param {string} merge_ingredients.id - The ID for merged ingredients.
  * @param {string} merge_ingredients.name - The name for merged ingredients.
  * @param {string[]} merge_ingredients.merge_these - An array of keys to be merged with the rows of data.
- * @returns {Entity[]} An array of arrays, where each inner array contains Entity objects representing the merged rows.
+ * @returns {{Header[], Entity[]}} An array of arrays, where each inner array contains Entity objects representing the merged rows.
  */
-function clean_extract(rows_of_each_data, merge_ingredients) {
-    // const headers_row = [];
+function cleanAndMergeRows(rows_of_each_data, merge_ingredients) {
+    const header_names = []; //thrown away
+    const headers_row = [];
     const entity_rows = [];
 
     rows_of_each_data.forEach((row_of_data) => {
@@ -344,6 +170,18 @@ function clean_extract(rows_of_each_data, merge_ingredients) {
                         value // 'Microcrystalline cellulose, corn starch,...'
                     );
                     newRow.push(merged_ingredient);
+
+                    /** HEADER */
+                    const found = header_names.includes(merge_ingredients.id);
+                    if (!found) {
+                        const merged_header = new Header(
+                            merge_ingredients.id, // 'MERGED_INGREDIENTS'
+                            merge_ingredients.name, // 'Ingredient Info'
+                            merge_ingredients.type
+                        );
+                        header_names.push(merge_ingredients.id);
+                        headers_row.push(merged_header);
+                    }
                 } else {
                     /* add the non-ingredient headers like PARTCODE */
                     const entity = new Entity(
@@ -354,6 +192,18 @@ function clean_extract(rows_of_each_data, merge_ingredients) {
                     );
 
                     newRow.push(entity);
+
+                    /** HEADER */
+                    const found = header_names.includes(clean_key);
+                    if (!found) {
+                        const header = new Header(
+                            clean_key,
+                            clean_key,
+                            clean_key
+                        );
+                        header_names.push(clean_key);
+                        headers_row.push(header);
+                    }
                 }
             }
         });
@@ -361,7 +211,7 @@ function clean_extract(rows_of_each_data, merge_ingredients) {
     });
 
     // console.log(entity_rows);
-    return entity_rows;
+    return { headers_row, entity_rows };
 }
 
 /**
@@ -403,6 +253,68 @@ function getUniqueIds(arrayOfArrays) {
     return uniqueIds;
 }
 
+/**
+ * Creates rows for each ingredient by filtering and processing rows based on merge ingredients and unique IDs.
+ * @param {Array<Array>} cleaned_rows - An array of arrays, where each inner array contains objects representing rows of data.
+ * @param {Object} merge_ingredients - An object containing merge ingredients information.
+ * @param {string} merge_ingredients.id - The ID for merged ingredients.
+ * @param {string[]} non_merged_uniqueIds - An array of non-merged unique IDs.
+ * @returns {Array[]} An array of arrays, where each inner array represents rows for each ingredient.
+ */
+function createRowForEachIngredient(
+    cleaned_rows,
+    merge_ingredients,
+    non_merged_uniqueIds
+) {
+    return cleaned_rows.map((clean_row) => {
+        // console.log('clean_row:', clean_row);
+
+        /** Include only rows that have id === MERGED_INGREDIENTS */
+        const ingredient_rows = clean_row.filter((item) => {
+            // console.log(`item: `, item.id);
+            return item.id === merge_ingredients.id;
+        });
+
+        /** Include only rows that are !== MERGED_INGREDIENTS */
+        const other_rows = clean_row.filter((item) => {
+            return item.id !== merge_ingredients.id;
+        });
+
+        /** Loop over each non_merged_uniqueIds.
+         * If found, return the value
+         * If not, return '' (accomodate missing PRODUCT_NAME's)
+         */
+        const placeHolders = [];
+        for (let index = 0; index < non_merged_uniqueIds.length; index++) {
+            const element = non_merged_uniqueIds[index];
+            // console.log(`element:`, element);
+
+            const found = other_rows.filter((other_row) => {
+                const id = other_row.id;
+                // console.log('id: ', id);
+                return id === element;
+            })[0];
+            // console.log(`found: `, found);
+            if (found) {
+                placeHolders.push(found);
+            } else {
+                /** Push a placeholder for missing values */
+                const bogus = new Entity(element, element, element, '');
+                placeHolders.push(bogus);
+            }
+        }
+
+        // console.log(`other_rows: `, other_rows);
+        // console.log(`placeHolders:`, placeHolders);
+
+        const ingredRow = ingredient_rows.map((ingred) => {
+            return [...placeHolders, ingred];
+        });
+        // console.log(`ingredRow`, ingredRow);
+        return ingredRow;
+    });
+}
+
 /** MAIN */
 function salsify_preprocess(original_jsonData) {
     /** Filter out parents - EA only */
@@ -412,6 +324,7 @@ function salsify_preprocess(original_jsonData) {
     );
     // console.log(rows_of_each_data);
 
+    /** Merge all these Salsify:Id's into 1 column */
     const merge_ingredients = {
         merge_these: [
             'LABEL_DATASET_OTHER_INGREDS_A',
@@ -420,40 +333,70 @@ function salsify_preprocess(original_jsonData) {
         ],
         id: 'MERGED_INGREDIENTS',
         name: 'Ingredient Info',
+        type: 'MERGED_INGREDIENTS',
     };
 
-    const clean_rows = clean_extract(rows_of_each_data, merge_ingredients);
+    const { headers_row, entity_rows: cleaned_rows } = cleanAndMergeRows(
+        rows_of_each_data,
+        merge_ingredients
+    );
 
-    // clean_rows.forEach((row) => console.log(row));
+    const sortedHeaders = sortObjectsByIdReverseAlphabetical(headers_row);
+    const sortedEntities = sortObjectsByIdReverseAlphabetical(cleaned_rows);
+
+    // cleaned_rows.forEach((row) => console.log(row));
+
+    const uniqueIds = getUniqueIds(sortedEntities);
+    //[ "PARTCODE", "Product ID", "MERGED_INGREDIENTS", "PRODUCT_NAME" ]
+    // console.log(uniqueIds);
+
+    const non_merged_uniqueIds = uniqueIds.filter(
+        (id) => id !== merge_ingredients.id
+    );
+    //[ "PARTCODE", "Product ID", "PRODUCT_NAME" ]
+    // console.log(non_merged_uniqueIds);
+
+    const ingredient_only_rows = createRowForEachIngredient(
+        sortedEntities,
+        merge_ingredients,
+        non_merged_uniqueIds
+    ).flat();
+
+    // console.log(`ingredient_only_rows: `, ingredient_only_rows);
 
     /**
      *
      * TODO: create table with only selected keys and values
      *
      */
+    const header_only_row = sortedHeaders.map((header) => {
+        // console.log(name);
+        // const header = new Header(name, name, name);
+        return header.name;
+    });
+    // console.log(`header_only_row: `, header_only_row);
+    const values_only_rows = ingredient_only_rows.map((row) => {
+        /** Return column values */
+        return row.map((obj) => obj.value);
+    });
 
-    const uniqueIds = getUniqueIds(clean_rows);
-    console.log(uniqueIds);
-    // dom_generateCheckboxes(
-    //     [...clean_headers, ...merge_these_columns],
-    //     headersToMerge
-    // );
+    console.log(header_only_row);
 
-    // const data_map = mapValuesToColumns(
-    //     rows_of_each_data,
-    //     clean_headers,
-    //     headersToMerge
-    // );
-    // console.log(data_map);
-    // let grass = [allowedHeaders, ...finale];
-    // // console.log(...grass);
+    const { jsonData, wbString } = xlsx_create_workbook([
+        header_only_row, ...values_only_rows,
+    ]);
 
-    // const checkedRadioButton = getCheckedRadioButtonId();
+    console.log(jsonData);
+    // Store the binary string in localStorage
+    localStorage.setItem('workbook', wbString);
 
-    // const { jsonData, wbString } = xlsx_create_workbook(
-    //     grass,
-    //     checkedRadioButton
-    // );
+    const htmlTable = create_html_table(jsonData, null);
+
+    // Get container element to append the table
+    const tableContainer = document.getElementById('table-container');
+    // Clear any old table
+    tableContainer.innerHTML = '';
+    tableContainer.appendChild(htmlTable);
 }
 
 /**
