@@ -147,7 +147,6 @@ function cleanAndMergeRows(rows_of_each_data, merge_ingredients) {
                             id: merge_ingredients.id, // 'MERGED_INGREDIENTS'
                             name: merge_ingredients.name, // 'Ingredient Info'
                             type: merge_ingredients.type,
-                            // index: currentIndex,
                         });
                         header_names.push(merge_ingredients.id);
                         headers_row.push(merged_header);
@@ -160,14 +159,12 @@ function cleanAndMergeRows(rows_of_each_data, merge_ingredients) {
                         name: merge_ingredients.name,
                         type: key_matches,
                         value: value,
-                        // index: currentIndex,
                     });
                     /*{
                         id:MERGED_INGREDIENTS,
                         name: 'Ingredient Info',
                         type: 'LABEL_DATASET_INGREDIENTS_A - en-US',
                         value: 'Microcrystalline cellulose, corn starch,...'
-                        index: 0
                     }*/
                     newRow.push(merged_ingredient);
                 } else {
@@ -180,7 +177,6 @@ function cleanAndMergeRows(rows_of_each_data, merge_ingredients) {
                             id: clean_key,
                             name: clean_key,
                             type: clean_key,
-                            // index: currentIndex,
                         });
                         header_names.push(clean_key);
                         headers_row.push(header);
@@ -192,7 +188,6 @@ function cleanAndMergeRows(rows_of_each_data, merge_ingredients) {
                         name: clean_key,
                         type: clean_key,
                         value: value,
-                        // index: currentIndex,
                     });
 
                     newRow.push(entity);
@@ -375,13 +370,14 @@ function sortAndmoveIngredientsToLast(array, targetId) {
 }
 
 /** MAIN */
-function salsify_preprocess(original_jsonData) {
+function salsify_preprocess(original_jsonData, parsingOption) {
     /** Filter out parents - EA only */
     const rows_of_each_data = [...original_jsonData].filter(
         (obj) =>
             obj['salsify:data_inheritance_hierarchy_level_id'] === 'variant'
     );
     // console.log(rows_of_each_data);
+    console.log(`parsingOption:`, parsingOption);
 
     /** Merge all these Salsify:Id's into 1 column */
     const merge_ingredients = {
@@ -423,6 +419,7 @@ function salsify_preprocess(original_jsonData) {
         (id) => id !== merge_ingredients.id
     );
 
+    //TODO: sort each partcode's merged by "order"
     /*** Prep arrays to send to SheetsJS ***/
     /* Create Non-Header Row */
     const ingredient_only_rows = createRowForEachIngredient(

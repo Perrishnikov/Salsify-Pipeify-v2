@@ -62,7 +62,7 @@ function xlsx_create_workbook(data) {
  * @param {File} file - The Excel file to be processed.
  * @returns {void}
  */
-function xlsx_import_file(file) {
+function xlsx_import_file(file, parsingOption) {
     let reader = new FileReader();
 
     reader.onload = function (e) {
@@ -72,7 +72,7 @@ function xlsx_import_file(file) {
         const jsonData = XLSX.utils.sheet_to_json(sheet);
 
         // parseSalsifyExport(jsonData);
-        salsify_preprocess(jsonData);
+        salsify_preprocess(jsonData, parsingOption);
         // console.dir(jsonData);
     };
 

@@ -15,7 +15,7 @@
             </div>
 
             <div id="radioButtons" class="margin-below">
-                <div class="subtitle">Parsing (Cleaning) Options:</div>
+                <div class="subtitle">Ingredient Parsing Options:</div>
 
                 <div class="option-div">
                     <input
@@ -29,6 +29,9 @@
                     <label for="option1" class="radio-checkbox-label"
                         >Raw</label
                     >
+                    <span class="option-context"
+                        >- unmodified and direct from the source</span
+                    >
                 </div>
 
                 <div class="option-div">
@@ -40,7 +43,24 @@
                         class="radio-button"
                     />
                     <label for="option2" class="radio-checkbox-label"
-                        >Clean Pipes</label
+                        >Parse Pipes</label
+                    >
+                    <span class="option-context">- assumes piped data is correct; creates column for each pipe</span>
+                </div>
+
+                <div class="option-div">
+                    <input
+                        type="radio"
+                        id="option3"
+                        name="parsingOptions"
+                        value="option3"
+                        class="radio-button"
+                    />
+                    <label for="option3" class="radio-checkbox-label"
+                        >Parse & Validate</label
+                    >
+                    <span class="option-context"
+                        >- cheks for errors; invalid data in cells</span
                     >
                 </div>
 
@@ -53,7 +73,10 @@
                         class="radio-button"
                     />
                     <label for="option3" class="radio-checkbox-label"
-                        >Parse Columns</label
+                        >Parse & Validate & Repair</label
+                    >
+                    <span class="option-context"
+                        >- for import back into Salsify</span
                     >
                 </div>
             </div>
@@ -61,7 +84,7 @@
             <div id="headerCheckboxes" class="margin-below">
                 <div class="subtitle">Headers (To Download):</div>
             </div>
-            
+
             <div class="margin-below">
                 <button id="download-btn" class="drag-drop-btn">
                     Download Parsed File

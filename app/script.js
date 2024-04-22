@@ -32,6 +32,28 @@ function getCheckedRadioButtonId() {
     return checkedRadioButton ? checkedRadioButton.id : null;
 }
 
+/**
+ * Set the Parsing options back to option1 whenever a new file is uploaded.
+ * @returns 
+ */
+function setRadioButtonDefault() {
+    const radioButtons = document.querySelectorAll(
+        'input[name="parsingOptions"]'
+    );
+
+    let checkedRadioButton = null;
+
+    radioButtons.forEach((radioButton) => {
+        // Check if the radio button's value matches the default value
+        if (radioButton.id === 'option1') {
+            // Set the radio button as checked
+            radioButton.checked = true;
+        }
+    });
+
+    return checkedRadioButton ? checkedRadioButton.id : null;
+}
+
 /* DROP BOX LISTENER */
 const dropArea = document.getElementById('dropArea');
 if (dropArea) {
@@ -46,9 +68,12 @@ if (dropArea) {
 
         // Check if files were dropped
         if (e.dataTransfer) {
+            setRadioButtonDefault();
+            const parsingOption = getCheckedRadioButtonId();
+            
             const file = e.dataTransfer.files[0];
             // xlsx.js
-            xlsx_import_file(file);
+            xlsx_import_file(file, parsingOption);
         } else {
             console.log('No files were dropped.');
         }
@@ -62,6 +87,7 @@ if (dropArea) {
         fileInput.style.display = 'none';
 
         fileInput.addEventListener('change', (e) => {
+            setRadioButtonDefault();
             const file = e.target.files[0];
             // xlsx.js
             xlsx_import_file(file);
