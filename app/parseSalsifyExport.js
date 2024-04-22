@@ -60,6 +60,7 @@ function standardTestIsTrue(valueToTest) {
     }
 }
 
+/** ********************************************************************* */
 /**
  * Removes '_' followed by a number from the end of a string.
  * @param {string} str - The string to remove '_' and number from.
@@ -73,68 +74,42 @@ function removeUnderscoreAndNumber(str) {
     return str.replace(regex, '');
 }
 
-function hasUnderscoreAndNumber(str) {
-    // Use a regular expression to match '_' followed by one or more digits at the end of the string
-    const regex = /_\d+$/;
-
-    return regex.test(str);
-}
-
 /**
- * Removes elements from the first array that exist in the second array.
- * @param {Array} arr1 - The array to modify.
- * @param {Array} arr2 - The array containing elements to remove.
+ * Represents a data cell with specified properties.
+ * @class
  */
-function removeElementsFromArray(arr1, arr2) {
-    arr1.forEach((item, index) => {
-        if (arr2.includes(item)) {
-            arr1.splice(index, 1);
-        }
-    });
-}
-
-class Header {
-    constructor(id, name, type = null) {
+class CellData {
+    /**
+     * Constructs a new instance of `CellData`.
+     * @param {Object} params - The parameters for the `CellData` instance.
+     * @param {string} params.id - The ID of the cell.
+     * @param {string} params.name - The name of the cell.
+     * @param {string} params.type - The type of the cell.
+     * @param {number} [params.index] - The index of the cell (optional).
+     * @param {any} [params.value=null] - The value of the cell (optional, defaults to `null`).
+     */
+    constructor({ id, name, type, index, value = null }) {
         this.id = id;
         this.name = name;
         this.type = type;
-    }
-}
-class Entity extends Header {
-    constructor(id, name, type, value) {
-        super(id, name, type);
+        this.index = index;
         this.value = value;
     }
 }
 
 /**
- * Sorts an array of objects by the `id` property in reverse alphabetical order.
- * @param {Object[]} arrayOfObjects - The array of objects to be sorted.
- * @returns {Object[]} The sorted array of objects.
- */
-function sortObjectsByIdReverseAlphabetical(arrayOfObjects) {
-    return arrayOfObjects.sort((a, b) => {
-        // Compare the `id` properties of the objects in reverse alphabetical order
-        if (a.id < b.id) {
-            return 1; // `b` should come before `a`
-        } else if (a.id > b.id) {
-            return -1; // `a` should come before `b`
-        } else {
-            return 0; // `a` and `b` have equal `id` properties
-        }
-    });
-}
-/**
- * Extracts headers from rows of data and matches them with merge ingredients.
+ * Cleans and merges rows of data based on merge ingredients and unique headers.
  * @param {Object[]} rows_of_each_data - An array of objects, each representing a row of data.
  * @param {Object} merge_ingredients - An object containing merge ingredients information.
- * @param {string} merge_ingredients.id - The ID for merged ingredients.
- * @param {string} merge_ingredients.name - The name for merged ingredients.
- * @param {string[]} merge_ingredients.merge_these - An array of keys to be merged with the rows of data.
- * @returns {{Header[], Entity[]}} An array of arrays, where each inner array contains Entity objects representing the merged rows.
+ * @param {string} merge_ingredients.id - The ID for merged ingredients (e.g., 'MERGED_INGREDIENTS').
+ * @param {string} merge_ingredients.name - The name for merged ingredients (e.g., 'Ingredient Info').
+ * @param {string[]} merge_ingredients.merge_these - An array of keys to be merged.
+ * @returns {Object} An object containing `headers_row` and `entity_rows` arrays.
+ * @returns {CellData[]} Object.headers_row - An array of header cells.
+ * @returns {Array<Array<CellData>>} Object.entity_rows - An array of arrays, each containing `CellData` objects representing rows of data.
  */
 function cleanAndMergeRows(rows_of_each_data, merge_ingredients) {
-    const header_names = []; //thrown away
+    const header_names = []; //thrown away (use for index?)
     const headers_row = [];
     const entity_rows = [];
 
@@ -160,57 +135,74 @@ function cleanAndMergeRows(rows_of_each_data, merge_ingredients) {
                     }
                 );
 
+                /* Create Cells to push into the Row array */
                 if (key_matches) {
-                    // console.log(`key_matches: `, key_matches, value);
+                    /* Creates an ingredient cell (key_matches: 'LABEL_DATASET_INGREDIENTS_A - en-US') */
 
-                    const merged_ingredient = new Entity(
-                        merge_ingredients.id, // 'MERGED_INGREDIENTS'
-                        merge_ingredients.name, // 'Ingredient Info'
-                        key_matches, // 'LABEL_DATASET_INGREDIENTS_A - en-US'
-                        value // 'Microcrystalline cellulose, corn starch,...'
-                    );
-                    newRow.push(merged_ingredient);
-
-                    /** HEADER */
                     const found = header_names.includes(merge_ingredients.id);
+
+                    /* Push THE (merged) Ingredient HEADER */
                     if (!found) {
-                        const merged_header = new Header(
-                            merge_ingredients.id, // 'MERGED_INGREDIENTS'
-                            merge_ingredients.name, // 'Ingredient Info'
-                            merge_ingredients.type
-                        );
+                        const merged_header = new CellData({
+                            id: merge_ingredients.id, // 'MERGED_INGREDIENTS'
+                            name: merge_ingredients.name, // 'Ingredient Info'
+                            type: merge_ingredients.type,
+                            // index: currentIndex,
+                        });
                         header_names.push(merge_ingredients.id);
                         headers_row.push(merged_header);
                     }
+
+                    // console.log(`key_matches: `, key_matches, value);
+                    /* Regardless, push an ingredient Cell */
+                    const merged_ingredient = new CellData({
+                        id: merge_ingredients.id,
+                        name: merge_ingredients.name,
+                        type: key_matches,
+                        value: value,
+                        // index: currentIndex,
+                    });
+                    /*{
+                        id:MERGED_INGREDIENTS,
+                        name: 'Ingredient Info',
+                        type: 'LABEL_DATASET_INGREDIENTS_A - en-US',
+                        value: 'Microcrystalline cellulose, corn starch,...'
+                        index: 0
+                    }*/
+                    newRow.push(merged_ingredient);
                 } else {
-                    /* add the non-ingredient headers like PARTCODE */
-                    const entity = new Entity(
-                        clean_key,
-                        clean_key,
-                        clean_key,
-                        value
-                    );
+                    /* Creates an non-ingredient cell (PARTCODE, Product ID)*/
 
-                    newRow.push(entity);
-
-                    /** HEADER */
+                    /** Push non-ingredient HEADER */
                     const found = header_names.includes(clean_key);
                     if (!found) {
-                        const header = new Header(
-                            clean_key,
-                            clean_key,
-                            clean_key
-                        );
+                        const header = new CellData({
+                            id: clean_key,
+                            name: clean_key,
+                            type: clean_key,
+                            // index: currentIndex,
+                        });
                         header_names.push(clean_key);
                         headers_row.push(header);
                     }
+
+                    /* Regardless, push non-ingredient Cell (PARTCODE) */
+                    const entity = new CellData({
+                        id: clean_key,
+                        name: clean_key,
+                        type: clean_key,
+                        value: value,
+                        // index: currentIndex,
+                    });
+
+                    newRow.push(entity);
                 }
             }
         });
         entity_rows.push(newRow);
     });
 
-    // console.log(entity_rows);
+    // console.log('header_names', header_names);
     return { headers_row, entity_rows };
 }
 
@@ -299,7 +291,12 @@ function createRowForEachIngredient(
                 placeHolders.push(found);
             } else {
                 /** Push a placeholder for missing values */
-                const bogus = new Entity(element, element, element, '');
+                const bogus = new CellData({
+                    id: element,
+                    name: element,
+                    type: element,
+                    value: '',
+                });
                 placeHolders.push(bogus);
             }
         }
@@ -313,6 +310,68 @@ function createRowForEachIngredient(
         // console.log(`ingredRow`, ingredRow);
         return ingredRow;
     });
+}
+
+/**
+ * Index the headers by the order in array
+ * Index rows by the Headers
+ * @param {*} headers_row
+ * @param {*} cleaned_rows
+ * @returns
+ */
+function indexTheEntities(headers_row, cleaned_rows) {
+    const indexed_headers = headers_row.map((cell, index) => {
+        cell.index = index;
+        return cell;
+    });
+
+    const indexed_rows = cleaned_rows.map((row) => {
+        return row.map((entity) => {
+            const id = entity.id;
+            const header = headers_row.filter((obj) => obj.id === id)[0];
+            entity.index = header.index;
+            return entity;
+        });
+    });
+
+    return { indexed_headers, indexed_rows };
+}
+
+/**
+ * Moves an object with a specific `id` to the last item in an array.
+ * @param {Object[]} array - The array of objects.
+ * @param {string|number} targetId - The `id` of the object to move.
+ */
+function sortAndmoveIngredientsToLast(array, targetId) {
+    const copiedArray = [...array];
+
+    copiedArray.sort((a, b) => {
+        const nameA = a.name.toUpperCase(); // ignore upper and lowercase
+        const nameB = b.name.toUpperCase(); // ignore upper and lowercase
+        if (nameA < nameB) {
+            return -1;
+        }
+        if (nameA > nameB) {
+            return 1;
+        }
+
+        // names must be equal
+        return 0;
+    });
+
+    // Find the index of the object with the specified `id`
+    const index = copiedArray.findIndex((obj) => obj.id === targetId);
+
+    // Check if the object was found
+    if (index !== -1) {
+        // Remove the object from its current position
+        const [obj] = copiedArray.splice(index, 1);
+
+        // Add the object to the end of the array
+        copiedArray.push(obj);
+    }
+
+    return copiedArray;
 }
 
 /** MAIN */
@@ -340,56 +399,61 @@ function salsify_preprocess(original_jsonData) {
         rows_of_each_data,
         merge_ingredients
     );
+    // console.log(`headers_row`, headers_row);
 
-    const sortedHeaders = sortObjectsByIdReverseAlphabetical(headers_row);
-    const sortedEntities = sortObjectsByIdReverseAlphabetical(cleaned_rows);
+    const sorted_headers = sortAndmoveIngredientsToLast(
+        headers_row,
+        merge_ingredients.id
+    );
 
-    // cleaned_rows.forEach((row) => console.log(row));
+    const { indexed_headers, indexed_rows } = indexTheEntities(
+        sorted_headers,
+        cleaned_rows
+    );
+    // console.log(indexed_headers);
+    //console.log(indexed_rows);
 
-    const uniqueIds = getUniqueIds(sortedEntities);
-    //[ "PARTCODE", "Product ID", "MERGED_INGREDIENTS", "PRODUCT_NAME" ]
-    // console.log(uniqueIds);
+    /* To get non_merged_uniqueIds */
+    /* [ "PARTCODE", "Product ID", "MERGED_INGREDIENTS", "PRODUCT_NAME" ] */
+    const uniqueIds = getUniqueIds(indexed_rows);
 
+    /* Part of creating a Row */
+    /* [ "PARTCODE", "Product ID", "PRODUCT_NAME" ] */
     const non_merged_uniqueIds = uniqueIds.filter(
         (id) => id !== merge_ingredients.id
     );
-    //[ "PARTCODE", "Product ID", "PRODUCT_NAME" ]
-    // console.log(non_merged_uniqueIds);
 
+    /*** Prep arrays to send to SheetsJS ***/
+    /* Create Non-Header Row */
     const ingredient_only_rows = createRowForEachIngredient(
-        sortedEntities,
+        indexed_rows,
         merge_ingredients,
         non_merged_uniqueIds
     ).flat();
-
     // console.log(`ingredient_only_rows: `, ingredient_only_rows);
 
-    /**
-     *
-     * TODO: create table with only selected keys and values
-     *
-     */
-    const header_only_row = sortedHeaders.map((header) => {
-        // console.log(name);
-        // const header = new Header(name, name, name);
+    const header_only_row = indexed_headers.map((header) => {
+        /* Retrun header name */
         return header.name;
     });
     // console.log(`header_only_row: `, header_only_row);
+
     const values_only_rows = ingredient_only_rows.map((row) => {
-        /** Return column values */
+        /** Return column value(s) */
         return row.map((obj) => obj.value);
     });
 
-    console.log(header_only_row);
-
+    /* returned SheetsJS data */
     const { jsonData, wbString } = xlsx_create_workbook([
-        header_only_row, ...values_only_rows,
+        header_only_row,
+        ...values_only_rows,
     ]);
-
     console.log(jsonData);
-    // Store the binary string in localStorage
+
+    /* Store the binary string in localStorage */
     localStorage.setItem('workbook', wbString);
 
+    /* Create DOM elements */
     const htmlTable = create_html_table(jsonData, null);
 
     // Get container element to append the table
@@ -399,6 +463,7 @@ function salsify_preprocess(original_jsonData) {
     tableContainer.appendChild(htmlTable);
 }
 
+/** ************************************************************* */
 /**
  * Generates checkboxes dynamically based on the clean headers array and appends them to the DOM.
  * @param {string[]} all_the_headers - An array of clean header names.
@@ -406,206 +471,48 @@ function salsify_preprocess(original_jsonData) {
  * @param {string[]} headersToMerge.headers - An array of headers to merge.
  * @param {string} headersToMerge.mergeAs - A message to append to the label for headers to merge.
  */
-function dom_generateCheckboxes(all_the_headers, headersToMerge) {
-    const headerCheckboxes = document.getElementById('headerCheckboxes');
+// function dom_generateCheckboxes(all_the_headers, headersToMerge) {
+//     const headerCheckboxes = document.getElementById('headerCheckboxes');
 
-    // Store the reference to the first child element
-    const subtitleDiv = headerCheckboxes.firstElementChild;
-    headerCheckboxes.innerHTML = '';
-    // Append back the preserved first child
-    headerCheckboxes.appendChild(subtitleDiv);
+//     // Store the reference to the first child element
+//     const subtitleDiv = headerCheckboxes.firstElementChild;
+//     headerCheckboxes.innerHTML = '';
+//     // Append back the preserved first child
+//     headerCheckboxes.appendChild(subtitleDiv);
 
-    // Iterate through the array of strings
-    all_the_headers.forEach((header_name) => {
-        const container = document.createElement('div');
-        container.classList.add('option-div');
+//     // Iterate through the array of strings
+//     all_the_headers.forEach((header_name) => {
+//         const container = document.createElement('div');
+//         container.classList.add('option-div');
 
-        // Create a checkbox element
-        const checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.checked = true; // Checkbox is checked by default
-        checkbox.value = header_name;
+//         // Create a checkbox element
+//         const checkbox = document.createElement('input');
+//         checkbox.type = 'checkbox';
+//         checkbox.checked = true; // Checkbox is checked by default
+//         checkbox.value = header_name;
 
-        // Add event listener to log value when clicked
-        checkbox.addEventListener('click', (e) => {
-            console.log(e.target.value);
-        });
+//         // Add event listener to log value when clicked
+//         checkbox.addEventListener('click', (e) => {
+//             console.log(e.target.value);
+//         });
 
-        // Create a label element for the checkbox
-        const label = document.createElement('label');
-        label.classList.add('radio-checkbox-label');
+//         // Create a label element for the checkbox
+//         const label = document.createElement('label');
+//         label.classList.add('radio-checkbox-label');
 
-        const labelName = headersToMerge.headers.includes(header_name)
-            ? `${header_name} as (${headersToMerge.mergeAs})`
-            : header_name;
+//         const labelName = headersToMerge.headers.includes(header_name)
+//             ? `${header_name} as (${headersToMerge.mergeAs})`
+//             : header_name;
 
-        label.appendChild(document.createTextNode(labelName));
+//         label.appendChild(document.createTextNode(labelName));
 
-        // Append checkbox and label to container
-        container.appendChild(checkbox);
-        container.appendChild(label);
+//         // Append checkbox and label to container
+//         container.appendChild(checkbox);
+//         container.appendChild(label);
 
-        headerCheckboxes.appendChild(container);
-    });
-}
-
-/**
- * @param {array} data
- * @returns {void}
- */
-function parseSalsifyExport(data) {
-    // returns only the EA's, no parents
-    const varientsOnly = data.filter(
-        (obj) =>
-            obj['salsify:data_inheritance_hierarchy_level_id'] === 'variant'
-    );
-
-    let allowedHeaders = [];
-    let disallowedHeaders = [];
-    let finale = [];
-    //
-    varientsOnly.forEach((row_of_data) => {
-        // console.log(item);
-        // let LABEL_DATASET_NUTRIENT_A = [];
-        // let LABEL_DATASET_INGREDIENTS_A = [];
-        // let LABEL_DATASET_OTHER_INGREDS_A = [];
-
-        const ALL_INGS = [];
-
-        // populate the allowedHeaders
-        for (let key in row_of_data) {
-            // each object has 'Product ID'
-            // key: 'PARTCODE', value: '10078'
-
-            if (row_of_data.hasOwnProperty(key)) {
-                const value = row_of_data[key];
-                // console.log(key, ' :', value);
-                // Push unique column headers into array AND add nut/ing/other to their respective arrays.
-                if (key.startsWith('LABEL_DATASET_NUTRIENT_A')) {
-                    // LABEL_DATASET_NUTRIENT_A.push(value);
-                    ALL_INGS.push(LABEL_formatter(NUT, value));
-
-                    if (!allowedHeaders.includes('LABEL_DATASET_NUTRIENT_A')) {
-                        // allowedHeaders.push('LABEL_DATASET_NUTRIENT_A');
-                    }
-                } else if (key.startsWith('LABEL_DATASET_INGREDIENTS_A')) {
-                    // LABEL_DATASET_INGREDIENTS_A.push(value);
-                    ALL_INGS.push(LABEL_formatter(ING, value));
-                    if (
-                        !allowedHeaders.includes('LABEL_DATASET_INGREDIENTS_A')
-                    ) {
-                        // allowedHeaders.push('LABEL_DATASET_INGREDIENTS_A');
-                    }
-                } else if (key.startsWith('LABEL_DATASET_OTHER_INGREDS_A')) {
-                    // LABEL_DATASET_OTHER_INGREDS_A.push(value);
-                    ALL_INGS.push(LABEL_formatter(OTHER, value));
-
-                    if (
-                        !allowedHeaders.includes(
-                            'LABEL_DATASET_OTHER_INGREDS_A'
-                        )
-                    ) {
-                        // allowedHeaders.push('LABEL_DATASET_OTHER_INGREDS_A');
-                    }
-                } else if (
-                    allowedHeaderKeys.includes(key) &
-                    !allowedHeaders.includes(key)
-                ) {
-                    // push all allowed headers into allowedHeaders
-
-                    allowedHeaders.push(key);
-                } else {
-                    disallowedHeaders.push(key);
-                }
-            }
-
-            // console.log(item[obj]);
-        }
-        // console.log('headers', allowedHeaders);
-        // console.log('disallowed', disallowedHeaders);
-        // console.log(LABEL_DATASET_INGREDIENTS_A);
-        // console.log(LABEL_DATASET_NUTRIENT_A);
-        // console.log(LABEL_DATASET_OTHER_INGREDS_A);
-
-        const concatenatedArray = ALL_INGS.map((sheetRow, index) => {
-            let shit = allowedHeaders.map((key) => row_of_data[key]);
-
-            shit.push(sheetRow.get('type'), sheetRow.get('data'));
-            // console.log(shit);
-
-            return shit;
-        });
-
-        finale.push(...concatenatedArray);
-        // console.log('numRowsPerVarient', numRowsPerVarient);
-
-        //TODO: Error objects
-        // const cleanNuts = LABEL_DATASET_NUTRIENT_A.map((row) => {
-        //     let header = row.split('|');
-
-        //     const shortDesc = header[1].trim();
-        //     const longDesc = header[2].trim();
-        //     let desc = coalesce(longDesc, shortDesc).trim();
-        //     let amount = header[3].trim();
-        //     let uom = header[4].trim();
-        //     let dv = header[5].trim();
-        //     const percent = header[6].trim(); // % or ''
-        //     const symbol = header[7].trim(); // † or **
-        //     // let definition = header[8].trim()
-
-        //     if (standardTestIsTrue(desc)) {
-        //         return;
-        //     }
-        //     //amount
-        //     if (amount === '') {
-        //         amount = 'ERROR';
-        //     } else if (isNaN(parseInt(amount.replace(/,/g, ''), 10))) {
-        //         //should be number
-        //         amount = 'ERROR';
-        //     }
-        //     //uom
-        //     if (uom === '') {
-        //         uom = 'ERROR';
-        //     } else if (!isNaN(parseInt(uom.replace(/,/g, ''), 10))) {
-        //         //should NOT be number
-        //         uom = 'ERROR';
-        //     }
-        //     //dv
-        //     if (isNaN(parseInt(dv.replace(/[,<]/g, ''), 10))) {
-        //         //should be number
-        //         dv = 'ERROR';
-        //     }
-
-        //     return formatter(desc, amount, uom, dv, percent, symbol);
-        // });
-
-        // console.log('cleanNuts', cleanNuts);
-        // TODO: Get this to export now....
-    });
-
-    allowedHeaders.push(...['TYPE', 'DATA']);
-    // console.log(allowedHeaders);
-    let grass = [allowedHeaders, ...finale];
-    // console.log(...grass);
-
-    const checkedRadioButton = getCheckedRadioButtonId();
-
-    const { jsonData, wbString } = xlsx_create_workbook(
-        grass,
-        checkedRadioButton
-    );
-
-    // Store the binary string in localStorage
-    localStorage.setItem('workbook', wbString);
-
-    const htmlTable = create_html_table(jsonData, checkedRadioButton);
-
-    // Get container element to append the table
-    const tableContainer = document.getElementById('table-container');
-    // Clear any old table
-    tableContainer.innerHTML = '';
-    tableContainer.appendChild(htmlTable);
-}
+//         headerCheckboxes.appendChild(container);
+//     });
+// }
 
 /* Function to generate HTML table from JSON data */
 function create_html_table(data, radioOption = null) {
