@@ -8,100 +8,79 @@
         <style></style>
     </head>
     <body>
-        <div>
+        <!-- <div> -->
             <div id="dropArea" class="margin-below">
                 Drag and drop a Salsify export (Excel) file here, or click to
                 select
             </div>
+            <div>
+                <div id="radioButtons" class="margin-below">
+                    <div class="subtitle">Ingredient Parsing Options:</div>
 
-            <div id="radioButtons" class="margin-below">
-                <div class="subtitle">Ingredient Parsing Options:</div>
+                    <!-- <div class="option-div">
+                        <input
+                            type="radio"
+                            id="raw1"
+                            name="parsingOptions"
+                            value="raw1"
+                            class="radio-button"
+                        />
+                        <label for="raw1" class="radio-checkbox-label"
+                            >Raw1</label
+                        >
+                        <span class="option-context"
+                            >- <strike>[1,1] MERGE 1 Useless without parsing - create one column and one row for
+                            all ingredient types; delimited ~ or \n</strike></span
+                        >
+                    </div> -->
+                    <div class="option-div">
+                        <input
+                            type="radio"
+                            id="raw4"
+                            name="parsingOptions"
+                            value="raw4"
+                            class="radio-button"
+                            checked
+                        />
+                        <label for="raw4" class="radio-checkbox-label"
+                            >Raw4</label
+                        >
+                        <span class="option-context"
+                            >- [2,x] MERGE 2 -> PARSE create one column for all
+                            ingredients and one for type; One row per ingredient</span
+                        >
+                    </div>
+                    <div class="option-div">
+                        <input
+                            type="radio"
+                            id="raw3"
+                            name="parsingOptions"
+                            value="raw3"
+                            class="radio-button"
+                        />
+                        <label for="raw3" class="radio-checkbox-label"
+                            >Raw3</label
+                        >
+                        <span class="option-context"
+                            >- [3,3] NEXT: create three columns for each of the
+                            ingredient types and one row per ingredient type;
+                            delimited ~ or \n</span
+                        >
+                    </div>
 
-                <div class="option-div">
-                    <input
-                        type="radio"
-                        id="raw1"
-                        name="parsingOptions"
-                        value="raw1"
-                        class="radio-button"
-                        
-                    />
-                    <label for="raw1" class="radio-checkbox-label"
-                        >Raw</label
-                    >
-                    <span class="option-context"
-                        >- create one column for all ingredient types; ~
-                        delimited</span
-                    >
-                </div>
-                <div class="option-div">
-                    <input
-                        type="radio"
-                        id="raw2"
-                        name="parsingOptions"
-                        value="raw2"
-                        class="radio-button"
-                        checked
-                    />
-                    <label for="raw2" class="radio-checkbox-label"
-                        >Raw</label
-                    >
-                    <span class="option-context"
-                        >- create one column for all ingredient types; ~
-                        delimited</span
-                    >
-                </div>
-                <div class="option-div">
+                    <!-- <div class="option-div">
                     <input
                         type="radio"
                         id="raw3"
                         name="parsingOptions"
                         value="raw3"
                         class="radio-button"
-                        
                     />
-                    <label for="raw3" class="radio-checkbox-label"
-                        >Raw</label
-                    >
-                    <span class="option-context"
-                        >- create three columns for each of the ingredeint
-                        types and one row per ingredient</span
-                    >
-                </div>
-                                <div class="option-div">
-                    <input
-                        type="radio"
-                        id="raw3"
-                        name="parsingOptions"
-                        value="raw3"
-                        class="radio-button"
-                        
-                    />
-                    <label for="raw3" class="radio-checkbox-label"
-                        >Raw</label
-                    >
-                    <span class="option-context"
-                        >- rows or columns</span
-                    >
-                </div>
-                <div class="option-div">
-                    <input
-                        type="radio"
-                        id="option3"
-                        name="parsingOptions"
-                        value="option3"
-                        class="radio-button"
-                    />
-                    <label for="option3" class="radio-checkbox-label"
-                        >Parse Pipes</label
-                    >
-                    <span class="option-context"
-                        >- creates column for each pipe and a row for each
-                        type</span
-                    >
-                </div>
+                    <label for="raw3" class="radio-checkbox-label">Raw</label>
+                    <span class="option-context">- rows or columns</span>
+                </div> -->
 
-                <div class="option-div">
+                    <!-- <div class="option-div">
                     <input
                         type="radio"
                         id="option4"
@@ -115,9 +94,9 @@
                     <span class="option-context"
                         >- cheks for errors; invalid data in cells</span
                     >
-                </div>
+                </div> -->
 
-                <div class="option-div">
+                    <!-- <div class="option-div">
                     <input
                         type="radio"
                         id="option5"
@@ -131,19 +110,25 @@
                     <span class="option-context"
                         >- for import back into Salsify</span
                     >
+                </div> -->
                 </div>
             </div>
 
-            <div id="headerCheckboxes" class="margin-below">
+            <!-- <div id="headerCheckboxes" class="margin-below">
                 <div class="subtitle">Headers (To Download):</div>
+            </div> -->
+
+            <div class="margin-below">
+                <!-- <button id="download-btn" class="drag-drop-btn">
+                    Download Parsed File
+                </button> -->
             </div>
 
             <div class="margin-below">
-                <button id="download-btn" class="drag-drop-btn">
-                    Download Parsed File
-                </button>
+                <div id="fileName" class="subtitle"></div>
+                <!-- append imported fileName here -->
             </div>
-        </div>
+        <!-- </div> -->
 
         <div id="table-container"></div>
 

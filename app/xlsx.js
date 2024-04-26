@@ -38,7 +38,18 @@ function xlsx_create_workbook(data) {
     // set the last column (data) to be wider
     cols[numberOfColumns - 1] = { wch: 30 };
 
-    worksheet['!cols'] = cols;
+    // worksheet['!cols'] = cols;
+
+    //**************************** */
+    // Define an array of objects (AoO)
+    // const data = [
+    //     { name: 'Alice', age: 30, occupation: 'Engineer' },
+    //     { name: 'Bob', age: 28, occupation: 'Designer' },
+    // ];
+
+    // Create a worksheet from the array of objects
+    // const worksheet = XLSX.utils.json_to_sheet(data);
+    //****************************** */
 
     // Add the worksheet to the workbook
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Pipeify');

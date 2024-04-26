@@ -375,20 +375,11 @@ function sortAndmoveIngredientsToLast(array, targetId) {
 function getHeadersAndRows(mergedJsonData, parsingOption) {
     console.log(`parsingOption `, parsingOption);
     switch (parsingOption) {
-        case 'raw1':
-            // let header_only_row = [];
-            // let values_only_rows = []
-
-            /** @type {Entity[]} */
-            const headers = [];
-            /** @type {Entity[][]} */
-            const rows = [];
-
+        case 'raw3':
             console.log(`Hello World!`);
-            return { header_only_row, values_only_rows };
 
-        case 'raw2':
-            /**  create one column for all ingredient types; ~ delimited */
+        case 'raw4':
+            /**   Raw4 - [2,x] MERGE 2 -> PARSE create one column for all ingredients and one for type; One row per ingredient */
             const merge_ingredients = {
                 merge_these: [
                     'LABEL_DATASET_OTHER_INGREDS_A',
@@ -399,6 +390,9 @@ function getHeadersAndRows(mergedJsonData, parsingOption) {
                 name: 'Ingredient Info',
                 type: 'MERGED_INGREDIENTS',
             };
+
+            const type = Entity()
+
 
             let { headers_row, entity_rows } =
                 mergeIngredientsIntoRows_createEntities(
@@ -524,8 +518,6 @@ function salsify_preprocess(jsonData, parsingOption) {
         console.error('Failed to parse JSON:', error);
         //TODO: Thow exception to DOM
     }
-
-
 
 
 }
@@ -656,6 +648,48 @@ function merge_multiple_ingredients(jsonData) {
 //         headerCheckboxes.appendChild(container);
 //     });
 // }
+
+/**
+ * Converts an array of objects to an HTML table.
+ *
+ * @param {Array<Object>} aoo - The array of objects to convert.
+ * @returns {string} - The HTML string representing the table.
+ */
+function convertAoOToHtml(aoo) {
+    if (aoo.length === 0) {
+        return '';
+    }
+
+    // Create the table
+    let html = '<table>';
+
+    // Get the headers (keys) from the first object
+    const headers = Object.keys(aoo[0]);
+
+    // Create the table header row
+    html += '<thead><tr>';
+    for (const header of headers) {
+        html += `<th>${header}</th>`;
+    }
+    html += '</tr></thead>';
+
+    // Create the table body
+    html += '<tbody>';
+    for (const obj of aoo) {
+        html += '<tr>';
+        for (const header of headers) {
+            const value = obj[header] || ''; // Get the value for the header key
+            html += `<td>${value}</td>`;
+        }
+        html += '</tr>';
+    }
+    html += '</tbody>';
+
+    // Close the table
+    html += '</table>';
+
+    return html;
+}
 
 /* Function to generate HTML table from JSON data */
 function create_html_table(data, radioOption = null) {

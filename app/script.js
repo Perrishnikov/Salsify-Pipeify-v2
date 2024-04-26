@@ -34,7 +34,6 @@ function getCheckedRadioButtonId() {
 
 /**
  * Set the Parsing options back to option1 whenever a new file is uploaded.
- * @returns 
  */
 function setRadioButtonDefault() {
     const radioButtons = document.querySelectorAll(
@@ -54,6 +53,31 @@ function setRadioButtonDefault() {
     return checkedRadioButton ? checkedRadioButton.id : null;
 }
 
+/**
+ * Appends the imported file name to the DOM element with ID 'fileName'.
+ *
+ * @param {string} fileName - The name of the imported file.
+ */
+function dom_append_filename(fileName) {
+    const fileNameArea = document.getElementById('fileName');
+
+    fileNameArea.textContent = `Imported File: ${fileName}`;
+}
+
+/**
+ * Handles file import, appends the file name to the DOM, and initiates file processing.
+ *
+ * @param {File} file - The file to import and process.
+ */
+function importFileHandler(file) {
+    const fileName = file.name;
+    dom_append_filename(fileName);
+
+    const parsingOption = getCheckedRadioButtonId();
+    // xlsx.js
+    xlsx_import_file(file, parsingOption);
+}
+
 /* DROP BOX LISTENER */
 const dropArea = document.getElementById('dropArea');
 if (dropArea) {
@@ -68,12 +92,8 @@ if (dropArea) {
 
         // Check if files were dropped
         if (e.dataTransfer) {
-            // setRadioButtonDefault();
-            const parsingOption = getCheckedRadioButtonId();
-            
             const file = e.dataTransfer.files[0];
-            // xlsx.js
-            xlsx_import_file(file, parsingOption);
+            importFileHandler(file);
         } else {
             console.log('No files were dropped.');
         }
@@ -87,10 +107,8 @@ if (dropArea) {
         fileInput.style.display = 'none';
 
         fileInput.addEventListener('change', (e) => {
-            // setRadioButtonDefault();
             const file = e.target.files[0];
-            // xlsx.js
-            xlsx_import_file(file);
+            importFileHandler(file);
         });
 
         document.body.appendChild(fileInput);
