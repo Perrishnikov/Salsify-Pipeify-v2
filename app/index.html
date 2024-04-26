@@ -20,34 +20,70 @@
                 <div class="option-div">
                     <input
                         type="radio"
-                        id="option1"
+                        id="raw1"
                         name="parsingOptions"
-                        value="option1"
+                        value="raw1"
                         class="radio-button"
-                        checked
+                        
                     />
-                    <label for="option1" class="radio-checkbox-label"
+                    <label for="raw1" class="radio-checkbox-label"
                         >Raw</label
                     >
                     <span class="option-context"
-                        >- unmodified and direct from the source</span
+                        >- create one column for all ingredient types; ~
+                        delimited</span
                     >
                 </div>
-
                 <div class="option-div">
                     <input
                         type="radio"
-                        id="option2"
+                        id="raw2"
                         name="parsingOptions"
-                        value="option2"
+                        value="raw2"
                         class="radio-button"
+                        checked
                     />
-                    <label for="option2" class="radio-checkbox-label"
-                        >Parse Pipes</label
+                    <label for="raw2" class="radio-checkbox-label"
+                        >Raw</label
                     >
-                    <span class="option-context">- assumes piped data is correct; creates column for each pipe</span>
+                    <span class="option-context"
+                        >- create one column for all ingredient types; ~
+                        delimited</span
+                    >
                 </div>
-
+                <div class="option-div">
+                    <input
+                        type="radio"
+                        id="raw3"
+                        name="parsingOptions"
+                        value="raw3"
+                        class="radio-button"
+                        
+                    />
+                    <label for="raw3" class="radio-checkbox-label"
+                        >Raw</label
+                    >
+                    <span class="option-context"
+                        >- create three columns for each of the ingredeint
+                        types and one row per ingredient</span
+                    >
+                </div>
+                                <div class="option-div">
+                    <input
+                        type="radio"
+                        id="raw3"
+                        name="parsingOptions"
+                        value="raw3"
+                        class="radio-button"
+                        
+                    />
+                    <label for="raw3" class="radio-checkbox-label"
+                        >Raw</label
+                    >
+                    <span class="option-context"
+                        >- rows or columns</span
+                    >
+                </div>
                 <div class="option-div">
                     <input
                         type="radio"
@@ -57,6 +93,23 @@
                         class="radio-button"
                     />
                     <label for="option3" class="radio-checkbox-label"
+                        >Parse Pipes</label
+                    >
+                    <span class="option-context"
+                        >- creates column for each pipe and a row for each
+                        type</span
+                    >
+                </div>
+
+                <div class="option-div">
+                    <input
+                        type="radio"
+                        id="option4"
+                        name="parsingOptions"
+                        value="option4"
+                        class="radio-button"
+                    />
+                    <label for="option4" class="radio-checkbox-label"
                         >Parse & Validate</label
                     >
                     <span class="option-context"
@@ -67,12 +120,12 @@
                 <div class="option-div">
                     <input
                         type="radio"
-                        id="option3"
+                        id="option5"
                         name="parsingOptions"
-                        value="option3"
+                        value="option5"
                         class="radio-button"
                     />
-                    <label for="option3" class="radio-checkbox-label"
+                    <label for="option5" class="radio-checkbox-label"
                         >Parse & Validate & Repair</label
                     >
                     <span class="option-context"

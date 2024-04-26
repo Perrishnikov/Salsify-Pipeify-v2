@@ -68,7 +68,7 @@ if (dropArea) {
 
         // Check if files were dropped
         if (e.dataTransfer) {
-            setRadioButtonDefault();
+            // setRadioButtonDefault();
             const parsingOption = getCheckedRadioButtonId();
             
             const file = e.dataTransfer.files[0];
@@ -87,7 +87,7 @@ if (dropArea) {
         fileInput.style.display = 'none';
 
         fileInput.addEventListener('change', (e) => {
-            setRadioButtonDefault();
+            // setRadioButtonDefault();
             const file = e.target.files[0];
             // xlsx.js
             xlsx_import_file(file);

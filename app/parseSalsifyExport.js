@@ -78,7 +78,7 @@ function removeUnderscoreAndNumber(str) {
  * Represents a data cell with specified properties.
  * @class
  */
-class CellData {
+class Entity {
     /**
      * Constructs a new instance of `CellData`.
      * @param {Object} params - The parameters for the `CellData` instance.
@@ -105,95 +105,92 @@ class CellData {
  * @param {string} merge_ingredients.name - The name for merged ingredients (e.g., 'Ingredient Info').
  * @param {string[]} merge_ingredients.merge_these - An array of keys to be merged.
  * @returns {Object} An object containing `headers_row` and `entity_rows` arrays.
- * @returns {CellData[]} Object.headers_row - An array of header cells.
- * @returns {Array<Array<CellData>>} Object.entity_rows - An array of arrays, each containing `CellData` objects representing rows of data.
+ * @returns {Entity[]} Object.headers_row - An array of header cells.
+//  * @returns {{{Entity[], Entity[]}}} Object.entity_rows - An array of arrays, each containing `CellData` objects representing rows of data.
  */
-function cleanAndMergeRows(rows_of_each_data, merge_ingredients) {
+function mergeIngredientsIntoRows_createEntities(
+    rows_of_each_data,
+    merge_ingredients
+) {
     const header_names = []; //thrown away (use for index?)
+    /** @type {Entity[]} */
     const headers_row = [];
+    /** @type {Entity[][]} */
     const entity_rows = [];
 
     rows_of_each_data.forEach((row_of_data) => {
+        /** @type {Entity[]} */
         const newRow = [];
 
         Object.entries(row_of_data).forEach(([key, value]) => {
             // key: 'PARTCODE', value: '10078'
+            // console.log(key, value);
 
-            /* ignore headers that start with "salsify:"*/
-            if (!key.startsWith('salsify:')) {
-                // console.log(`key: ${key}, value: ${value}`);
+            /* does the clean_key match a merged_ingredient? */
+            const key_matches = merge_ingredients.merge_these.find((obj) => {
+                // console.log(obj);
+                return obj === key; //*
+            });
 
-                /* remove headers that end with _n */
-                const clean_key = removeUnderscoreAndNumber(key);
-                // console.log('clean_key: ', clean_key);
+            /* Create Cells to push into the Row array */
+            if (key_matches) {
+                /* Creates an ingredient cell (key_matches: 'LABEL_DATASET_INGREDIENTS_A - en-US') */
 
-                /* does the clean_key match a merged_ingredient? */
-                const key_matches = merge_ingredients.merge_these.find(
-                    (obj) => {
-                        // console.log(obj);
-                        return obj === clean_key;
-                    }
-                );
+                const found = header_names.includes(merge_ingredients.id);
 
-                /* Create Cells to push into the Row array */
-                if (key_matches) {
-                    /* Creates an ingredient cell (key_matches: 'LABEL_DATASET_INGREDIENTS_A - en-US') */
-
-                    const found = header_names.includes(merge_ingredients.id);
-
-                    /* Push THE (merged) Ingredient HEADER */
-                    if (!found) {
-                        const merged_header = new CellData({
-                            id: merge_ingredients.id, // 'MERGED_INGREDIENTS'
-                            name: merge_ingredients.name, // 'Ingredient Info'
-                            type: merge_ingredients.type,
-                        });
-                        header_names.push(merge_ingredients.id);
-                        headers_row.push(merged_header);
-                    }
-
-                    // console.log(`key_matches: `, key_matches, value);
-                    /* Regardless, push an ingredient Cell */
-                    const merged_ingredient = new CellData({
-                        id: merge_ingredients.id,
-                        name: merge_ingredients.name,
-                        type: key_matches,
-                        value: value,
+                /* Push THE (merged) Ingredient HEADER */
+                if (!found) {
+                    const merged_header = new Entity({
+                        id: merge_ingredients.id, // 'MERGED_INGREDIENTS'
+                        name: merge_ingredients.name, // 'Ingredient Info'
+                        type: merge_ingredients.type,
                     });
-                    /*{
+                    header_names.push(merge_ingredients.id);
+                    headers_row.push(merged_header);
+                }
+
+                // console.log(`key_matches: `, key_matches, value);
+                /* Regardless, push an ingredient Cell */
+                const merged_ingredient = new Entity({
+                    id: merge_ingredients.id,
+                    name: merge_ingredients.name,
+                    type: key_matches,
+                    value: value,
+                });
+                /*{
                         id:MERGED_INGREDIENTS,
                         name: 'Ingredient Info',
                         type: 'LABEL_DATASET_INGREDIENTS_A - en-US',
                         value: 'Microcrystalline cellulose, corn starch,...'
                     }*/
-                    newRow.push(merged_ingredient);
-                } else {
-                    /* Creates an non-ingredient cell (PARTCODE, Product ID)*/
+                newRow.push(merged_ingredient);
+            } else {
+                /* Creates a non-ingredient cell (PARTCODE, Product ID)*/
 
-                    /** Push non-ingredient HEADER */
-                    const found = header_names.includes(clean_key);
-                    if (!found) {
-                        const header = new CellData({
-                            id: clean_key,
-                            name: clean_key,
-                            type: clean_key,
-                        });
-                        header_names.push(clean_key);
-                        headers_row.push(header);
-                    }
-
-                    /* Regardless, push non-ingredient Cell (PARTCODE) */
-                    const entity = new CellData({
-                        id: clean_key,
-                        name: clean_key,
-                        type: clean_key,
-                        value: value,
+                /** Push non-ingredient HEADER */
+                const found = header_names.includes(key);
+                if (!found) {
+                    const header = new Entity({
+                        id: key,
+                        name: key,
+                        type: key,
                     });
-
-                    newRow.push(entity);
+                    header_names.push(key);
+                    headers_row.push(header);
                 }
+
+                /* Regardless, push non-ingredient Cell (PARTCODE) */
+                const entity = new Entity({
+                    id: key,
+                    name: key,
+                    type: key,
+                    value: value,
+                });
+
+                newRow.push(entity);
             }
         });
+        // console.log(`newRow`, newRow);
         entity_rows.push(newRow);
     });
 
@@ -286,7 +283,7 @@ function createRowForEachIngredient(
                 placeHolders.push(found);
             } else {
                 /** Push a placeholder for missing values */
-                const bogus = new CellData({
+                const bogus = new Entity({
                     id: element,
                     name: element,
                     type: element,
@@ -308,11 +305,17 @@ function createRowForEachIngredient(
 }
 
 /**
- * Index the headers by the order in array
- * Index rows by the Headers
- * @param {*} headers_row
- * @param {*} cleaned_rows
- * @returns
+ * Indexes the headers and rows based on their IDs and returns the indexed headers and rows.
+ *
+ * This function takes a row of header objects (`headers_row`) and an array of cleaned rows (`cleaned_rows`) as input.
+ * It assigns an index property to each header object based on its position in the row and associates each entity in the cleaned rows
+ * with the corresponding index from the header row based on their IDs.
+ *
+ * @param {Array<Object>} headers_row - The row of header objects, where each object represents a header and may contain an ID property.
+ * @param {Array<Array<Object>>} cleaned_rows - An array of cleaned rows, where each row is an array of entities (objects) that may contain an ID property.
+ * @returns {Object} - An object containing two properties:
+ *                    - `indexed_headers`: An array of header objects with an additional index property indicating their position in the row.
+ *                    - `indexed_rows`: An array of rows, where each row contains entities (objects) with an additional index property indicating the corresponding header index.
  */
 function indexTheEntities(headers_row, cleaned_rows) {
     const indexed_headers = headers_row.map((cell, index) => {
@@ -369,95 +372,238 @@ function sortAndmoveIngredientsToLast(array, targetId) {
     return copiedArray;
 }
 
+function getHeadersAndRows(mergedJsonData, parsingOption) {
+    console.log(`parsingOption `, parsingOption);
+    switch (parsingOption) {
+        case 'raw1':
+            // let header_only_row = [];
+            // let values_only_rows = []
+
+            /** @type {Entity[]} */
+            const headers = [];
+            /** @type {Entity[][]} */
+            const rows = [];
+
+            console.log(`Hello World!`);
+            return { header_only_row, values_only_rows };
+
+        case 'raw2':
+            /**  create one column for all ingredient types; ~ delimited */
+            const merge_ingredients = {
+                merge_these: [
+                    'LABEL_DATASET_OTHER_INGREDS_A',
+                    'LABEL_DATASET_NUTRIENT_A - en-US',
+                    'LABEL_DATASET_INGREDIENTS_A - en-US',
+                ],
+                id: 'MERGED_INGREDIENTS',
+                name: 'Ingredient Info',
+                type: 'MERGED_INGREDIENTS',
+            };
+
+            let { headers_row, entity_rows } =
+                mergeIngredientsIntoRows_createEntities(
+                    mergedJsonData,
+                    merge_ingredients
+                );
+
+            //TODO: add a column for 'pipeify:type' here
+            // addTypeColumn(headers_row, entity_rows);
+
+            // console.log(`headers_row`, headers_row);
+            // console.log('entity_rows', entity_rows);
+
+            const sorted_headers = sortAndmoveIngredientsToLast(
+                headers_row,
+                merge_ingredients.id
+            );
+
+            const { indexed_headers, indexed_rows } = indexTheEntities(
+                sorted_headers,
+                entity_rows
+            );
+            // console.log('indexed_headers', indexed_headers);
+            // console.log('indexed_rows', indexed_headers);
+
+            /* To get non_merged_uniqueIds */
+            /* [ "PARTCODE", "Product ID", "MERGED_INGREDIENTS", "PRODUCT_NAME" ] */
+            const uniqueIds = getUniqueIds(indexed_rows);
+
+            /* Part of creating a Row */
+            /* [ "PARTCODE", "Product ID", "PRODUCT_NAME" ] */
+            const non_merged_uniqueIds = uniqueIds.filter(
+                (id) => id !== merge_ingredients.id
+            );
+
+            /*** Prep arrays to send to SheetsJS ***/
+            /* Create Non-Header Row */
+            const ingredient_only_rows = createRowForEachIngredient(
+                indexed_rows,
+                merge_ingredients,
+                non_merged_uniqueIds
+            ).flat();
+            console.log(`ingredient_only_rows: `, ingredient_only_rows);
+
+            const header_only_row = indexed_headers.map((header) => {
+                /* Retrun header name */
+                return header.name;
+            });
+            console.log(`header_only_row: `, header_only_row);
+
+            const values_only_rows = ingredient_only_rows.map((row) => {
+                /** Return column value(s) */
+                return row.map((obj) => obj.value);
+            });
+
+            return { header_only_row, values_only_rows };
+        default:
+            break;
+    }
+}
+
 /** MAIN */
-function salsify_preprocess(original_jsonData, parsingOption) {
+function salsify_preprocess(jsonData, parsingOption) {
+    //* Clean jsonData first before storing it */
     /** Filter out parents - EA only */
-    const rows_of_each_data = [...original_jsonData].filter(
+    const varientsOnly = [...jsonData].filter(
         (obj) =>
             obj['salsify:data_inheritance_hierarchy_level_id'] === 'variant'
     );
-    // console.log(rows_of_each_data);
-    console.log(`parsingOption:`, parsingOption);
 
-    /** Merge all these Salsify:Id's into 1 column */
-    const merge_ingredients = {
-        merge_these: [
-            'LABEL_DATASET_OTHER_INGREDS_A',
-            'LABEL_DATASET_NUTRIENT_A - en-US',
-            'LABEL_DATASET_INGREDIENTS_A - en-US',
-        ],
-        id: 'MERGED_INGREDIENTS',
-        name: 'Ingredient Info',
-        type: 'MERGED_INGREDIENTS',
-    };
-
-    const { headers_row, entity_rows: cleaned_rows } = cleanAndMergeRows(
-        rows_of_each_data,
-        merge_ingredients
-    );
-    // console.log(`headers_row`, headers_row);
-
-    const sorted_headers = sortAndmoveIngredientsToLast(
-        headers_row,
-        merge_ingredients.id
-    );
-
-    const { indexed_headers, indexed_rows } = indexTheEntities(
-        sorted_headers,
-        cleaned_rows
-    );
-    // console.log(indexed_headers);
-    //console.log(indexed_rows);
-
-    /* To get non_merged_uniqueIds */
-    /* [ "PARTCODE", "Product ID", "MERGED_INGREDIENTS", "PRODUCT_NAME" ] */
-    const uniqueIds = getUniqueIds(indexed_rows);
-
-    /* Part of creating a Row */
-    /* [ "PARTCODE", "Product ID", "PRODUCT_NAME" ] */
-    const non_merged_uniqueIds = uniqueIds.filter(
-        (id) => id !== merge_ingredients.id
-    );
-
-    //TODO: sort each partcode's merged by "order"
-    /*** Prep arrays to send to SheetsJS ***/
-    /* Create Non-Header Row */
-    const ingredient_only_rows = createRowForEachIngredient(
-        indexed_rows,
-        merge_ingredients,
-        non_merged_uniqueIds
-    ).flat();
-    // console.log(`ingredient_only_rows: `, ingredient_only_rows);
-
-    const header_only_row = indexed_headers.map((header) => {
-        /* Retrun header name */
-        return header.name;
+    /* Remove props that start woth "salsify:" */
+    const nonSalsifyPropsOnly = varientsOnly.map((obj) => {
+        Object.keys(obj).forEach((key) => {
+            // If the key starts with the prefix "salsify:", delete the key and its value from the object
+            if (key.startsWith('salsify:')) {
+                delete obj[key];
+            }
+        });
+        return obj;
     });
-    // console.log(`header_only_row: `, header_only_row);
+    // console.dir(nonSalsifyPropsOnly);
+    // console.log(`parsingOption:`, parsingOption);
 
-    const values_only_rows = ingredient_only_rows.map((row) => {
-        /** Return column value(s) */
-        return row.map((obj) => obj.value);
+    const mergedJsonData = merge_multiple_ingredients(nonSalsifyPropsOnly);
+    // console.log('mergedJsonData', mergedJsonData);
+    storeJsonObjectInLocalStorage('original_merged', mergedJsonData);
+
+    //* Done with Salsify processing */
+
+    try {
+        const jsonString = localStorage.getItem('original_merged');
+        const jsonObject = JSON.parse(jsonString);
+
+        //TODO: sort each partcode's merged by "order"
+        // TODO: New option: Raw is combine all ingredients into one cell with pipe. 2) Row per ingredient type 3) Row per ingredient.
+        // TODO: Sub radios? Raw, but merged into ingreds
+
+        const { header_only_row, values_only_rows } = getHeadersAndRows(
+            jsonObject,
+            parsingOption
+        );
+
+        //* returned SheetsJS data */
+        const { jsonDataSheet, wbString } = xlsx_create_workbook([
+            header_only_row,
+            ...values_only_rows,
+        ]);
+        // console.log(jsonDataSheet);
+
+        /* Store the binary string in localStorage to Download Parsed File later */
+        // localStorage.setItem('workbook', wbString);
+        storeJsonObjectInLocalStorage(jsonDataSheet, 'download_json');
+
+        /* Create DOM elements */
+        const htmlTable = create_html_table(jsonDataSheet, null);
+
+        // Get container element to append the table
+        const tableContainer = document.getElementById('table-container');
+        // Clear any old table
+        tableContainer.innerHTML = '';
+        tableContainer.appendChild(htmlTable);
+    } catch (error) {
+        console.error('Failed to parse JSON:', error);
+        //TODO: Thow exception to DOM
+    }
+
+
+
+
+}
+
+/**
+ * Stores a JSON object in localStorage.
+ *
+ * @param {string} key - The key under which the JSON object should be stored.
+ * @param {Object} jsonObject - The JSON object to store.
+ */
+function storeJsonObjectInLocalStorage(key, jsonObject) {
+    // Convert the JSON object to a JSON string using JSON.stringify()
+    const jsonString = JSON.stringify(jsonObject);
+
+    // Store the JSON string in localStorage under the given key
+    localStorage.setItem(key, jsonString);
+}
+
+/**
+ * Merges columns in the provided JSON data based on specified prefixes and returns a new array of objects with merged data.
+ *
+ * This function takes a JSON array of rows (objects) as input, iterates through each row, and combines values in columns
+ * that match specified prefixes (e.g., "LABEL_DATASET_INGREDIENTS_A - en-US" and "LABEL_DATASET_NUTRIENT_A - en-US").
+ * It then constructs a new array of rows with the merged data, keeping non-merged columns intact.
+ *
+ * @param {Array<Object>} jsonData - The JSON array of rows (objects) containing data from the Excel file.
+ * @returns {Array<Object>} - A new JSON array of rows (objects) with merged data.
+ */
+function merge_multiple_ingredients(jsonData) {
+    // Define the column prefixes you want to merge
+    const mergePrefixes = [
+        'LABEL_DATASET_INGREDIENTS_A - en-US',
+        'LABEL_DATASET_NUTRIENT_A - en-US',
+    ];
+
+    // Create an array to hold the new JSON data with merged columns
+    const mergedJsonData = jsonData.map((row) => {
+        // Create a new object to hold the merged row
+        let mergedRow = {};
+
+        // Iterate through the merge prefixes
+        mergePrefixes.forEach((prefix) => {
+            // Initialize a variable to hold the combined value
+            let combinedValue = '';
+
+            // Iterate through the keys in the row to find columns matching the prefix
+            Object.keys(row).forEach((key) => {
+                if (key.startsWith(prefix)) {
+                    // Add the value to the combinedValue with a ~ delimiter if not the first value
+                    if (combinedValue) {
+                        combinedValue += `~${row[key]}`;
+                    } else {
+                        combinedValue = row[key];
+                    }
+                }
+            });
+
+            // If there's a combined value, add it to the merged row under the prefix key
+            if (combinedValue) {
+                mergedRow[prefix] = combinedValue;
+            }
+        });
+
+        // Add all the non-merged keys and values from the original row to the merged row
+        Object.keys(row).forEach((key) => {
+            // If the key doesn't match any merge prefix, add it to the merged row
+            const isMergedPrefix = mergePrefixes.some((prefix) =>
+                key.startsWith(prefix)
+            );
+            if (!isMergedPrefix) {
+                mergedRow[key] = row[key];
+            }
+        });
+
+        return mergedRow;
     });
 
-    /* returned SheetsJS data */
-    const { jsonData, wbString } = xlsx_create_workbook([
-        header_only_row,
-        ...values_only_rows,
-    ]);
-    console.log(jsonData);
-
-    /* Store the binary string in localStorage */
-    localStorage.setItem('workbook', wbString);
-
-    /* Create DOM elements */
-    const htmlTable = create_html_table(jsonData, null);
-
-    // Get container element to append the table
-    const tableContainer = document.getElementById('table-container');
-    // Clear any old table
-    tableContainer.innerHTML = '';
-    tableContainer.appendChild(htmlTable);
+    return mergedJsonData;
 }
 
 /** ************************************************************* */

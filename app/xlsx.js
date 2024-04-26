@@ -21,7 +21,7 @@ function xlsx_create_workbook(data) {
     // ];
 
     const workbook = XLSX.utils.book_new();
-    
+
     // Convert data to a worksheet
     const worksheet = XLSX.utils.aoa_to_sheet(data);
 
@@ -51,9 +51,9 @@ function xlsx_create_workbook(data) {
     });
 
     // Convert data to JSON object
-    const jsonData = XLSX.utils.sheet_to_json(worksheet);
+    const jsonDataSheet = XLSX.utils.sheet_to_json(worksheet);
 
-    return { jsonData, wbString };
+    return { jsonDataSheet, wbString };
 }
 
 /* XLSX Processing */
@@ -63,17 +63,15 @@ function xlsx_create_workbook(data) {
  * @returns {void}
  */
 function xlsx_import_file(file, parsingOption) {
-    let reader = new FileReader();
+    const reader = new FileReader();
 
-    reader.onload = function (e) {
+    reader.onload = (e) => {
         const data = new Uint8Array(e.target.result);
         const workbook = XLSX.read(data, { type: 'array' });
         const sheet = workbook.Sheets[workbook.SheetNames[0]];
         const jsonData = XLSX.utils.sheet_to_json(sheet);
 
-        // parseSalsifyExport(jsonData);
         salsify_preprocess(jsonData, parsingOption);
-        // console.dir(jsonData);
     };
 
     reader.readAsArrayBuffer(file);
