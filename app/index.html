@@ -18,22 +18,22 @@
             <div id="radioButtons" class="margin-below">
                 <div class="subtitle">Ingredient Parsing Options:</div>
 
-                <!-- <div class="option-div">
-                        <input
-                            type="radio"
-                            id="raw1"
-                            name="parsingOptions"
-                            value="raw1"
-                            class="radio-button"
-                        />
-                        <label for="raw1" class="radio-checkbox-label"
-                            >Raw1</label
-                        >
-                        <span class="option-context"
-                            >- <strike>[1,1] MERGE 1 Useless without parsing - create one column and one row for
-                            all ingredient types; delimited ~ or \n</strike></span
-                        >
-                    </div> -->
+                <div class="option-div">
+                    <input
+                        type="radio"
+                        id="raw3"
+                        name="parsingOptions"
+                        value="raw3"
+                        class="radio-button"
+                        
+                    />
+                    <label for="raw3" class="radio-checkbox-label">Meh</label>
+                    <span class="option-context"
+                        >- [3,1] Creates 3 columns for each of the ingredient
+                        types and 1 row per partcode.</span
+                    >
+                </div>
+
                 <div class="option-div">
                     <input
                         type="radio"
@@ -41,41 +41,14 @@
                         name="parsingOptions"
                         value="raw4"
                         class="radio-button"
+                        checked
                     />
-                    <label for="raw4" class="radio-checkbox-label">Raw4</label>
+                    <label for="raw4" class="radio-checkbox-label">1st</label>
                     <span class="option-context"
-                        >- [1,x] PARSE THIS - Create 1 column for all
+                        >- [1,x] Creates 1 column for all
                         ingredients and up to 3 rows per partcode.</span
                     >
                 </div>
-                <div class="option-div">
-                    <input
-                        type="radio"
-                        id="raw3"
-                        name="parsingOptions"
-                        value="raw3"
-                        class="radio-button"
-                        checked
-                    />
-                    <label for="raw3" class="radio-checkbox-label">Raw3</label>
-                    <span class="option-context"
-                        >- [3,1] Create 3 columns for each of the ingredient
-                        types and 1 row per partcode; delimited ~ or
-                        \n</span
-                    >
-                </div>
-
-                <!-- <div class="option-div">
-                    <input
-                        type="radio"
-                        id="raw3"
-                        name="parsingOptions"
-                        value="raw3"
-                        class="radio-button"
-                    />
-                    <label for="raw3" class="radio-checkbox-label">Raw</label>
-                    <span class="option-context">- rows or columns</span>
-                </div> -->
 
                 <div class="option-div">
                     <input
@@ -85,15 +58,27 @@
                         value="pipe4"
                         class="radio-button"
                     />
-                    <label for="pipe4" class="radio-checkbox-label"
-                        >Parse4</label
-                    >
+                    <label for="pipe4" class="radio-checkbox-label">2nd</label>
                     <span class="option-context"
-                        >- [1,x] Separates by | and ~</span
+                        >- [1,x] Creates 1 column for all ingredinets and x rows
+                        per ~ per partcode.</span
                     >
                 </div>
-
-                <!-- <div class="option-div">
+                <div class="option-div">
+                    <input
+                        type="radio"
+                        id="pipe5"
+                        name="parsingOptions"
+                        value="pipe5"
+                        class="radio-button"
+                    />
+                    <label for="pipe5" class="radio-checkbox-label">3rd</label>
+                    <span class="option-context"
+                        >- [8,x] Creates 8 columns, 1 for each pipe and x rows
+                        per ~ per partcode.</span
+                    >
+                </div>
+                <div class="option-div">
                     <input
                         type="radio"
                         id="option5"
@@ -102,12 +87,27 @@
                         class="radio-button"
                     />
                     <label for="option5" class="radio-checkbox-label"
-                        >Parse & Validate & Repair</label
+                        >Error Detection</label
+                    >
+                    <span class="option-context"
+                        >- </span
+                    >
+                </div>
+                <div class="option-div">
+                    <input
+                        type="radio"
+                        id="option6"
+                        name="parsingOptions"
+                        value="option6"
+                        class="radio-button"
+                    />
+                    <label for="option6" class="radio-checkbox-label"
+                        >Error Correction</label
                     >
                     <span class="option-context"
                         >- for import back into Salsify</span
                     >
-                </div> -->
+                </div>
             </div>
         </div>
 
