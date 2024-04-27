@@ -206,6 +206,17 @@ class Entity {
  }
  */
 
+/**
+ * Represents a data structure containing various attributes and their values.
+ *
+ * @typedef {Object} SalsifyObject
+ * @property {string} LABEL_DATASET_INGREDIENTS_A - The ingredient data in en-US format.
+ * @property {string} LABEL_DATASET_NUTRIENT_A - The nutrient data in en-US format.
+ * @property {string} LABEL_DATASET_OTHER_INGREDS_A - The other ingredient data.
+ * @property {string} PARTCODE - The part code.
+ * @property {string} Product_ID - The product ID.
+ */
+
 function indexTheEntities(headers_row, cleaned_rows) {
     const indexed_headers = headers_row.map((cell, index) => {
         cell.index = index;
@@ -308,7 +319,7 @@ function removeStringsFromArray(originalArray, valuesToRemove) {
  * @param {Entity} ingredient_type_entity - The ingredient type entity.
  * @returns {Array<Object>} - An array of entities created from the rows of data.
  */
-function createArrayOfEntities(
+function createArrayOfRows(
     rows_of_data,
     ingredients_to_merge,
     merged_ingredient_entity,
@@ -354,19 +365,40 @@ function createArrayOfEntities(
     return rowsOfIngredient;
 }
 
+const ingredients_to_merge = [
+    'LABEL_DATASET_NUTRIENT_A - en-US',
+    'LABEL_DATASET_INGREDIENTS_A - en-US',
+    'LABEL_DATASET_OTHER_INGREDS_A',
+];
+
 function switch_parsingOptions(mergedJsonData, parsingOption) {
     console.log(`parsingOption `, parsingOption);
     switch (parsingOption) {
         case 'raw3':
-            console.log(`TODO: Raw3`);
+            /** [3,3] NEXT: create three columns for each of the ingredient types and one row per ingredient type; delimited ~ or \n */
 
+            // PARTCODE, Product ID, LABEL_DATASET_OTHER_INGREDS_A, ...
+            const uniqueKeys = getUniqueKeys(mergedJsonData);
+            /** @type {Row} */
+            const rowsOfIngredient = [];
+
+            mergedJsonData.forEach((row) => {
+                const entity = {};
+
+                for (const key of uniqueKeys) {
+                    const value = row[key] || ''; // return '' if not found
+                    entity[key] = value;
+                }
+
+                rowsOfIngredient.push(entity);
+
+                // console.log(`entity`, entity);
+            });
+            // return null
+            return rowsOfIngredient;
+            break;
         case 'raw4':
-            /**   Raw4 - [2,x] MERGE 2 -> PARSE create one column for all ingredients and one for type; One row per ingredient */
-            const ingredients_to_merge = [
-                'LABEL_DATASET_OTHER_INGREDS_A',
-                'LABEL_DATASET_NUTRIENT_A - en-US',
-                'LABEL_DATASET_INGREDIENTS_A - en-US',
-            ];
+            /** Raw4 - [2,x] MERGE 2 -> PARSE create one column for all ingredients and one for type; One row per ingredient */
 
             const merged_ingredient_entity = new Entity({
                 id: 'MERGED_INGREDIENTS',
@@ -379,7 +411,7 @@ function switch_parsingOptions(mergedJsonData, parsingOption) {
                 type: 'INGREDIENT_TYPE',
             });
 
-            const entityRows = createArrayOfEntities(
+            const entityRows = createArrayOfRows(
                 mergedJsonData,
                 ingredients_to_merge,
                 merged_ingredient_entity,
@@ -387,8 +419,64 @@ function switch_parsingOptions(mergedJsonData, parsingOption) {
             );
 
             return entityRows;
+            break;
+        case 'parse4':
+            console.log(`Hello World!`);
+            break;
         default:
             break;
+    }
+}
+
+function callIngredientParseOption(parsingOption) {
+    try {
+        const jsonString = localStorage.getItem('original_merged');
+        const jsonObject = JSON.parse(jsonString);
+
+        const entityRows = switch_parsingOptions(jsonObject, parsingOption);
+        console.log(`entityRows`, entityRows);
+
+        //* SORT - start */
+        // Define the columns to move to the front
+        const columnsToMoveToFront = ['PARTCODE', 'Product ID'];
+
+        // Move specified columns to the front of each object
+        const movedToFront = moveColumnsToFront(
+            entityRows,
+            columnsToMoveToFront
+        );
+
+        // Move specified columns to the end of each object
+        const reorderedData = moveColumnsToEnd(
+            movedToFront,
+            ingredients_to_merge
+        );
+
+        //* SORT - done */
+        const { jsonDataSheet, wbString } = create_AoO_sheet(reorderedData);
+        //* returned SheetsJS data */
+
+        /* Store the binary string in localStorage to Download Parsed File later */
+        localStorage.setItem('workbook', wbString);
+        storeJsonObjectInLocalStorage(jsonDataSheet, 'download_json');
+
+        /* Create DOM elements */
+        const htmlTable = create_html_table(jsonDataSheet, null);
+
+        // Get container element to append the table
+        const tableContainer = document.getElementById('table-container');
+        // Clear any old table
+        tableContainer.innerHTML = '';
+        tableContainer.appendChild(htmlTable);
+    } catch (error) {
+        switch (error.message) {
+            case 'arrayOfObjects is null':
+                break;
+            default:
+                console.dir('Caught an unexpected error:', error);
+                showToast(`Failed to parse JSON: ${error}`, 'error');
+                break;
+        }
     }
 }
 
@@ -414,38 +502,83 @@ function salsify_preprocess(jsonData, parsingOption) {
     // console.dir(nonSalsifyPropsOnly);
     // console.log(`parsingOption:`, parsingOption);
 
-    const mergedJsonData = merge_multiple_ingredients(nonSalsifyPropsOnly);
+    /** @type {SalsifyObject[]} */
+    const mergedJsonData =
+        preprocess_mergeMultipleIngredients(nonSalsifyPropsOnly);
     // console.log('mergedJsonData', mergedJsonData);
     storeJsonObjectInLocalStorage('original_merged', mergedJsonData);
 
     //* Done with Salsify processing */
+    callIngredientParseOption(parsingOption);
+}
 
-    try {
-        const jsonString = localStorage.getItem('original_merged');
-        const jsonObject = JSON.parse(jsonString);
+function moveColumnsToFront(data, columnsToMove) {
+    // Create a new array to hold the reordered objects
+    const reorderedData = [];
 
-        const entityRows = switch_parsingOptions(jsonObject, parsingOption);
-        // console.log(`entityRows`, entityRows);
+    // Iterate through each object in the original data
+    data.forEach((obj) => {
+        // Create a new object
+        const reorderedObj = {};
 
-        const { jsonDataSheet, wbString } = create_AoO_sheet(entityRows);
-        //* returned SheetsJS data */   
+        // Move specified columns to the front of the object
+        columnsToMove.forEach((key) => {
+            if (obj.hasOwnProperty(key)) {
+                reorderedObj[key] = obj[key];
+            }
+        });
 
-        /* Store the binary string in localStorage to Download Parsed File later */
-        localStorage.setItem('workbook', wbString);
-        storeJsonObjectInLocalStorage(jsonDataSheet, 'download_json');
+        // Add remaining columns that are not in the specified list
+        for (const key in obj) {
+            if (!reorderedObj.hasOwnProperty(key)) {
+                reorderedObj[key] = obj[key];
+            }
+        }
 
-        /* Create DOM elements */
-        const htmlTable = create_html_table(jsonDataSheet, null);
+        // Add the reordered object to the new array
+        reorderedData.push(reorderedObj);
+    });
 
-        // Get container element to append the table
-        const tableContainer = document.getElementById('table-container');
-        // Clear any old table
-        tableContainer.innerHTML = '';
-        tableContainer.appendChild(htmlTable);
-    } catch (error) {
-        console.error('Failed to parse JSON:', error);
-        //TODO: Thow exception to DOM
-    }
+    // Return the new array of objects with specified columns moved to the front
+    return reorderedData;
+}
+
+/**
+ * Moves specified columns to the end of each object in an array of objects.
+ *
+ * @param {Array<Object>} data - The original array of objects.
+ * @param {Array<string>} columnsToMove - An array of property keys to move to the end of each object.
+ * @returns {Array<Object>} - A new array of objects with specified columns moved to the end of each object.
+ */
+function moveColumnsToEnd(data, columnsToMove) {
+    // Create a new array to hold the reordered objects
+    const reorderedData = [];
+
+    // Iterate through each object in the original data
+    data.forEach((obj) => {
+        // Create a new object
+        const reorderedObj = {};
+
+        // Add remaining columns (not in the specified list) to the new object
+        for (const key in obj) {
+            if (!columnsToMove.includes(key)) {
+                reorderedObj[key] = obj[key];
+            }
+        }
+
+        // Add specified columns to the end of the object
+        columnsToMove.forEach((key) => {
+            if (obj.hasOwnProperty(key)) {
+                reorderedObj[key] = obj[key];
+            }
+        });
+
+        // Add the reordered object to the new array
+        reorderedData.push(reorderedObj);
+    });
+
+    // Return the new array of objects with specified columns moved to the end
+    return reorderedData;
 }
 
 /**
@@ -472,7 +605,7 @@ function storeJsonObjectInLocalStorage(key, jsonObject) {
  * @param {Array<Object>} jsonData - The JSON array of rows (objects) containing data from the Excel file.
  * @returns {Array<Object>} - A new JSON array of rows (objects) with merged data.
  */
-function merge_multiple_ingredients(jsonData) {
+function preprocess_mergeMultipleIngredients(jsonData) {
     // Define the column prefixes you want to merge
     const mergePrefixes = [
         'LABEL_DATASET_INGREDIENTS_A - en-US',
@@ -581,41 +714,41 @@ function merge_multiple_ingredients(jsonData) {
  * @param {Array<Object>} aoo - The array of objects to convert.
  * @returns {string} - The HTML string representing the table.
  */
-function convertAoOToHtml(aoo) {
-    if (aoo.length === 0) {
-        return '';
-    }
+// function convertAoOToHtml(aoo) {
+//     if (aoo.length === 0) {
+//         return '';
+//     }
 
-    // Create the table
-    let html = '<table>';
+//     // Create the table
+//     let html = '<table>';
 
-    // Get the headers (keys) from the first object
-    const headers = Object.keys(aoo[0]);
+//     // Get the headers (keys) from the first object
+//     const headers = Object.keys(aoo[0]);
 
-    // Create the table header row
-    html += '<thead><tr>';
-    for (const header of headers) {
-        html += `<th>${header}</th>`;
-    }
-    html += '</tr></thead>';
+//     // Create the table header row
+//     html += '<thead><tr>';
+//     for (const header of headers) {
+//         html += `<th>${header}</th>`;
+//     }
+//     html += '</tr></thead>';
 
-    // Create the table body
-    html += '<tbody>';
-    for (const obj of aoo) {
-        html += '<tr>';
-        for (const header of headers) {
-            const value = obj[header] || ''; // Get the value for the header key
-            html += `<td>${value}</td>`;
-        }
-        html += '</tr>';
-    }
-    html += '</tbody>';
+//     // Create the table body
+//     html += '<tbody>';
+//     for (const obj of aoo) {
+//         html += '<tr>';
+//         for (const header of headers) {
+//             const value = obj[header] || ''; // Get the value for the header key
+//             html += `<td>${value}</td>`;
+//         }
+//         html += '</tr>';
+//     }
+//     html += '</tbody>';
 
-    // Close the table
-    html += '</table>';
+//     // Close the table
+//     html += '</table>';
 
-    return html;
-}
+//     return html;
+// }
 
 /* Function to generate HTML table from JSON data */
 function create_html_table(data, radioOption = null) {

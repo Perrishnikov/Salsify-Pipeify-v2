@@ -3,6 +3,11 @@
     --font-size: 16px; /* Define a variable named --font-size */
     --font-size-smaller: 14px;
     --padding-margin: 16px;
+    --danger: hsl(348, 86%, 43%);
+    --warning: hsl(48, 100%, 29%);
+    --success: hsl(141, 53%, 31%);
+    --info: hsl(204, 71%, 39%);
+    --background-light: hsl(0, 0%, 90%)
 }
 
 body {
@@ -15,6 +20,7 @@ body {
     /* font-family: Arial, sans-serif; */
     font-family: 'Roboto', sans-serif;
     font-size: var(--font-size);
+    background-color: var(--background-light);
 }
 .margin-below {
     margin-bottom: calc(var(--padding-margin) * 2);
@@ -122,10 +128,65 @@ tr:hover {
 }
 
 /* DOWNLOAD BUTTON */
-#download-btn {
+/* #download-btn {
     padding: calc(var(--padding-margin) / 2);
     font-size: var(--font-size);
     border-radius: calc(var(--padding-margin) / 2);
     border: 1px solid #000;
     cursor: pointer;
+} */
+
+button {
+    padding: calc(var(--padding-margin) / 2);
+    font-size: var(--font-size);
+    border-radius: calc(var(--padding-margin) / 2);
+    border: 1px solid #000;
+    cursor: pointer;
+}
+
+/* TOAST */
+#toast-container {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Toast styles */
+.toast {
+    background-color: #333;
+    color: white;
+    padding: 10px;
+    border-radius: 4px;
+    transition: opacity 0.3s, transform 0.3s;
+    opacity: 0;
+    transform: translateY(-100%);
+}
+
+/* Show toast animation */
+.toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+/* Styles for different message types */
+.toast.info {
+    background-color: var(--info); /* Blue for info */
+    color: white;
+}
+.toast.success {
+    background-color: var(--success); /* Blue for info */
+    color: white;
+}
+.toast.warning {
+    background-color: var(--warning); /* Yellow for warning */
+    color: black;
+}
+
+.toast.error {
+    /* background-color: #F44336; Red for error */
+    background-color: var(--danger);
+    color: white;
 }

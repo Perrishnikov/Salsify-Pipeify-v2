@@ -6,6 +6,9 @@ if (radioButtonsDiv) {
 
         // TODO: Update xlsx.js Table Format
         console.log(`change table columns to ${selectedOption}`);
+
+        const parsingOption = getCheckedRadioButtonId();
+        callIngredientParseOption(parsingOption);
     });
 }
 
@@ -35,23 +38,23 @@ function getCheckedRadioButtonId() {
 /**
  * Set the Parsing options back to option1 whenever a new file is uploaded.
  */
-function setRadioButtonDefault() {
-    const radioButtons = document.querySelectorAll(
-        'input[name="parsingOptions"]'
-    );
+// function setRadioButtonDefault() {
+//     const radioButtons = document.querySelectorAll(
+//         'input[name="parsingOptions"]'
+//     );
 
-    let checkedRadioButton = null;
+//     let checkedRadioButton = null;
 
-    radioButtons.forEach((radioButton) => {
-        // Check if the radio button's value matches the default value
-        if (radioButton.id === 'option1') {
-            // Set the radio button as checked
-            radioButton.checked = true;
-        }
-    });
+//     radioButtons.forEach((radioButton) => {
+//         // Check if the radio button's value matches the default value
+//         if (radioButton.id === 'option1') {
+//             // Set the radio button as checked
+//             radioButton.checked = true;
+//         }
+//     });
 
-    return checkedRadioButton ? checkedRadioButton.id : null;
-}
+//     return checkedRadioButton ? checkedRadioButton.id : null;
+// }
 
 /**
  * Appends the imported file name to the DOM element with ID 'fileName'.
@@ -136,4 +139,34 @@ if (button_download) {
             `pipeify - ingedients - ${formattedDate}.xlsx`
         );
     });
+}
+
+/**
+ * Clears localStorage when the button with ID 'clear-localstorage-btn' is pressed.
+ */
+const clearButton = document.getElementById('clear-localstorage-btn');
+// Check if the button exists
+if (clearButton) {
+    // Add a click event listener to the button
+    clearButton.addEventListener('click', () => {
+        localStorage.clear();
+
+        // console.log('localStorage cleared');
+
+        const table = document.getElementById('table-container');
+        const fileName = document.getElementById('fileName');
+
+        const hasChildren = table.childNodes.length > 0; // Using childNodes
+        // or
+        // const hasChildren = div.children.length > 0; // Using children
+
+        if (hasChildren) {
+            table.innerHTML = '';
+            fileName.innerHTML = '';
+            showToast(`Local Storage cleared`, 'info');
+        }
+    });
+} else {
+    // console.warn('Button with ID "clear-localstorage-btn" not found');
+    showToast(`Button with ID "clear-localstorage-btn" not found`, 'error');
 }

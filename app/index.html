@@ -9,15 +9,16 @@
     </head>
     <body>
         <!-- <div> -->
-            <div id="dropArea" class="margin-below">
-                Drag and drop a Salsify export (Excel) file here, or click to
-                select
-            </div>
-            <div>
-                <div id="radioButtons" class="margin-below">
-                    <div class="subtitle">Ingredient Parsing Options:</div>
+        <div id="dropArea" class="margin-below">
+            Drag and drop a Salsify export (Excel) file here, or click to select
+        </div>
+        <div id="toast-container"></div>
 
-                    <!-- <div class="option-div">
+        <div>
+            <div id="radioButtons" class="margin-below">
+                <div class="subtitle">Ingredient Parsing Options:</div>
+
+                <!-- <div class="option-div">
                         <input
                             type="radio"
                             id="raw1"
@@ -33,42 +34,38 @@
                             all ingredient types; delimited ~ or \n</strike></span
                         >
                     </div> -->
-                    <div class="option-div">
-                        <input
-                            type="radio"
-                            id="raw4"
-                            name="parsingOptions"
-                            value="raw4"
-                            class="radio-button"
-                            checked
-                        />
-                        <label for="raw4" class="radio-checkbox-label"
-                            >Raw4</label
-                        >
-                        <span class="option-context"
-                            >- [2,x] MERGE 2 -> PARSE create one column for all
-                            ingredients and one for type; One row per ingredient</span
-                        >
-                    </div>
-                    <div class="option-div">
-                        <input
-                            type="radio"
-                            id="raw3"
-                            name="parsingOptions"
-                            value="raw3"
-                            class="radio-button"
-                        />
-                        <label for="raw3" class="radio-checkbox-label"
-                            >Raw3</label
-                        >
-                        <span class="option-context"
-                            >- [3,3] NEXT: create three columns for each of the
-                            ingredient types and one row per ingredient type;
-                            delimited ~ or \n</span
-                        >
-                    </div>
+                <div class="option-div">
+                    <input
+                        type="radio"
+                        id="raw4"
+                        name="parsingOptions"
+                        value="raw4"
+                        class="radio-button"
+                    />
+                    <label for="raw4" class="radio-checkbox-label">Raw4</label>
+                    <span class="option-context"
+                        >- [1,x] PARSE THIS - Create 1 column for all
+                        ingredients and up to 3 rows per partcode.</span
+                    >
+                </div>
+                <div class="option-div">
+                    <input
+                        type="radio"
+                        id="raw3"
+                        name="parsingOptions"
+                        value="raw3"
+                        class="radio-button"
+                        checked
+                    />
+                    <label for="raw3" class="radio-checkbox-label">Raw3</label>
+                    <span class="option-context"
+                        >- [3,1] Create 3 columns for each of the ingredient
+                        types and 1 row per partcode; delimited ~ or
+                        \n</span
+                    >
+                </div>
 
-                    <!-- <div class="option-div">
+                <!-- <div class="option-div">
                     <input
                         type="radio"
                         id="raw3"
@@ -80,23 +77,23 @@
                     <span class="option-context">- rows or columns</span>
                 </div> -->
 
-                    <!-- <div class="option-div">
+                <div class="option-div">
                     <input
                         type="radio"
-                        id="option4"
+                        id="pipe4"
                         name="parsingOptions"
-                        value="option4"
+                        value="pipe4"
                         class="radio-button"
                     />
-                    <label for="option4" class="radio-checkbox-label"
-                        >Parse & Validate</label
+                    <label for="pipe4" class="radio-checkbox-label"
+                        >Parse4</label
                     >
                     <span class="option-context"
-                        >- cheks for errors; invalid data in cells</span
+                        >- [1,x] Separates by | and ~</span
                     >
-                </div> -->
+                </div>
 
-                    <!-- <div class="option-div">
+                <!-- <div class="option-div">
                     <input
                         type="radio"
                         id="option5"
@@ -111,27 +108,31 @@
                         >- for import back into Salsify</span
                     >
                 </div> -->
-                </div>
             </div>
+        </div>
 
-            <!-- <div id="headerCheckboxes" class="margin-below">
+        <!-- <div id="headerCheckboxes" class="margin-below">
                 <div class="subtitle">Headers (To Download):</div>
             </div> -->
 
-            <div class="margin-below">
-                <button id="download-btn" class="drag-drop-btn">
-                    Download Parsed File
-                </button>
-            </div>
+        <div class="margin-below">
+            <button id="download-btn" class="drag-drop-btn" disabled>
+                Download Parsed File
+            </button>
+            <button id="clear-localstorage-btn" class="drag-drop-btn">
+                Clear Local Storage
+            </button>
+        </div>
 
-            <div class="margin-below">
-                <div id="fileName" class="subtitle"></div>
-                <!-- append imported fileName here -->
-            </div>
+        <div class="margin-below">
+            <div id="fileName" class="subtitle"></div>
+            <!-- append imported fileName here -->
+        </div>
         <!-- </div> -->
 
         <div id="table-container"></div>
 
+        <script src="toast.js"></script>
         <script src="parseSalsifyExport.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
         <script src="xlsx.js"></script>
