@@ -38,18 +38,7 @@ function xlsx_create_workbook(data) {
     // set the last column (data) to be wider
     cols[numberOfColumns - 1] = { wch: 30 };
 
-    // worksheet['!cols'] = cols;
-
-    //**************************** */
-    // Define an array of objects (AoO)
-    // const data = [
-    //     { name: 'Alice', age: 30, occupation: 'Engineer' },
-    //     { name: 'Bob', age: 28, occupation: 'Designer' },
-    // ];
-
-    // Create a worksheet from the array of objects
-    // const worksheet = XLSX.utils.json_to_sheet(data);
-    //****************************** */
+    worksheet['!cols'] = cols;
 
     // Add the worksheet to the workbook
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Pipeify');
@@ -67,6 +56,38 @@ function xlsx_create_workbook(data) {
     return { jsonDataSheet, wbString };
 }
 
+function create_AoO_sheet(data) {
+    // Create a worksheet from the array of objects
+    const worksheet = XLSX.utils.json_to_sheet(data);
+
+    // Create a new workbook
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Pipeify');
+
+    // Write the workbook to a binary string
+    const wbString = XLSX.write(workbook, {
+        type: 'binary',
+        bookType: 'xlsx',
+        props: {
+            Title: 'Pipeify Export',
+            CreatedDate: new Date(),
+            Company: "Nature's Way",
+            Comments: '...',
+        },
+    });
+
+    // Convert worksheet to JSON with headers option
+    // The header option specifies how to handle the first row:
+    // - 1: Use the first row as headers
+    // - 0: Treat the first row as data
+    const jsonDataSheet = XLSX.utils.sheet_to_json(worksheet, {
+        header: 0, // Try 0 if you are not sure the first row contains headers
+        // defval: '', // Default value for missing cells
+    });
+
+    // console.log(jsonDataSheet);
+    return { jsonDataSheet, wbString };
+}
 /* XLSX Processing */
 /**
  * Processes an Excel file.
