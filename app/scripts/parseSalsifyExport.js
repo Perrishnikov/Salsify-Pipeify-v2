@@ -59,28 +59,6 @@ function standardTestIsTrue(valueToTest) {
 }
 
 /** ********************************************************************* */
-/**
- * Represents a data cell with specified properties.
- * @class
- */
-class Entity {
-    /**
-     * Constructs a new instance of `CellData`.
-     * @param {Object} params - The parameters for the `CellData` instance.
-     * @param {string} params.id - The ID of the cell.
-     * @param {string} params.name - The name of the cell.
-     * @param {string} params.type - The type of the cell.
-     * @param {number} [params.index] - The index of the cell (optional).
-     * @param {any} [params.value=null] - The value of the cell (optional, defaults to `null`).
-     */
-    constructor({ id, name, type, index, value = null }) {
-        this.id = id;
-        this.name = name;
-        this.type = type;
-        this.index = index;
-        this.value = value;
-    }
-}
 
 /**
  { 
@@ -110,7 +88,6 @@ class Entity {
  * @property {string} Product_ID - The product ID.
  */
 
-//
 function indexTheEntities(headers_row, cleaned_rows) {
     const indexed_headers = headers_row.map((cell, index) => {
         cell.index = index;
@@ -129,269 +106,59 @@ function indexTheEntities(headers_row, cleaned_rows) {
     return { indexed_headers, indexed_rows };
 }
 
-/**
- * Returns all unique keys from an array of objects.
- *
- * @param {Array<Object>} arrayOfObjects - The array of objects to process.
- * @returns {Array<string>} - An array of unique keys from the objects.
- */
-function getUniqueKeys(arrayOfObjects) {
-    // Create a Set to store unique keys
-    const uniqueKeysSet = new Set();
+/************************************************************************ */
 
-    // Loop through each object in the array
-    for (const obj of arrayOfObjects) {
-        // Loop through each key in the current object
-        for (const key in obj) {
-            // Add the key to the Set
-            uniqueKeysSet.add(key);
-        }
+/**
+ * Represents a data cell with specified properties.
+ * @class
+ */
+class Entity {
+    /**
+     * Constructs a new instance of `CellData`.
+     * @param {Object} params - The parameters for the `CellData` instance.
+     * @param {string} params.id - The ID of the cell.
+     * @param {string} params.name - The name of the cell.
+     * @param {string} params.type - The type of the cell.
+     * @param {number} [params.index] - The index of the cell (optional).
+     * @param {any} [params.value=null] - The value of the cell (optional, defaults to `null`).
+     */
+    constructor({ id, name, type, index, value = null }) {
+        this.id = id;
+        this.name = name;
+        this.type = type;
+        this.index = index;
+        this.value = value;
     }
-
-    // Convert the Set to an array and return it
-    return Array.from(uniqueKeysSet);
 }
 
-/**
- * Removes an array of string values from an array of strings.
- *
- * @param {Array<string>} originalArray - The original array of strings.
- * @param {Array<string>} valuesToRemove - The array of string values to remove from the original array.
- * @returns {Array<string>} - A new array with the specified values removed.
- */
-function removeStringsFromArray(originalArray, valuesToRemove) {
-    // Create a Set from the values to remove for efficient look-up
-    const valuesToRemoveSet = new Set(valuesToRemove);
-
-    // Filter the original array, keeping only values not in the Set
-    return originalArray.filter((value) => !valuesToRemoveSet.has(value));
-}
-
-/**
- * Creates an array of entities from rows of data by merging specified ingredients and types.
- *
- * @param {Array<Object>} rows_of_data - The array of rows of data to process.
- * @param {Array<string>} ingredients_to_merge - The array of keys representing ingredients to merge.
- * @param {Entity} merged_ingredient_entity - The merged ingredient entity.
- * @param {Entity} ingredient_type_entity - The ingredient type entity.
- * @returns {Array<Object>} - An array of entities created from the rows of data.
- */
-function createRowForEachMergedIngredientType(
-    rows_of_data,
-    ingredients_to_merge,
-    merged_ingredient_entity,
-    ingredient_type_entity
-) {
-    // PARTCODE, Product ID, LABEL_DATASET_OTHER_INGREDS_A, ...
-    const uniqueKeys = getUniqueKeys(rows_of_data);
-
-    // remove LABEL_DATASET_OTHER_INGREDS_A and others
-    const salsifyKeys = removeStringsFromArray(
-        uniqueKeys,
-        ingredients_to_merge
-    );
-
-    /** @type {Row} */
-    const rowsOfIngredient = [];
-
-    rows_of_data.forEach((row) => {
-        const entity = {};
-
-        for (const key of salsifyKeys) {
-            const value = row[key] || ''; // return '' if not found
-            entity[key] = value;
-        }
-
-        for (const key of ingredients_to_merge) {
-            //LABEL_DATASET_OTHER_INGREDS_A
-            /** If the row[key] matches an ingredient to merge... */
-            const value = row[key];
-            if (value) {
-                // copy existing props into new object
-                const ingredientRow = { ...entity };
-                // add MERGED_INGREDIENTS: value
-                ingredientRow[merged_ingredient_entity.id] = value;
-                // add INGREDIENT_TYPE: LABEL_DATASET_OTHER_INGREDS_A
-                ingredientRow[ingredient_type_entity.id] = key;
-
-                rowsOfIngredient.push(ingredientRow);
-            }
-        }
-    });
-
-    return rowsOfIngredient;
-}
-
-/**
- * Removes specified keys from an object and returns a new object.
- *
- * @param {Object} obj - The original object from which keys should be removed.
- * @param {Array<string>} keysToRemove - An array of keys to remove from the object.
- * @returns {Object} - A new object with specified keys removed.
- */
-function removeKeysFromObject(obj, keysToRemove) {
-    // Create a shallow copy of the original object
-    const newObj = { ...obj };
-
-    // Iterate through each key in the keysToRemove array
-    keysToRemove.forEach((key) => {
-        // Remove the key from the new object using the delete operator
-        delete newObj[key];
-    });
-
-    // Return the new object with specified keys removed
-    return newObj;
-}
-
-function createRowForEachInredient(entityRows) {
-    const rowsOfIngredients = [];
-    entityRows.forEach((row) => {
-        // console.log('modifiedObj', modifiedObj);
-
-        const mergedIngredient = row[merged_ingredient_entity.id];
-        // console.log(row);
-
-        /** If row has MERGED_INGREDIENTS */
-        if (mergedIngredient) {
-            // Split the string by the tilde (~) delimiter
-            const delimitedArray = mergedIngredient.split(importDelimiter);
-
-            delimitedArray.forEach((ingredient) => {
-                const rowCopy = JSON.parse(JSON.stringify(row));
-
-                const cleanCopy = removeKeysFromObject(rowCopy, [
-                    merged_ingredient_entity.id,
-                    ingredient_type_entity.id,
-                ]);
-
-                const type = row[ingredient_type_entity.id];
-
-                // MERGED_INGREDIENTS = 1|Calories||25| |||
-                cleanCopy[merged_ingredient_entity.id] = ingredient;
-
-                // INGREDIENT_TYPE = LABEL_DATASET_NUTRIENT_A - en-US
-                cleanCopy[ingredient_type_entity.id] = type;
-
-                rowsOfIngredients.push(cleanCopy);
-            });
-        }
-    });
-    return rowsOfIngredients;
-}
-
-const pipedObject = {
-    ORDER: '',
-    // SHORT_DESC: '',
-    // LONG_DESC: '',
-    DESC: '',
-    QTY: '',
-    UOM: '',
-    DV: '',
-    SYMBOL: '',
-    DEF: '',
-    FOOTNOTE: '',
-    // ASTERISK: ''
+const LABEL_DATASET_NUTRIENT_A = {
+    id: 'LABEL_DATASET_NUTRIENT_A - en-US',
+    abbr: 'Nutrient',
+    starts_with: 'LABEL_DATASET_NUTRIENT_A',
 };
-function createColumnForEachPipe(rowsOfIngredients) {
-    console.log(rowsOfIngredients);
 
-    const newEntities = [];
+const LABEL_DATASET_INGREDIENTS_A = {
+    id: 'LABEL_DATASET_INGREDIENTS_A - en-US',
+    abbr: 'Ingredient',
+    starts_with: 'LABEL_DATASET_INGREDIENTS_A',
+};
 
-    rowsOfIngredients.forEach((row) => {
-        const mergedIngredient = row[merged_ingredient_entity.id];
+const LABEL_DATASET_OTHER_INGREDS_A = {
+    id: 'LABEL_DATASET_OTHER_INGREDS_A',
+    abbr: 'Other',
+    starts_with: 'LABEL_DATASET_OTHER_INGREDS_A',
+};
 
-        const delimitedArray = mergedIngredient.split('|');
-
-        // console.log(delimitedArray);
-        const type = row[ingredient_type_entity.id];
-
-        const rowCopy = JSON.parse(JSON.stringify(row));
-        const combinedCopy = { ...rowCopy, ...pipedObject };
-        const cleanCopy = removeKeysFromObject(combinedCopy, [
-            merged_ingredient_entity.id,
-        ]);
-
-        // console.log(`type: `, type);
-        if (type === 'LABEL_DATASET_NUTRIENT_A - en-US') {
-            const order = delimitedArray[0].trim();
-            const shortDesc = delimitedArray[1].trim();
-            const longDesc = delimitedArray[2].trim();
-            const coelesced = coalesce(longDesc, shortDesc);
-            const qty = delimitedArray[3].trim();
-            const uom = delimitedArray[4].trim();
-            const dvAmt = delimitedArray[5].trim();
-            const symbol = delimitedArray[6].trim();
-            const foot = delimitedArray[7].trim();
-
-            cleanCopy.ORDER = order;
-            cleanCopy.DESC = coelesced;
-            cleanCopy.QTY = qty;
-            cleanCopy.UOM = uom;
-            cleanCopy.DV = dvAmt;
-            cleanCopy.SYMBOL = symbol;
-            cleanCopy.FOOTNOTE = foot;
-
-            // console.log(`cleanCopy`, cleanCopy);
-            // console.log(`rowCopy`, rowCopy);
-            newEntities.push(cleanCopy);
-        } else if (type === 'LABEL_DATASET_INGREDIENTS_A - en-US') {
-            // console.log(`Ingredient`)
-            const order = delimitedArray[0].trim();
-            const shortDesc = delimitedArray[1].trim();
-            const qty = delimitedArray[2].trim();
-            const uom = delimitedArray[3].trim();
-            const unk = delimitedArray[4].trim();
-            const dvAmt = delimitedArray[5].trim();
-            const asterisk = delimitedArray[6].trim();
-            const foot = delimitedArray[7].trim();
-
-            cleanCopy.ORDER = order;
-            cleanCopy.DESC = shortDesc;
-            cleanCopy.QTY = qty;
-            cleanCopy.UOM = uom;
-            cleanCopy.DV = dvAmt;
-            cleanCopy.SYMBOL = asterisk;
-            cleanCopy.FOOTNOTE = foot;
-            // cleanCopy.unk= unk
-
-            if (unk) {
-                console.error(`unk`, unk);
-            }
-
-            newEntities.push(cleanCopy);
-        }
-
-        if (type === 'LABEL_DATASET_OTHER_INGREDS_A') {
-            //TODO
-            // console.log('Other');
-            const other = delimitedArray[0].trim();
-            cleanCopy.DESC = other;
-            newEntities.push(cleanCopy);
-        }
-        // console.log(`pipe`, pipe);
-        // const cleanCopy = removeKeysFromObject(rowCopy, [
-        //     merged_ingredient_entity.id,
-        //     ingredient_type_entity.id,
-        // ]);
-        // delete rowCopy[merged_ingredient_entity.id];
-        // delete rowCopy[ingredient_type_entity.id];
-
-        // MERGED_INGREDIENTS = 1|Calories||25| |||
-        // cleanCopy[merged_ingredient_entity.id] = ingredient;
-
-        // INGREDIENT_TYPE = LABEL_DATASET_NUTRIENT_A - en-US
-        // cleanCopy[ingredient_type_entity.id] = type;
-
-        // rowsOfIngredients.push(cleanCopy);
-        // });
-    });
-
-    return newEntities;
+class Type {
+    constructor() {}
 }
+
+//TODO: clean, class, or scope these
+// Keep here
 const ingredients_to_merge = [
-    'LABEL_DATASET_NUTRIENT_A - en-US',
-    'LABEL_DATASET_INGREDIENTS_A - en-US',
-    'LABEL_DATASET_OTHER_INGREDS_A',
+    LABEL_DATASET_NUTRIENT_A.id,
+    LABEL_DATASET_INGREDIENTS_A.id,
+    LABEL_DATASET_OTHER_INGREDS_A.id,
 ];
 const merged_ingredient_entity = new Entity({
     id: 'MERGED_INGREDIENTS',
@@ -404,33 +171,40 @@ const ingredient_type_entity = new Entity({
     type: 'INGREDIENT_TYPE',
 });
 
+/**
+ * Triggered when radio buttons change
+ * @param {*} mergedJsonData
+ * @param {*} parsingOption
+ * @returns
+ */
 function switch_parsingOptions(mergedJsonData, parsingOption) {
     console.log(`parsingOption `, parsingOption);
     switch (parsingOption) {
-        case 'raw3':
-            /** [3,3] Meh - Creates 3 columns for each of the ingredient types and 1 row per partcode */
+        case 'meh':
+            {
+                /** [3,3] Meh - Creates 3 columns for each of the ingredient types and 1 row per partcode */
 
-            // PARTCODE, Product ID, LABEL_DATASET_OTHER_INGREDS_A, ...
-            const uniqueKeys = getUniqueKeys(mergedJsonData);
-            /** @type {Row} */
-            const rowsOfIngredient = [];
+                // PARTCODE, Product ID, LABEL_DATASET_OTHER_INGREDS_A, ...
+                const uniqueKeys = getUniqueKeys(mergedJsonData);
+                /** @type {Row} */
+                const rowsOfIngredient = [];
 
-            mergedJsonData.forEach((row) => {
-                const entity = {};
+                mergedJsonData.forEach((row) => {
+                    const entity = {};
 
-                for (const key of uniqueKeys) {
-                    const value = row[key] || ''; // return '' if not found
-                    entity[key] = value;
-                }
+                    for (const key of uniqueKeys) {
+                        const value = row[key] || ''; // return '' if not found
+                        entity[key] = value;
+                    }
 
-                rowsOfIngredient.push(entity);
+                    rowsOfIngredient.push(entity);
 
-                // console.log(`entity`, entity);
-            });
-            // return null
-            return rowsOfIngredient;
+                    // console.log(`entity`, entity);
+                });
+                return rowsOfIngredient;
+            }
             break;
-        case 'raw4':
+        case 'option1':
             {
                 /** 1st - [1,x] Creates 1 column for all ingredients and up to 3 rows per partcode. */
 
@@ -444,7 +218,7 @@ function switch_parsingOptions(mergedJsonData, parsingOption) {
                 return entityRows;
             }
             break;
-        case 'pipe4':
+        case 'option2':
             {
                 /** 2nd - [1,x] Creates 1 column for all ingredinets and x rows per ~ per partcode. */
 
@@ -461,32 +235,67 @@ function switch_parsingOptions(mergedJsonData, parsingOption) {
                 return rowsOfIngredients;
             }
             break;
-        case 'pipe5':
-            /** 3rd - [8,x] Creates 8 columns, 1 for each pipe and x rows per ~ per partcode. */
-            const entityRows = createRowForEachMergedIngredientType(
-                mergedJsonData,
-                ingredients_to_merge,
-                merged_ingredient_entity,
-                ingredient_type_entity
-            );
+        case 'option3':
+            {
+                /** 3rd - [8,x] Creates 8 columns, 1 for each pipe and x rows per ~ per partcode. */
+                const entityRows = createRowForEachMergedIngredientType(
+                    mergedJsonData,
+                    ingredients_to_merge,
+                    merged_ingredient_entity,
+                    ingredient_type_entity
+                );
 
-            const rowsOfIngredients = createRowForEachInredient(entityRows);
-            // console.log(rowsOfIngredients);
+                const rowsOfIngredients = createRowForEachInredient(entityRows);
+                // console.log(rowsOfIngredients);
 
-            const columnOfPipes = createColumnForEachPipe(rowsOfIngredients);
+                const columnOfPipes =
+                    createColumnForEachPipe(rowsOfIngredients);
 
-            return columnOfPipes;
+                return columnOfPipes;
+            }
+            break;
+        case 'option4':
+            {
+                const entityRows = createRowForEachMergedIngredientType(
+                    mergedJsonData,
+                    ingredients_to_merge,
+                    merged_ingredient_entity,
+                    ingredient_type_entity
+                );
+
+                const rowsOfIngredients = createRowForEachInredient(entityRows);
+                // console.log(rowsOfIngredients);
+
+                const columnOfPipes =
+                    createColumnForEachPipe(rowsOfIngredients);
+
+                console.log(columnOfPipes);
+
+                columnOfPipes.map((row) => {
+                    console.log(`row: `, row);
+                    if (
+                        row.INGREDIENT_TYPE ===
+                        'LABEL_DATASET_NUTRIENT_A - en-US'
+                    ) {
+                        const order = row.ORDER;
+                        console.log(`order: `, order);
+                    }
+                    return row;
+                });
+                return columnOfPipes;
+            }
             break;
         default:
             break;
     }
 }
 
-function callIngredientParseOption(parsingOption) {
+function process_parsing_option(parsingOption) {
     try {
         const jsonString = localStorage.getItem('original_merged');
         const jsonObject = JSON.parse(jsonString);
 
+        /** Create all the data here */
         const entityRows = switch_parsingOptions(jsonObject, parsingOption);
         // console.log(`entityRows`, entityRows);
 
@@ -507,15 +316,16 @@ function callIngredientParseOption(parsingOption) {
         );
 
         //* SORT - done */
-        const { jsonDataSheet, wbString } = create_AoO_sheet(reorderedData);
+
+        // const { jsonDataSheet, wbString } = create_AoO_sheet(reorderedData);
         //* returned SheetsJS data */
 
         /* Store the binary string in localStorage to Download Parsed File later */
-        localStorage.setItem('workbook', wbString);
-        storeJsonObjectInLocalStorage(jsonDataSheet, 'download_json');
+        // localStorage.setItem('workbook', wbString);
+        // storeJsonObjectInLocalStorage(jsonDataSheet, 'download_json');
 
-        /* Create DOM elements */
-        const htmlTable = create_html_table(jsonDataSheet, null);
+        /* //! DOM doesnt need workbook Create DOM elements */
+        const htmlTable = create_html_table(reorderedData, null);
 
         // Get container element to append the table
         const tableContainer = document.getElementById('table-container');
@@ -564,7 +374,7 @@ function salsify_preprocess(jsonData, parsingOption) {
     storeJsonObjectInLocalStorage('original_merged', mergedJsonData);
 
     //* Done with Salsify processing */
-    callIngredientParseOption(parsingOption);
+    process_parsing_option(parsingOption);
 }
 
 /********************************************************************* */

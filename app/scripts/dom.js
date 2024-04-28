@@ -8,7 +8,7 @@ if (radioButtonsDiv) {
         console.log(`change table columns to ${selectedOption}`);
 
         const parsingOption = getCheckedRadioButtonId();
-        callIngredientParseOption(parsingOption);
+        process_parsing_option(parsingOption);
     });
 }
 
@@ -36,47 +36,19 @@ function getCheckedRadioButtonId() {
 }
 
 /**
- * Set the Parsing options back to option1 whenever a new file is uploaded.
- */
-// function setRadioButtonDefault() {
-//     const radioButtons = document.querySelectorAll(
-//         'input[name="parsingOptions"]'
-//     );
-
-//     let checkedRadioButton = null;
-
-//     radioButtons.forEach((radioButton) => {
-//         // Check if the radio button's value matches the default value
-//         if (radioButton.id === 'option1') {
-//             // Set the radio button as checked
-//             radioButton.checked = true;
-//         }
-//     });
-
-//     return checkedRadioButton ? checkedRadioButton.id : null;
-// }
-
-/**
- * Appends the imported file name to the DOM element with ID 'fileName'.
- *
- * @param {string} fileName - The name of the imported file.
- */
-function dom_append_filename(fileName) {
-    const fileNameArea = document.getElementById('fileName');
-
-    fileNameArea.textContent = `Imported File: ${fileName}`;
-}
-
-/**
  * Handles file import, appends the file name to the DOM, and initiates file processing.
  *
  * @param {File} file - The file to import and process.
  */
 function importFileHandler(file) {
     const fileName = file.name;
-    dom_append_filename(fileName);
 
+    // dom_append_filename(fileName);
+    const fileNameArea = document.getElementById('fileName');
+    // Append file name to DOM
+    fileNameArea.textContent = `Imported File: ${fileName}`;
     const parsingOption = getCheckedRadioButtonId();
+    
     // xlsx.js
     xlsx_import_file(file, parsingOption);
 }

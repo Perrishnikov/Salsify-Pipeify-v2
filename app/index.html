@@ -8,7 +8,6 @@
         <style></style>
     </head>
     <body>
-        <!-- <div> -->
         <div id="dropArea" class="margin-below">
             Drag and drop a Salsify export (Excel) file here, or click to select
         </div>
@@ -21,13 +20,12 @@
                 <div class="option-div">
                     <input
                         type="radio"
-                        id="raw3"
+                        id="meh"
                         name="parsingOptions"
-                        value="raw3"
+                        value="meh"
                         class="radio-button"
-                        
                     />
-                    <label for="raw3" class="radio-checkbox-label">Meh</label>
+                    <label for="meh" class="radio-checkbox-label">Meh</label>
                     <span class="option-context"
                         >- [3,1] Creates 3 columns for each of the ingredient
                         types and 1 row per partcode.</span
@@ -37,28 +35,32 @@
                 <div class="option-div">
                     <input
                         type="radio"
-                        id="raw4"
+                        id="option1"
                         name="parsingOptions"
-                        value="raw4"
+                        value="option1"
                         class="radio-button"
                         checked
                     />
-                    <label for="raw4" class="radio-checkbox-label">1st</label>
+                    <label for="option1" class="radio-checkbox-label"
+                        >1st</label
+                    >
                     <span class="option-context"
-                        >- [1,x] Creates 1 column for all
-                        ingredients and up to 3 rows per partcode.</span
+                        >- [1,x] Creates 1 column for all ingredients and up to
+                        3 rows per partcode.</span
                     >
                 </div>
 
                 <div class="option-div">
                     <input
                         type="radio"
-                        id="pipe4"
+                        id="option2"
                         name="parsingOptions"
-                        value="pipe4"
+                        value="option2"
                         class="radio-button"
                     />
-                    <label for="pipe4" class="radio-checkbox-label">2nd</label>
+                    <label for="option2" class="radio-checkbox-label"
+                        >2nd</label
+                    >
                     <span class="option-context"
                         >- [1,x] Creates 1 column for all ingredinets and x rows
                         per ~ per partcode.</span
@@ -67,16 +69,31 @@
                 <div class="option-div">
                     <input
                         type="radio"
-                        id="pipe5"
+                        id="option3"
                         name="parsingOptions"
-                        value="pipe5"
+                        value="option3"
                         class="radio-button"
                     />
-                    <label for="pipe5" class="radio-checkbox-label">3rd</label>
+                    <label for="option3" class="radio-checkbox-label"
+                        >3rd</label
+                    >
                     <span class="option-context"
                         >- [8,x] Creates 8 columns, 1 for each pipe and x rows
                         per ~ per partcode.</span
                     >
+                </div>
+                <div class="option-div">
+                    <input
+                        type="radio"
+                        id="option4"
+                        name="parsingOptions"
+                        value="option4"
+                        class="radio-button"
+                    />
+                    <label for="option4" class="radio-checkbox-label"
+                        >4th</label
+                    >
+                    <span class="option-context">- Error Detection 1</span>
                 </div>
                 <div class="option-div">
                     <input
@@ -87,25 +104,10 @@
                         class="radio-button"
                     />
                     <label for="option5" class="radio-checkbox-label"
-                        >Error Detection</label
-                    >
+                        >5th
+                    </label>
                     <span class="option-context"
-                        >- </span
-                    >
-                </div>
-                <div class="option-div">
-                    <input
-                        type="radio"
-                        id="option6"
-                        name="parsingOptions"
-                        value="option6"
-                        class="radio-button"
-                    />
-                    <label for="option6" class="radio-checkbox-label"
-                        >Error Correction</label
-                    >
-                    <span class="option-context"
-                        >- for import back into Salsify</span
+                        >- Error Correction for import back into Salsify</span
                     >
                 </div>
             </div>
@@ -128,15 +130,18 @@
             <div id="fileName" class="subtitle"></div>
             <!-- append imported fileName here -->
         </div>
-        <!-- </div> -->
 
         <div id="table-container"></div>
 
-        <script src="toast.js"></script>
-        <script src="parseSalsifyExport.js"></script>
+        <script src="scripts/toast.js"></script>
+        <script src="scripts/process/process_1.js"></script>
+        <script src="scripts/process/process_2.js"></script>
+        <script src="scripts/process/process_3.js"></script>
+        <script src="scripts/process/process_4.js"></script>
+        <script src="scripts/parseSalsifyExport.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-        <script src="xlsx.js"></script>
-        <script src="script.js"></script>
+        <script src="scripts/xlsx.js"></script>
+        <script src="scripts/dom.js"></script>
         <script></script>
     </body>
 </html>
