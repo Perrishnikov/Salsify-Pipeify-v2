@@ -57,8 +57,8 @@ function abbreviateIngredientType(type) {
  *
  * @param {Array<Object>} rows_of_data - The array of rows of data to process.
  * @param {Array<string>} ingredients_to_merge - The array of keys representing ingredients to merge.
- * @param {Entity} merged_ingredient_entity - The merged ingredient entity.
- * @param {Entity} ingredient_type_entity - The ingredient type entity.
+ * @param {Header} merged_ingredient_entity - The merged ingredient entity.
+ * @param {Header} ingredient_type_entity - The ingredient type entity.
  * @returns {Array<Object>} - An array of entities created from the rows of data.
  */
 function createRowForEachMergedIngredientType(

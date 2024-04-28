@@ -112,7 +112,7 @@ function indexTheEntities(headers_row, cleaned_rows) {
  * Represents a data cell with specified properties.
  * @class
  */
-class Entity {
+class Header {
     /**
      * Constructs a new instance of `CellData`.
      * @param {Object} params - The parameters for the `CellData` instance.
@@ -126,49 +126,61 @@ class Entity {
         this.id = id;
         this.name = name;
         this.type = type;
-        this.index = index;
-        this.value = value;
+        // this.index = index;
+        // this.value = value;
+        this.abbr = ''
     }
 }
 
 const LABEL_DATASET_NUTRIENT_A = {
     id: 'LABEL_DATASET_NUTRIENT_A - en-US',
     abbr: 'Nutrient',
-    starts_with: 'LABEL_DATASET_NUTRIENT_A',
+    // starts_with: 'LABEL_DATASET_NUTRIENT_A',
 };
 
 const LABEL_DATASET_INGREDIENTS_A = {
     id: 'LABEL_DATASET_INGREDIENTS_A - en-US',
     abbr: 'Ingredient',
-    starts_with: 'LABEL_DATASET_INGREDIENTS_A',
+    // starts_with: 'LABEL_DATASET_INGREDIENTS_A',
 };
 
 const LABEL_DATASET_OTHER_INGREDS_A = {
     id: 'LABEL_DATASET_OTHER_INGREDS_A',
     abbr: 'Other',
-    starts_with: 'LABEL_DATASET_OTHER_INGREDS_A',
+    // starts_with: 'LABEL_DATASET_OTHER_INGREDS_A',
 };
 
 class Type {
-    constructor() {}
+    id = '';
 }
 
-//TODO: clean, class, or scope these
-// Keep here
+class Entity{
+    /** @type {string} */
+    value= '';
+
+    /** @type {Type | string} PARTCODE, Product ID, MERGED_INGREDIENT, */
+    type;
+
+    /** @type {Header} */
+    header;
+
+    status;
+}
+
 const ingredients_to_merge = [
     LABEL_DATASET_NUTRIENT_A.id,
     LABEL_DATASET_INGREDIENTS_A.id,
     LABEL_DATASET_OTHER_INGREDS_A.id,
 ];
-const merged_ingredient_entity = new Entity({
+const merged_ingredient_entity = new Header({
     id: 'MERGED_INGREDIENTS',
     name: 'Ingredient Info',
-    type: 'MERGED_INGREDIENTS',
+    // type: 'MERGED_INGREDIENTS',
 });
-const ingredient_type_entity = new Entity({
+const ingredient_type_entity = new Header({
     id: 'INGREDIENT_TYPE',
     name: 'Type',
-    type: 'INGREDIENT_TYPE',
+    // type: 'INGREDIENT_TYPE',
 });
 
 /**
@@ -185,8 +197,9 @@ function switch_parsingOptions(mergedJsonData, parsingOption) {
                 /** [3,3] Meh - Creates 3 columns for each of the ingredient types and 1 row per partcode */
 
                 // PARTCODE, Product ID, LABEL_DATASET_OTHER_INGREDS_A, ...
+                console.log(`mergedJsonData`, mergedJsonData);
                 const uniqueKeys = getUniqueKeys(mergedJsonData);
-                /** @type {Row} */
+               
                 const rowsOfIngredient = [];
 
                 mergedJsonData.forEach((row) => {
@@ -377,6 +390,70 @@ function salsify_preprocess(jsonData, parsingOption) {
     process_parsing_option(parsingOption);
 }
 
+
+
+/**
+ * Merges columns in the provided JSON data based on specified prefixes and returns a new array of objects with merged data.
+ *
+ * This function takes a JSON array of rows (objects) as input, iterates through each row, and combines values in columns
+ * that match specified prefixes (e.g., "LABEL_DATASET_INGREDIENTS_A - en-US" and "LABEL_DATASET_NUTRIENT_A - en-US").
+ * It then constructs a new array of rows with the merged data, keeping non-merged columns intact.
+ *
+ * @param {Array<Object>} jsonData - The JSON array of rows (objects) containing data from the Excel file.
+ * @returns {Array<Object>} - A new JSON array of rows (objects) with merged data.
+ */
+function prepreprocess_mergeMultipleIngredients(jsonData) {
+    // Define the column prefixes you want to merge
+    const mergePrefixes = [
+        LABEL_DATASET_NUTRIENT_A.id,
+        LABEL_DATASET_INGREDIENTS_A.id
+    ];
+
+    // Create an array to hold the new JSON data with merged columns
+    const mergedJsonData = jsonData.map((row) => {
+        // Create a new object to hold the merged row
+        let mergedRow = {};
+
+        // Iterate through the merge prefixes
+        mergePrefixes.forEach((prefix) => {
+            // Initialize a variable to hold the combined value
+            let combinedValue = '';
+
+            // Iterate through the keys in the row to find columns matching the prefix
+            Object.keys(row).forEach((key) => {
+                if (key.startsWith(prefix)) {
+                    // Add the value to the combinedValue with a ~ delimiter if not the first value
+                    if (combinedValue) {
+                        combinedValue += `${importDelimiter}${row[key]}`;
+                    } else {
+                        combinedValue = row[key];
+                    }
+                }
+            });
+
+            // If there's a combined value, add it to the merged row under the prefix key
+            if (combinedValue) {
+                mergedRow[prefix] = combinedValue;
+            }
+        });
+
+        // Add all the non-merged keys and values from the original row to the merged row
+        Object.keys(row).forEach((key) => {
+            // If the key doesn't match any merge prefix, add it to the merged row
+            const isMergedPrefix = mergePrefixes.some((prefix) =>
+                key.startsWith(prefix)
+            );
+            if (!isMergedPrefix) {
+                mergedRow[key] = row[key];
+            }
+        });
+
+        return mergedRow;
+    });
+
+    return mergedJsonData;
+}
+
 /********************************************************************* */
 function moveColumnsToFront(data, columnsToMove) {
     // Create a new array to hold the reordered objects
@@ -461,67 +538,6 @@ function storeJsonObjectInLocalStorage(key, jsonObject) {
     localStorage.setItem(key, jsonString);
 }
 
-/**
- * Merges columns in the provided JSON data based on specified prefixes and returns a new array of objects with merged data.
- *
- * This function takes a JSON array of rows (objects) as input, iterates through each row, and combines values in columns
- * that match specified prefixes (e.g., "LABEL_DATASET_INGREDIENTS_A - en-US" and "LABEL_DATASET_NUTRIENT_A - en-US").
- * It then constructs a new array of rows with the merged data, keeping non-merged columns intact.
- *
- * @param {Array<Object>} jsonData - The JSON array of rows (objects) containing data from the Excel file.
- * @returns {Array<Object>} - A new JSON array of rows (objects) with merged data.
- */
-function prepreprocess_mergeMultipleIngredients(jsonData) {
-    // Define the column prefixes you want to merge
-    const mergePrefixes = [
-        'LABEL_DATASET_INGREDIENTS_A - en-US',
-        'LABEL_DATASET_NUTRIENT_A - en-US',
-    ];
-
-    // Create an array to hold the new JSON data with merged columns
-    const mergedJsonData = jsonData.map((row) => {
-        // Create a new object to hold the merged row
-        let mergedRow = {};
-
-        // Iterate through the merge prefixes
-        mergePrefixes.forEach((prefix) => {
-            // Initialize a variable to hold the combined value
-            let combinedValue = '';
-
-            // Iterate through the keys in the row to find columns matching the prefix
-            Object.keys(row).forEach((key) => {
-                if (key.startsWith(prefix)) {
-                    // Add the value to the combinedValue with a ~ delimiter if not the first value
-                    if (combinedValue) {
-                        combinedValue += `${importDelimiter}${row[key]}`;
-                    } else {
-                        combinedValue = row[key];
-                    }
-                }
-            });
-
-            // If there's a combined value, add it to the merged row under the prefix key
-            if (combinedValue) {
-                mergedRow[prefix] = combinedValue;
-            }
-        });
-
-        // Add all the non-merged keys and values from the original row to the merged row
-        Object.keys(row).forEach((key) => {
-            // If the key doesn't match any merge prefix, add it to the merged row
-            const isMergedPrefix = mergePrefixes.some((prefix) =>
-                key.startsWith(prefix)
-            );
-            if (!isMergedPrefix) {
-                mergedRow[key] = row[key];
-            }
-        });
-
-        return mergedRow;
-    });
-
-    return mergedJsonData;
-}
 
 /** ************************************************************* */
 
