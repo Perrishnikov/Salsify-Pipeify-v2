@@ -122,66 +122,105 @@ class Header {
      * @param {number} [params.index] - The index of the cell (optional).
      * @param {any} [params.value=null] - The value of the cell (optional, defaults to `null`).
      */
-    constructor({ id, name, type, index, value = null }) {
+    constructor({ id, name }) {
         this.id = id;
         this.name = name;
-        this.type = type;
-        // this.index = index;
-        // this.value = value;
-        this.abbr = ''
     }
 }
 
-const LABEL_DATASET_NUTRIENT_A = {
-    id: 'LABEL_DATASET_NUTRIENT_A - en-US',
-    abbr: 'Nutrient',
-    // starts_with: 'LABEL_DATASET_NUTRIENT_A',
-};
+// Array has Objects
+// An Object for each Row
+// Object has key for each column
+// key is header
+// value is cell value
 
-const LABEL_DATASET_INGREDIENTS_A = {
-    id: 'LABEL_DATASET_INGREDIENTS_A - en-US',
-    abbr: 'Ingredient',
-    // starts_with: 'LABEL_DATASET_INGREDIENTS_A',
-};
-
-const LABEL_DATASET_OTHER_INGREDS_A = {
-    id: 'LABEL_DATASET_OTHER_INGREDS_A',
-    abbr: 'Other',
-    // starts_with: 'LABEL_DATASET_OTHER_INGREDS_A',
-};
-
-class Type {
-    id = '';
-}
-
-class Entity{
+class Cell {
     /** @type {string} */
-    value= '';
+    value = '';
 
-    /** @type {Type | string} PARTCODE, Product ID, MERGED_INGREDIENT, */
+    /** @type {string} PARTCODE, Product ID, MERGED_INGREDIENT, */
     type;
 
     /** @type {Header} */
     header;
 
+    /** @type {Status} */
     status;
+    constructor({ value, header, type, status = null }) {
+        this.value = value;
+        this.type = type;
+        this.header = header;
+        this.status = status;
+    }
 }
+
+/**
+ * Represents a substitution object.
+ *
+ * @typedef {Object} Substitution
+ * @property {string} id - The unique identifier for the substitution.
+ * @property {string} abbr - The abbreviation for the substitution.
+ */
+/**@type {Substitution} */
+const LABEL_DATASET_NUTRIENT_A = {
+    id: 'LABEL_DATASET_NUTRIENT_A - en-US',
+    abbr: 'Nutrients',
+};
+/**@type {Substitution} */
+const LABEL_DATASET_INGREDIENTS_A = {
+    id: 'LABEL_DATASET_INGREDIENTS_A - en-US',
+    abbr: 'Ingredients',
+};
+/**@type {Substitution} */
+const LABEL_DATASET_OTHER_INGREDS_A = {
+    id: 'LABEL_DATASET_OTHER_INGREDS_A',
+    abbr: 'Other',
+};
+/**@type {Substitution} */
+const MERGED_INGREDIENTS = {
+    id: 'MERGED_INGREDIENTS',
+    abbr: 'Ingredient Info',
+};
+/**@type {Substitution} */
+const INGREDIENT_TYPE = {
+    id: 'INGREDIENT_TYPE',
+    abbr: 'Type',
+};
 
 const ingredients_to_merge = [
     LABEL_DATASET_NUTRIENT_A.id,
     LABEL_DATASET_INGREDIENTS_A.id,
     LABEL_DATASET_OTHER_INGREDS_A.id,
 ];
-const merged_ingredient_entity = new Header({
-    id: 'MERGED_INGREDIENTS',
-    name: 'Ingredient Info',
-    // type: 'MERGED_INGREDIENTS',
-});
-const ingredient_type_entity = new Header({
-    id: 'INGREDIENT_TYPE',
-    name: 'Type',
-    // type: 'INGREDIENT_TYPE',
-});
+
+/**
+ * Returns all unique keys from an array of objects.
+ *
+ * @param {Array<Object>} arrayOfObjects - The array of objects to process.
+ * @returns {Array<string>} - An array of unique keys from the objects.
+ */
+function getUniqueColumnNames(arrayOfObjects) {
+    // Create a Set to store unique keys
+    const uniqueKeysSet = new Set();
+
+    // Loop through each object in the array
+    for (const obj of arrayOfObjects) {
+        // Loop through each key in the current object
+        for (const key in obj) {
+            // Add the key to the Set
+            uniqueKeysSet.add(key);
+        }
+    }
+
+    // Convert the Set to an array and return it
+    return Array.from(uniqueKeysSet);
+}
+
+/**
+ * An array of objects, where each object has a numerical key and a value of type Entity.
+ *
+ * @typedef {Object.<number, Cell>} ObjectWithEntity
+ */
 
 /**
  * Triggered when radio buttons change
@@ -190,60 +229,76 @@ const ingredient_type_entity = new Header({
  * @returns
  */
 function switch_parsingOptions(mergedJsonData, parsingOption) {
-    console.log(`parsingOption `, parsingOption);
+    // console.log('mergedJsonData', mergedJsonData);
+    // console.log(`parsingOption `, parsingOption);
+
+    const uniqueColumnNames = getUniqueColumnNames(mergedJsonData);
+    // console.log(`uniqueKeys`, uniqueKeys);
+
+    const orderedColumnNames = uniqueColumnNames
+        .moveToFrontById('PRODUCT_NAME')
+        .moveToFrontById('Product ID')
+        .moveToFrontById('PARTCODE')
+        .moveToEndById(LABEL_DATASET_NUTRIENT_A.id)
+        .moveToEndById(LABEL_DATASET_INGREDIENTS_A.id)
+        .moveToEndById(LABEL_DATASET_OTHER_INGREDS_A.id);
+    // console.log(`orderedColumnNames`, orderedColumnNames);
+
     switch (parsingOption) {
         case 'meh':
             {
                 /** [3,3] Meh - Creates 3 columns for each of the ingredient types and 1 row per partcode */
 
-                // PARTCODE, Product ID, LABEL_DATASET_OTHER_INGREDS_A, ...
-                console.log(`mergedJsonData`, mergedJsonData);
-                const uniqueKeys = getUniqueKeys(mergedJsonData);
-               
-                const rowsOfIngredient = [];
-
-                mergedJsonData.forEach((row) => {
-                    const entity = {};
-
-                    for (const key of uniqueKeys) {
-                        const value = row[key] || ''; // return '' if not found
-                        entity[key] = value;
-                    }
-
-                    rowsOfIngredient.push(entity);
-
-                    // console.log(`entity`, entity);
+                const rowsOfCells = option_0({
+                    rows: mergedJsonData,
+                    columnNames: orderedColumnNames,
+                    substitute_headers: [
+                        LABEL_DATASET_NUTRIENT_A,
+                        LABEL_DATASET_INGREDIENTS_A,
+                        LABEL_DATASET_OTHER_INGREDS_A,
+                    ],
                 });
-                return rowsOfIngredient;
+
+                return rowsOfCells;
             }
             break;
         case 'option1':
             {
                 /** 1st - [1,x] Creates 1 column for all ingredients and up to 3 rows per partcode. */
 
-                const entityRows = createRowForEachMergedIngredientType(
-                    mergedJsonData,
+                const rowsOfCells = per_type_per_partcode_1({
+                    rows: mergedJsonData,
+                    columnNames: orderedColumnNames,
                     ingredients_to_merge,
-                    merged_ingredient_entity,
-                    ingredient_type_entity
-                );
+                    substitute_values: [
+                        LABEL_DATASET_NUTRIENT_A,
+                        LABEL_DATASET_INGREDIENTS_A,
+                        LABEL_DATASET_OTHER_INGREDS_A,
+                    ],
+                });
 
-                return entityRows;
+                return rowsOfCells;
             }
             break;
         case 'option2':
             {
-                /** 2nd - [1,x] Creates 1 column for all ingredinets and x rows per ~ per partcode. */
+                /** 2nd - [1,x] Creates 1 column for all ingredinets and x rows per ingredient per partcode. */
 
-                const entityRows = createRowForEachMergedIngredientType(
-                    mergedJsonData,
+                const rowsOfCells = per_type_per_partcode_1({
+                    rows: mergedJsonData,
+                    columnNames: orderedColumnNames,
                     ingredients_to_merge,
-                    merged_ingredient_entity,
-                    ingredient_type_entity
-                );
+                    substitute_values: [
+                        LABEL_DATASET_NUTRIENT_A,
+                        LABEL_DATASET_INGREDIENTS_A,
+                        LABEL_DATASET_OTHER_INGREDS_A,
+                    ],
+                });
 
-                const rowsOfIngredients = createRowForEachInredient(entityRows);
-                // console.log(rowsOfIngredients);
+                const rowsOfIngredients = per_ingred_per_partCode_2(
+                    rowsOfCells,
+                    ingredients_to_merge
+                );
 
                 return rowsOfIngredients;
             }
@@ -251,60 +306,69 @@ function switch_parsingOptions(mergedJsonData, parsingOption) {
         case 'option3':
             {
                 /** 3rd - [8,x] Creates 8 columns, 1 for each pipe and x rows per ~ per partcode. */
-                const entityRows = createRowForEachMergedIngredientType(
-                    mergedJsonData,
+                const rowsOfCells = per_type_per_partcode_1({
+                    rows: mergedJsonData,
+                    columnNames: orderedColumnNames,
                     ingredients_to_merge,
-                    merged_ingredient_entity,
-                    ingredient_type_entity
-                );
+                    substitute_values: [
+                        LABEL_DATASET_NUTRIENT_A,
+                        LABEL_DATASET_INGREDIENTS_A,
+                        LABEL_DATASET_OTHER_INGREDS_A,
+                    ],
+                });
 
-                const rowsOfIngredients = createRowForEachInredient(entityRows);
+                const rowsOfIngredients = per_ingred_per_partCode_2(
+                    rowsOfCells,
+                    ingredients_to_merge
+                );
                 // console.log(rowsOfIngredients);
 
                 const columnOfPipes =
-                    createColumnForEachPipe(rowsOfIngredients);
+                    per_pipe_per_partcode_3(rowsOfIngredients);
 
                 return columnOfPipes;
             }
             break;
         case 'option4':
-            {
-                const entityRows = createRowForEachMergedIngredientType(
-                    mergedJsonData,
-                    ingredients_to_merge,
-                    merged_ingredient_entity,
-                    ingredient_type_entity
-                );
+            // {
+            //     const entityRows = per_type_per_partcode_1(
+            //         mergedJsonData,
+            //         ingredients_to_merge,
+            //         merged_ingredient_subst,
+            //         ingredient_type_subst
+            //     );
 
-                const rowsOfIngredients = createRowForEachInredient(entityRows);
-                // console.log(rowsOfIngredients);
+            //     const rowsOfIngredients = per_ingred_per_partCode_2(entityRows);
+            //     // console.log(rowsOfIngredients);
 
-                const columnOfPipes =
-                    createColumnForEachPipe(rowsOfIngredients);
+            //     const columnOfPipes =
+            //         per_pipe_per_partcode_3(rowsOfIngredients);
 
-                console.log(columnOfPipes);
+            //     console.log(columnOfPipes);
 
-                columnOfPipes.map((row) => {
-                    console.log(`row: `, row);
-                    if (
-                        row.INGREDIENT_TYPE ===
-                        'LABEL_DATASET_NUTRIENT_A - en-US'
-                    ) {
-                        const order = row.ORDER;
-                        console.log(`order: `, order);
-                    }
-                    return row;
-                });
-                return columnOfPipes;
-            }
+            //     columnOfPipes.map((row) => {
+            //         console.log(`row: `, row);
+            //         if (
+            //             row.INGREDIENT_TYPE ===
+            //             'LABEL_DATASET_NUTRIENT_A - en-US'
+            //         ) {
+            //             const order = row.ORDER;
+            //             console.log(`order: `, order);
+            //         }
+            //         return row;
+            //     });
+            //     return columnOfPipes;
+            // }
             break;
         default:
             break;
     }
+
+    // return reordered;
 }
 
 function process_parsing_option(parsingOption) {
-    try {
+    // try {
         const jsonString = localStorage.getItem('original_merged');
         const jsonObject = JSON.parse(jsonString);
 
@@ -314,19 +378,19 @@ function process_parsing_option(parsingOption) {
 
         //* SORT - start */
         // Define the columns to move to the front
-        const columnsToMoveToFront = ['PARTCODE', 'Product ID'];
+        // const columnsToMoveToFront = ['PARTCODE', 'Product ID'];
 
         // Move specified columns to the front of each object
-        const movedToFront = moveColumnsToFront(
-            entityRows,
-            columnsToMoveToFront
-        );
+        // const movedToFront = moveColumnsToFront(
+        //     entityRows,
+        //     columnsToMoveToFront
+        // );
 
         // Move specified columns to the end of each object
-        const reorderedData = moveColumnsToEnd(
-            movedToFront,
-            ingredients_to_merge
-        );
+        // const reorderedData = moveColumnsToEnd(
+        //     entityRows,
+        //     ingredients_to_merge
+        // );
 
         //* SORT - done */
 
@@ -338,23 +402,24 @@ function process_parsing_option(parsingOption) {
         // storeJsonObjectInLocalStorage(jsonDataSheet, 'download_json');
 
         /* //! DOM doesnt need workbook Create DOM elements */
-        const htmlTable = create_html_table(reorderedData, null);
+        // const htmlTable = create_html_table(reorderedData, null);
+        const htmlTable = create_html_table_with_entities(entityRows, null);
 
         // Get container element to append the table
         const tableContainer = document.getElementById('table-container');
         // Clear any old table
         tableContainer.innerHTML = '';
         tableContainer.appendChild(htmlTable);
-    } catch (error) {
-        switch (error.message) {
-            case 'arrayOfObjects is null':
-                break;
-            default:
-                console.dir(error);
-                showToast(`Unexpected error: ${error}`, 'error');
-                break;
-        }
-    }
+    // } catch (error) {
+    //     switch (error.message) {
+    //         case 'arrayOfObjects is null':
+    //             break;
+    //         default:
+    //             console.dir(error);
+    //             showToast(`Unexpected error: ${error}`, 'error');
+    //             break;
+    //     }
+    // }
 }
 
 /** MAIN ****************************************************************/
@@ -390,8 +455,6 @@ function salsify_preprocess(jsonData, parsingOption) {
     process_parsing_option(parsingOption);
 }
 
-
-
 /**
  * Merges columns in the provided JSON data based on specified prefixes and returns a new array of objects with merged data.
  *
@@ -406,7 +469,7 @@ function prepreprocess_mergeMultipleIngredients(jsonData) {
     // Define the column prefixes you want to merge
     const mergePrefixes = [
         LABEL_DATASET_NUTRIENT_A.id,
-        LABEL_DATASET_INGREDIENTS_A.id
+        LABEL_DATASET_INGREDIENTS_A.id,
     ];
 
     // Create an array to hold the new JSON data with merged columns
@@ -455,36 +518,43 @@ function prepreprocess_mergeMultipleIngredients(jsonData) {
 }
 
 /********************************************************************* */
-function moveColumnsToFront(data, columnsToMove) {
-    // Create a new array to hold the reordered objects
-    const reorderedData = [];
 
-    // Iterate through each object in the original data
-    data.forEach((obj) => {
-        // Create a new object
-        const reorderedObj = {};
+// Extend the Array prototype with a new function called moveToFrontById
+Array.prototype.moveToFrontById = function (id) {
+    // Find the index of the object with the specified `id` property
+    //! const index = this.findIndex((obj) => obj.id === id);
+    const index = this.findIndex((name) => name === id);
 
-        // Move specified columns to the front of the object
-        columnsToMove.forEach((key) => {
-            if (obj.hasOwnProperty(key)) {
-                reorderedObj[key] = obj[key];
-            }
-        });
+    // If the object is found and the index is not the first index, proceed
+    if (index > 0) {
+        // Splice the object out of the array
+        const [obj] = this.splice(index, 1);
+        // Insert the object at the front of the array
+        this.unshift(obj);
+    }
 
-        // Add remaining columns that are not in the specified list
-        for (const key in obj) {
-            if (!reorderedObj.hasOwnProperty(key)) {
-                reorderedObj[key] = obj[key];
-            }
-        }
+    return this;
+};
+/**
+ * Moves an object with the specified `id` to the end of an array of objects.
+ *
+ * @param {string} id - The `id` of the object to move to the end of the array.
+ * @returns {Array<Object>} - The array with the object moved to the end.
+ */
+Array.prototype.moveToEndById = function (id) {
+    // Find the index of the object with the specified `id` property
+    const index = this.findIndex((name) => name === id);
 
-        // Add the reordered object to the new array
-        reorderedData.push(reorderedObj);
-    });
+    // If the object is found and the index is not already at the end, proceed
+    if (index > -1 && index < this.length - 1) {
+        // Remove the object from its current position
+        const [obj] = this.splice(index, 1);
+        // Add the object to the end of the array
+        this.push(obj);
+    }
 
-    // Return the new array of objects with specified columns moved to the front
-    return reorderedData;
-}
+    return this;
+};
 
 /**
  * Moves specified columns to the end of each object in an array of objects.
@@ -538,8 +608,37 @@ function storeJsonObjectInLocalStorage(key, jsonObject) {
     localStorage.setItem(key, jsonString);
 }
 
-
 /** ************************************************************* */
+
+/* Function to generate HTML table from JSON data */
+function create_html_table_with_entities(data, radioOption = null) {
+    const myTable = document.createElement('table');
+    myTable.setAttribute('id', 'my-table');
+
+    // Add table header
+    const headerRow = document.createElement('tr');
+    for (const key in data[0]) {
+        const headerName = data[0][key].header.name;
+        // console.log('headerName', headerName);
+        const th = document.createElement('th');
+        th.textContent = headerName; //*
+        headerRow.appendChild(th);
+    }
+    myTable.appendChild(headerRow);
+
+    // Add table rows
+    data.forEach((item) => {
+        const row = document.createElement('tr');
+        for (const key in item) {
+            const cell = document.createElement('td');
+            cell.textContent = item[key].value; //*
+            row.appendChild(cell);
+        }
+        myTable.appendChild(row);
+    });
+
+    return myTable;
+}
 
 /* Function to generate HTML table from JSON data */
 function create_html_table(data, radioOption = null) {

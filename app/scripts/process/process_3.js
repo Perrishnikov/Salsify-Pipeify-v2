@@ -18,7 +18,7 @@ const pipedObject = {
  * @param {*} rowsOfIngredients
  * @returns
  */
-function createColumnForEachPipe(rowsOfIngredients) {
+function per_pipe_per_partcode_3(rowsOfIngredients) {
     // console.log(rowsOfIngredients);
 
     const newEntities = [];
