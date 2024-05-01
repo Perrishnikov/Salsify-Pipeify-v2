@@ -58,7 +58,7 @@ function per_type_per_partcode_1({
             // console.log(`ingredient_value`, ingredient_value);
 
             // Create a new row by copying salsifyCells
-            const rowForType = [...salsifyCells];
+            const rowForType = salsifyCells.map(cloneCell);
 
             /** Substitutions for ingredient type */
             const substitutionFound = substitute_values.find(

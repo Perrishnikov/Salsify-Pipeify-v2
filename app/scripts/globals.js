@@ -41,6 +41,23 @@ class Cell {
     }
 }
 
+/**
+ * Helper function to create a deep copy of a Cell instance.
+ *
+ * @param {Cell} cell - The Cell instance to clone.
+ * @returns {Cell} - A deep copy of the Cell instance.
+ */
+function cloneCell(cell) {
+    return new Cell({
+        value: cell.value,
+        type: cell.type,
+        header: new Header({
+            id: cell.header.id,
+            name: cell.header.name,
+        }),
+    });
+}
+
 function createOrderCell(value) {
     const ORDER = new Header({
         id: 'ORDER',
