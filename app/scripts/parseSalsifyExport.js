@@ -252,10 +252,9 @@ function switch_parsingOptions(mergedJsonData, parsingOption) {
                         LABEL_DATASET_OTHER_INGREDS_A,
                     ],
                 });
-                console.log(rowsOfCells);
+
                 const rowsOfIngredients = per_ingred_per_partcode_2(
                     rowsOfCells,
-                    // ingredients_to_merge
                 );
 
                 return rowsOfIngredients;
@@ -264,27 +263,24 @@ function switch_parsingOptions(mergedJsonData, parsingOption) {
         case 'option3':
             {
                 /** 3rd - [8,x] Creates 8 columns, 1 for each pipe and x rows per ~ per partcode. */
-                // const rowsOfCells = per_type_per_partcode_1({
-                //     rows: mergedJsonData,
-                //     columnNames: orderedColumnNames,
-                //     ingredients_to_merge,
-                //     substitute_values: [
-                //         LABEL_DATASET_NUTRIENT_A,
-                //         LABEL_DATASET_INGREDIENTS_A,
-                //         LABEL_DATASET_OTHER_INGREDS_A,
-                //     ],
-                // });
+                const rowsOfCells = per_type_per_partcode_1({
+                    rows: mergedJsonData,
+                    columnNames: orderedColumnNames,
+                    ingredients_to_merge,
+                    substitute_values: [
+                        LABEL_DATASET_NUTRIENT_A,
+                        LABEL_DATASET_INGREDIENTS_A,
+                        LABEL_DATASET_OTHER_INGREDS_A,
+                    ],
+                });
 
-                // const rowsOfIngredients = per_ingred_per_partcode_2(
-                //     rowsOfCells,
-                //     ingredients_to_merge
-                // );
-                // // console.log(rowsOfIngredients);
+                const rowsOfIngredients =
+                    per_ingred_per_partcode_2(rowsOfCells);
 
-                // const columnOfPipes =
-                //     per_pipe_per_partcode_3(rowsOfIngredients);
+                const columnOfPipes =
+                    per_pipe_per_partcode_3(rowsOfIngredients);
 
-                // return columnOfPipes;
+                return columnOfPipes;
             }
             break;
         case 'option4':

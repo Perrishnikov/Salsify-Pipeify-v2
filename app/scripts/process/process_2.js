@@ -19,7 +19,7 @@ function per_ingred_per_partcode_2(rows) {
 
                 // Create a new row for each ingredient
                 ingredientsArray.forEach((ingredient) => {
-                    // Create a deep copy of the row without the MERGED_INGREDIENTS cell
+                    // Remove the original MERGED_INGREDIENTS Create a deep copy of the row without the MERGED_INGREDIENTS cell
                     const newRow = row.filter((c) => c !== cell).map(cloneCell);
 
                     // Create a new Cell for the ingredient

@@ -69,6 +69,7 @@ function createNutrient(pipes) {
  * @param {Object.<number, Cell>} object - The object to which new `Cell` instances will be added.
  * @returns {Object.<number, Cell>} - The updated `duplicatedObject` with new `Cell` instances added.
  */
+/*
 function createCellsForNutrient(nutrient, object) {
     const duplicatedObject = deepCopyObjectWithCells(object);
 
@@ -102,6 +103,7 @@ function createCellsForNutrient(nutrient, object) {
 
     return duplicatedObject;
 }
+*/
 
 class Ingredient {
     /**@type {number} */
@@ -186,135 +188,228 @@ function deepCopyIngred(object) {
  * @param {Object.<number, Cell>} object - The object to which new `Cell` instances will be added.
  * @returns {Object.<number, Cell>} - The updated `duplicatedObject` with new `Cell` instances added.
  */
-function createCellsForIngredient(ingredient, duplicatedObject) {
-    // const duplicatedObject = deepCopyIngred(object);
-    const arrt = [];
+function createCellsForIngredient(ingredient) {
+    const ingredientCells = [];
 
-    // console.log(`comes in bad`, duplicatedObject);
     const orderCell = createOrderCell(ingredient.order);
-    arrt.push(orderCell);
-    // const orderKey = getNextKey(duplicatedObject);
-    // duplicatedObject[orderKey] = orderCell;
-    // console.log(`orderKey`, orderKey, duplicatedObject);
-    // duplicatedObject.perry = 'perry'
-
     const descCell = createDescCell(ingredient.shortDesc);
-    // const descKey = getNextKey(duplicatedObject);
-    arrt.push(descCell);
-    // duplicatedObject[descKey] = descCell;
-    // console.log(`descKey`, descKey, duplicatedObject);
-
     const qtyCell = createQtyCell(ingredient.qty);
-    arrt.push(qtyCell);
-    // const qtyKey = getNextKey(duplicatedObject);
-    // duplicatedObject[qtyKey] = qtyCell;
-    // console.log(`qtyKey`, qtyKey, duplicatedObject);
-
     const uomCell = createUomCell(ingredient.uom);
-    arrt.push(uomCell);
-    // const uomKey = getNextKey(duplicatedObject);
-    // duplicatedObject[uomKey] = uomCell;
-
     const dvAmtCell = createDvAmtCell(ingredient.dvAmt);
-    arrt.push(dvAmtCell);
-    // const dvAmtKey = getNextKey(duplicatedObject);
-    // duplicatedObject[dvAmtKey] = dvAmtCell;
-
     const symbolCell = createSymbolCell(ingredient.symbol);
-    arrt.push(symbolCell);
-    // const symbolKey = getNextKey(duplicatedObject);
-    // duplicatedObject[symbolKey] = symbolCell;
-
     const footnoteCell = createFootnoteCell(ingredient.foot);
-    arrt.push(footnoteCell);
-    // const footnoteKey = getNextKey(duplicatedObject);
-    // duplicatedObject[footnoteKey] = footnoteCell;
 
-    // return duplicatedObject;
-    return arrt;
+    ingredientCells.push(
+        orderCell,
+        descCell,
+        qtyCell,
+        uomCell,
+        dvAmtCell,
+        symbolCell,
+        footnoteCell
+    );
+    return ingredientCells;
 }
 
+/**
+ * Retrieves an object from an array where the `type` property equals 'INGREDIENT_TYPE'.
+ *
+ * @param {Array<Object<string,string>>} array - The array of objects to search.
+ * @returns {Object|null} - The first object with `type` equal to 'INGREDIENT_TYPE', or null if not found.
+ */
+function getObjectByIngredientType(array) {
+    // Use the `find` method to locate the object with `type` equal to 'INGREDIENT_TYPE'
+    return array.find((obj) => obj.type === 'INGREDIENT_TYPE') || null;
+}
+
+function createCellsForNutrient(nutrient) {
+    const nutrientCells = [];
+    const orderCell = createOrderCell(nutrient.order);
+    const descCell = createDescCell(nutrient.coalesced);
+    const qtyCell = createQtyCell(nutrient.qty);
+    const uomCell = createUomCell(nutrient.uom);
+    const dvAmtCell = createDvAmtCell(nutrient.dvAmt);
+    const symbolCell = createSymbolCell(nutrient.symbol);
+    const footnoteCell = createFootnoteCell(nutrient.foot);
+
+    nutrientCells.push(
+        orderCell,
+        descCell,
+        qtyCell,
+        uomCell,
+        dvAmtCell,
+        symbolCell,
+        footnoteCell
+    );
+
+    return nutrientCells;
+}
+
+function createCellsForOther(value) {
+    const otherCells = [];
+
+    const orderCell = createOrderCell('');
+    const descCell = createDescCell(value);
+    const qtyCell = createQtyCell('');
+    const uomCell = createUomCell('');
+    const dvAmtCell = createDvAmtCell('');
+    const symbolCell = createSymbolCell('');
+    const footnoteCell = createFootnoteCell('');
+
+    otherCells.push(
+        orderCell,
+        descCell,
+        qtyCell,
+        uomCell,
+        dvAmtCell,
+        symbolCell,
+        footnoteCell
+    );
+    return otherCells;
+}
+/**
+ * Creates an array of rows, each representing a single ingredient from `MERGED_INGREDIENTS` in each row.
+ *
+ * @param {Array<Array<Cell>>} rows - An array of arrays, each representing a row of data with Cell instances.
+ * @returns {Array<Array<Cell>>} - An array of rows, each representing a single ingredient from `MERGED_INGREDIENTS` in each row.
+ */
+function per_pipe_per_partcode_3(rows) {
+    const rowsOfIngredients = [];
+
+    // Iterate through each row of data
+    rows.forEach((row) => {
+        // Process each cell in the row
+        // console.log(`row`, row);
+
+        row.forEach((cell) => {
+            // console.log(`cell`, cell);
+
+            // Check if the cell is of type MERGED_INGREDIENTS
+            if (cell.type === MERGED_INGREDIENTS.id) {
+                // Split the merged ingredient value by the import delimiter
+                const ingredientTypeObject = getObjectByIngredientType(row);
+
+                const ingredientsArray = cell.value.split('|');
+                // console.log(`ingredientsArray`,cell.type, ingredientsArray);
+
+                // Remove the original MERGED_INGREDIENTS Create a deep copy of the row without the MERGED_INGREDIENTS cell
+                const newRow = row.filter((c) => c !== cell).map(cloneCell);
+
+                if (
+                    ingredientTypeObject.value === LABEL_DATASET_NUTRIENT_A.abbr
+                ) {
+                    const nutrient = createNutrient(ingredientsArray);
+                    // console.log('nutrient', nutrient);
+                    const nutrientCells = createCellsForNutrient(nutrient);
+                    // console.log(`nutrientCells`, nutrientCells);
+
+                    newRow.push(...nutrientCells);
+                } else if (
+                    ingredientTypeObject.value ===
+                    LABEL_DATASET_INGREDIENTS_A.abbr
+                ) {
+                    const ingredient = createIngredient(ingredientsArray);
+
+                    const ingredientCells =
+                        createCellsForIngredient(ingredient);
+
+                    newRow.push(...ingredientCells);
+                } else if (
+                    ingredientTypeObject.value ===
+                    LABEL_DATASET_OTHER_INGREDS_A.abbr
+                ) {
+                    const other = createCellsForOther(cell.value);
+
+                    newRow.push(...other);
+                }
+                rowsOfIngredients.push(newRow);
+            }
+        });
+    });
+    // console.log(`rowsOfIngredients`, rowsOfIngredients);
+    return rowsOfIngredients;
+}
 /**
  * //* 3rd
  * @param {Array<Object.<number, Cell>>} rows - An array of merged JSON data.
  * @returns {Array<ObjectWithEntity>} - An array of objects representing rows of ingredients.
  */
-function per_pipe_per_partcode_3(rows) {
-    console.log(rows);
 
-    // const rowsOfIngredients = [];
+// function per_pipe_per_partcode_3(rows) {
+//     console.log(rows);
 
-    return rows.map((row_as_obj) => {
-        //! Create new cells for each split
-        // For each obj, get it's cell
-        //duplicate all the Cells and update the MERGED_INGREDIENT value to tilde
-        let duplicatedObject = deepCopyObjectWithCells(row_as_obj);
-                    const nextIndex = Object.keys(duplicatedObject).length;
+//     // const rowsOfIngredients = [];
 
-        const typeKey = getCellKeyBy(INGREDIENT_TYPE.id, duplicatedObject);
-        /** @type {Cell} */
-        const typeCell = duplicatedObject[typeKey];
-        const type = typeCell.value;
-        // console.log(`typeCell`, typeCell);
-        console.log(`duplicatedObject ------>`, type, duplicatedObject);
-        const ingredientKey = getCellKeyBy(
-            MERGED_INGREDIENTS.id,
-            duplicatedObject
-        );
-        /** @type {Cell} */
-        const ingredientCell = duplicatedObject[ingredientKey];
-        const ingredientValue = ingredientCell.value;
-        // console.log(`ingredientCell --->`, ingredientCell);
+//     return rows.map((row_as_obj) => {
+//         //! Create new cells for each split
+//         // For each obj, get it's cell
+//         //duplicate all the Cells and update the MERGED_INGREDIENT value to tilde
+//         let duplicatedObject = deepCopyObjectWithCells(row_as_obj);
+//                     const nextIndex = Object.keys(duplicatedObject).length;
 
-        const delimitedArray = ingredientValue.split('|');
+//         const typeKey = getCellKeyBy(INGREDIENT_TYPE.id, duplicatedObject);
+//         /** @type {Cell} */
+//         const typeCell = duplicatedObject[typeKey];
+//         const type = typeCell.value;
+//         // console.log(`typeCell`, typeCell);
+//         console.log(`duplicatedObject ------>`, type, duplicatedObject);
+//         const ingredientKey = getCellKeyBy(
+//             MERGED_INGREDIENTS.id,
+//             duplicatedObject
+//         );
+//         /** @type {Cell} */
+//         const ingredientCell = duplicatedObject[ingredientKey];
+//         const ingredientValue = ingredientCell.value;
+//         // console.log(`ingredientCell --->`, ingredientCell);
 
-        if (type === LABEL_DATASET_NUTRIENT_A.abbr) {
-            // const delimitedArray = ingredientValue.split('|');
-            /**@type {Nutrient} */
-            // const nutrient = createNutrient(delimitedArray);
-            // // console.log(nutrient);
-            // const nutrientCells = createCellsForNutrient(
-            //     nutrient,
-            //     duplicatedObject
-            // );
-            // // console.log(`nutrientCells`, nutrientCells);
-            // rowsOfIngredients.push(nutrientCells);
-        } else if (type === LABEL_DATASET_INGREDIENTS_A.abbr) {
-            // const delimitedArray = ingredientValue.split('|');
-            // console.log(`delimitedArray ingredient`, delimitedArray);
+//         const delimitedArray = ingredientValue.split('|');
 
-            // if (delimitedArray.length > 0) {
-            const ingredient = createIngredient(delimitedArray);
-            // console.log(`Ingredient`, ingredient);
+//         if (type === LABEL_DATASET_NUTRIENT_A.abbr) {
+//             // const delimitedArray = ingredientValue.split('|');
+//             /**@type {Nutrient} */
+// const nutrient = createNutrient(delimitedArray);
+// // console.log(nutrient);
+// const nutrientCells = createCellsForNutrient(
+//     nutrient,
+//     duplicatedObject
+// );
+// // console.log(`nutrientCells`, nutrientCells);
+// rowsOfIngredients.push(nutrientCells);
+//         } else if (type === LABEL_DATASET_INGREDIENTS_A.abbr) {
+//             // const delimitedArray = ingredientValue.split('|');
+//             // console.log(`delimitedArray ingredient`, delimitedArray);
 
-            const ingredientCells = createCellsForIngredient(
-                ingredient,
-                duplicatedObject
-            );
-            // Determine the next available index
+//             // if (delimitedArray.length > 0) {
+//             const ingredient = createIngredient(delimitedArray);
+//             // console.log(`Ingredient`, ingredient);
 
+//             const ingredientCells = createCellsForIngredient(
+//                 ingredient,
+//                 duplicatedObject
+//             );
+//             // Determine the next available index
 
-            // Add the Cell objects to the sequence object
-            ingredientCells.forEach((cell, index) => {
-                duplicatedObject[nextIndex + index] = cell;
-            });
+//             // Add the Cell objects to the sequence object
+//             ingredientCells.forEach((cell, index) => {
+//                 duplicatedObject[nextIndex + index] = cell;
+//             });
 
-            // ingredientCells.forEach((cell, index) => {
-            //     const keys = Object.keys(duplicatedObject).length;
-            //     // const nextKey = getNextKey(duplicatedObject);
-            //     console.log(`cell`, keys, cell);
-            //     duplicatedObject[length.toString()] = cell;
-            // });
+//             // ingredientCells.forEach((cell, index) => {
+//             //     const keys = Object.keys(duplicatedObject).length;
+//             //     // const nextKey = getNextKey(duplicatedObject);
+//             //     console.log(`cell`, keys, cell);
+//             //     duplicatedObject[length.toString()] = cell;
+//             // });
 
-            // rowsOfIngredients.push(ingredientCells);
-            console.log(`.........................`, duplicatedObject);
-            // }
-            return duplicatedObject;
-        }
-    });
-    console.log(rowsOfIngredients);
-    return rowsOfIngredients;
-}
+//             // rowsOfIngredients.push(ingredientCells);
+//             console.log(`.........................`, duplicatedObject);
+//             // }
+//             return duplicatedObject;
+//         }
+//     });
+//     console.log(rowsOfIngredients);
+//     return rowsOfIngredients;
+// }
 
 /*
     rowsOfIngredients.forEach((row) => {
