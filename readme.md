@@ -67,3 +67,13 @@
         ...
     ]
     
+create a function based on these parameters that returns a new row for each key in the ingredients_to_merge Set
+/**
+ * Creates Cells for each row based on column names and merges ingredients as necessary.
+ *
+ * @param {Object} options - The options object.
+ * @param {Array<Object>} options.rows - An array of objects representing each row of data.
+ * @param {Set<string>} options.ingredients_to_merge - An array of column names to merge into one Cell.
+ * @param {Array<string>} options.columnNames - An array of column names for which to create Cell instances.
+ * @returns {Array<Cell[]>} - An array of arrays, each containing Cell instances for a row.
+ */

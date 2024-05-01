@@ -88,71 +88,25 @@ function standardTestIsTrue(valueToTest) {
  * @property {string} Product_ID - The product ID.
  */
 
-function indexTheEntities(headers_row, cleaned_rows) {
-    const indexed_headers = headers_row.map((cell, index) => {
-        cell.index = index;
-        return cell;
-    });
+// function indexTheEntities(headers_row, cleaned_rows) {
+//     const indexed_headers = headers_row.map((cell, index) => {
+//         cell.index = index;
+//         return cell;
+//     });
 
-    const indexed_rows = cleaned_rows.map((row) => {
-        return row.map((entity) => {
-            const id = entity.id;
-            const header = headers_row.filter((obj) => obj.id === id)[0];
-            entity.index = header.index;
-            return entity;
-        });
-    });
+//     const indexed_rows = cleaned_rows.map((row) => {
+//         return row.map((entity) => {
+//             const id = entity.id;
+//             const header = headers_row.filter((obj) => obj.id === id)[0];
+//             entity.index = header.index;
+//             return entity;
+//         });
+//     });
 
-    return { indexed_headers, indexed_rows };
-}
+//     return { indexed_headers, indexed_rows };
+// }
 
 /************************************************************************ */
-
-/**
- * Represents a data cell with specified properties.
- * @class
- */
-class Header {
-    /**
-     * Constructs a new instance of `CellData`.
-     * @param {Object} params - The parameters for the `CellData` instance.
-     * @param {string} params.id - The ID of the cell.
-     * @param {string} params.name - The name of the cell.
-     * @param {string} params.type - The type of the cell.
-     * @param {number} [params.index] - The index of the cell (optional).
-     * @param {any} [params.value=null] - The value of the cell (optional, defaults to `null`).
-     */
-    constructor({ id, name }) {
-        this.id = id;
-        this.name = name;
-    }
-}
-
-// Array has Objects
-// An Object for each Row
-// Object has key for each column
-// key is header
-// value is cell value
-
-class Cell {
-    /** @type {string} */
-    value = '';
-
-    /** @type {string} PARTCODE, Product ID, MERGED_INGREDIENT, */
-    type;
-
-    /** @type {Header} */
-    header;
-
-    /** @type {Status} */
-    status;
-    constructor({ value, header, type, status = null }) {
-        this.value = value;
-        this.type = type;
-        this.header = header;
-        this.status = status;
-    }
-}
 
 /**
  * Represents a substitution object.
@@ -187,11 +141,16 @@ const INGREDIENT_TYPE = {
     abbr: 'Type',
 };
 
-const ingredients_to_merge = [
+// const ingredients_to_merge = [
+//     LABEL_DATASET_NUTRIENT_A.id,
+//     LABEL_DATASET_INGREDIENTS_A.id,
+//     LABEL_DATASET_OTHER_INGREDS_A.id,
+// ];
+const ingredients_to_merge = new Set([
     LABEL_DATASET_NUTRIENT_A.id,
     LABEL_DATASET_INGREDIENTS_A.id,
     LABEL_DATASET_OTHER_INGREDS_A.id,
-];
+]);
 
 /**
  * Returns all unique keys from an array of objects.
@@ -265,6 +224,32 @@ function switch_parsingOptions(mergedJsonData, parsingOption) {
         case 'option1':
             {
                 /** 1st - [1,x] Creates 1 column for all ingredients and up to 3 rows per partcode. */
+                console.log(mergedJsonData);
+                // const rowsOfCells = per_type_per_partcode_1({
+                //     rows: mergedJsonData,
+                //     columnNames: orderedColumnNames,
+                //     ingredients_to_merge,
+                //     substitute_values: [
+                //         LABEL_DATASET_NUTRIENT_A,
+                //         LABEL_DATASET_INGREDIENTS_A,
+                //         LABEL_DATASET_OTHER_INGREDS_A,
+                //     ],
+                // });
+
+                // Example usage:
+                // const rows = ['Row 1', 'Row 2', 'Row 3'];
+                // const ingredients_to_merge = [
+                //     'Ingredient A',
+                //     'Ingredient B',
+                //     'Ingredient C',
+                // ];
+                // const columnNames = [
+                //     'PARTCODE',
+                //     'Product ID',
+                //     'Ingredient A',
+                //     'Ingredient B',
+                //     'Ingredient C',
+                // ];
 
                 const rowsOfCells = per_type_per_partcode_1({
                     rows: mergedJsonData,
@@ -276,7 +261,7 @@ function switch_parsingOptions(mergedJsonData, parsingOption) {
                         LABEL_DATASET_OTHER_INGREDS_A,
                     ],
                 });
-
+                console.log(rowsOfCells);
                 return rowsOfCells;
             }
             break;
@@ -295,7 +280,7 @@ function switch_parsingOptions(mergedJsonData, parsingOption) {
                     ],
                 });
 
-                const rowsOfIngredients = per_ingred_per_partCode_2(
+                const rowsOfIngredients = per_ingred_per_partcode_2(
                     rowsOfCells,
                     ingredients_to_merge
                 );
@@ -317,7 +302,7 @@ function switch_parsingOptions(mergedJsonData, parsingOption) {
                     ],
                 });
 
-                const rowsOfIngredients = per_ingred_per_partCode_2(
+                const rowsOfIngredients = per_ingred_per_partcode_2(
                     rowsOfCells,
                     ingredients_to_merge
                 );
@@ -369,47 +354,47 @@ function switch_parsingOptions(mergedJsonData, parsingOption) {
 
 function process_parsing_option(parsingOption) {
     // try {
-        const jsonString = localStorage.getItem('original_merged');
-        const jsonObject = JSON.parse(jsonString);
+    const jsonString = localStorage.getItem('original_merged');
+    const jsonObject = JSON.parse(jsonString);
 
-        /** Create all the data here */
-        const entityRows = switch_parsingOptions(jsonObject, parsingOption);
-        // console.log(`entityRows`, entityRows);
+    /** Create all the data here */
+    const entityRows = switch_parsingOptions(jsonObject, parsingOption);
+    // console.log(`entityRows`, entityRows);
 
-        //* SORT - start */
-        // Define the columns to move to the front
-        // const columnsToMoveToFront = ['PARTCODE', 'Product ID'];
+    //* SORT - start */
+    // Define the columns to move to the front
+    // const columnsToMoveToFront = ['PARTCODE', 'Product ID'];
 
-        // Move specified columns to the front of each object
-        // const movedToFront = moveColumnsToFront(
-        //     entityRows,
-        //     columnsToMoveToFront
-        // );
+    // Move specified columns to the front of each object
+    // const movedToFront = moveColumnsToFront(
+    //     entityRows,
+    //     columnsToMoveToFront
+    // );
 
-        // Move specified columns to the end of each object
-        // const reorderedData = moveColumnsToEnd(
-        //     entityRows,
-        //     ingredients_to_merge
-        // );
+    // Move specified columns to the end of each object
+    // const reorderedData = moveColumnsToEnd(
+    //     entityRows,
+    //     ingredients_to_merge
+    // );
 
-        //* SORT - done */
+    //* SORT - done */
 
-        // const { jsonDataSheet, wbString } = create_AoO_sheet(reorderedData);
-        //* returned SheetsJS data */
+    // const { jsonDataSheet, wbString } = create_AoO_sheet(reorderedData);
+    //* returned SheetsJS data */
 
-        /* Store the binary string in localStorage to Download Parsed File later */
-        // localStorage.setItem('workbook', wbString);
-        // storeJsonObjectInLocalStorage(jsonDataSheet, 'download_json');
+    /* Store the binary string in localStorage to Download Parsed File later */
+    // localStorage.setItem('workbook', wbString);
+    // storeJsonObjectInLocalStorage(jsonDataSheet, 'download_json');
 
-        /* //! DOM doesnt need workbook Create DOM elements */
-        // const htmlTable = create_html_table(reorderedData, null);
-        const htmlTable = create_html_table_with_entities(entityRows, null);
+    /* //! DOM doesnt need workbook Create DOM elements */
+    // const htmlTable = create_html_table(reorderedData, null);
+    const htmlTable = create_html_table_with_entities(entityRows, null);
 
-        // Get container element to append the table
-        const tableContainer = document.getElementById('table-container');
-        // Clear any old table
-        tableContainer.innerHTML = '';
-        tableContainer.appendChild(htmlTable);
+    // Get container element to append the table
+    const tableContainer = document.getElementById('table-container');
+    // Clear any old table
+    tableContainer.innerHTML = '';
+    tableContainer.appendChild(htmlTable);
     // } catch (error) {
     //     switch (error.message) {
     //         case 'arrayOfObjects is null':
@@ -520,41 +505,52 @@ function prepreprocess_mergeMultipleIngredients(jsonData) {
 /********************************************************************* */
 
 // Extend the Array prototype with a new function called moveToFrontById
-Array.prototype.moveToFrontById = function (id) {
-    // Find the index of the object with the specified `id` property
-    //! const index = this.findIndex((obj) => obj.id === id);
-    const index = this.findIndex((name) => name === id);
+// Array.prototype.moveToFrontById = function (id) {
 
-    // If the object is found and the index is not the first index, proceed
-    if (index > 0) {
-        // Splice the object out of the array
-        const [obj] = this.splice(index, 1);
-        // Insert the object at the front of the array
-        this.unshift(obj);
-    }
+Object.defineProperty(Array.prototype, 'moveToFrontById', {
+    value: function (id) {
+        // Find the index of the object with the specified `id` property
+        const index = this.findIndex((obj) => obj.id === id);
 
-    return this;
-};
+        // If the object is found and its index is not the first index, move the object to the front
+        if (index > 0) {
+            // Remove the object from the array at the found index
+            const [obj] = this.splice(index, 1);
+            // Insert the object at the front of the array
+            this.unshift(obj);
+        }
+
+        // Return the array to allow chaining
+        return this;
+    },
+    enumerable: false, // Set the property as non-enumerable
+    writable: true,
+    configurable: true,
+});
 /**
  * Moves an object with the specified `id` to the end of an array of objects.
  *
  * @param {string} id - The `id` of the object to move to the end of the array.
  * @returns {Array<Object>} - The array with the object moved to the end.
  */
-Array.prototype.moveToEndById = function (id) {
-    // Find the index of the object with the specified `id` property
-    const index = this.findIndex((name) => name === id);
+Object.defineProperty(Array.prototype, 'moveToEndById', {
+    value: function (id) {
+        const index = this.findIndex((name) => name === id);
 
-    // If the object is found and the index is not already at the end, proceed
-    if (index > -1 && index < this.length - 1) {
-        // Remove the object from its current position
-        const [obj] = this.splice(index, 1);
-        // Add the object to the end of the array
-        this.push(obj);
-    }
+        // If the object is found and the index is not already at the end, proceed
+        if (index > -1 && index < this.length - 1) {
+            // Remove the object from its current position
+            const [obj] = this.splice(index, 1);
+            // Add the object to the end of the array
+            this.push(obj);
+        }
 
-    return this;
-};
+        return this;
+    },
+    enumerable: false, // Set the property as non-enumerable
+    writable: true,
+    configurable: true,
+});
 
 /**
  * Moves specified columns to the end of each object in an array of objects.
@@ -563,36 +559,36 @@ Array.prototype.moveToEndById = function (id) {
  * @param {Array<string>} columnsToMove - An array of property keys to move to the end of each object.
  * @returns {Array<Object>} - A new array of objects with specified columns moved to the end of each object.
  */
-function moveColumnsToEnd(data, columnsToMove) {
-    // Create a new array to hold the reordered objects
-    const reorderedData = [];
+// function moveColumnsToEnd(data, columnsToMove) {
+//     // Create a new array to hold the reordered objects
+//     const reorderedData = [];
 
-    // Iterate through each object in the original data
-    data.forEach((obj) => {
-        // Create a new object
-        const reorderedObj = {};
+//     // Iterate through each object in the original data
+//     data.forEach((obj) => {
+//         // Create a new object
+//         const reorderedObj = {};
 
-        // Add remaining columns (not in the specified list) to the new object
-        for (const key in obj) {
-            if (!columnsToMove.includes(key)) {
-                reorderedObj[key] = obj[key];
-            }
-        }
+//         // Add remaining columns (not in the specified list) to the new object
+//         for (const key in obj) {
+//             if (!columnsToMove.includes(key)) {
+//                 reorderedObj[key] = obj[key];
+//             }
+//         }
 
-        // Add specified columns to the end of the object
-        columnsToMove.forEach((key) => {
-            if (obj.hasOwnProperty(key)) {
-                reorderedObj[key] = obj[key];
-            }
-        });
+//         // Add specified columns to the end of the object
+//         columnsToMove.forEach((key) => {
+//             if (obj.hasOwnProperty(key)) {
+//                 reorderedObj[key] = obj[key];
+//             }
+//         });
 
-        // Add the reordered object to the new array
-        reorderedData.push(reorderedObj);
-    });
+//         // Add the reordered object to the new array
+//         reorderedData.push(reorderedObj);
+//     });
 
-    // Return the new array of objects with specified columns moved to the end
-    return reorderedData;
-}
+//     // Return the new array of objects with specified columns moved to the end
+//     return reorderedData;
+// }
 
 /**
  * Stores a JSON object in localStorage.
@@ -610,30 +606,35 @@ function storeJsonObjectInLocalStorage(key, jsonObject) {
 
 /** ************************************************************* */
 
-/* Function to generate HTML table from JSON data */
+/**
+ * Creates an HTML table from the provided data, with an option to customize using a radio option.
+ *
+ * @param {Array<Object>} data - The data to create the table from.
+ * @param {string|null} [radioOption=null] - An optional radio option to customize the table.
+ * @returns {HTMLTableElement} - The created HTML table element.
+ */
 function create_html_table_with_entities(data, radioOption = null) {
+    // Create the table element
     const myTable = document.createElement('table');
     myTable.setAttribute('id', 'my-table');
 
-    // Add table header
+    // Add the table header
     const headerRow = document.createElement('tr');
-    for (const key in data[0]) {
-        const headerName = data[0][key].header.name;
-        // console.log('headerName', headerName);
+    Object.values(data[0]).forEach((cell) => {
         const th = document.createElement('th');
-        th.textContent = headerName; //*
+        th.textContent = cell.header.name;
         headerRow.appendChild(th);
-    }
+    });
     myTable.appendChild(headerRow);
 
     // Add table rows
     data.forEach((item) => {
         const row = document.createElement('tr');
-        for (const key in item) {
-            const cell = document.createElement('td');
-            cell.textContent = item[key].value; //*
-            row.appendChild(cell);
-        }
+        Object.values(item).forEach((cell) => {
+            const td = document.createElement('td');
+            td.textContent = cell.value;
+            row.appendChild(td);
+        });
         myTable.appendChild(row);
     });
 

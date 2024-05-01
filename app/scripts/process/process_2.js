@@ -1,4 +1,3 @@
-
 /**
  * Creates a deep copy of a Cell instance, including deep copying its nested Header object.
  *
@@ -19,13 +18,14 @@ function deepCopyCell(cell) {
             headerProps[key] = value;
         }
     }
+    // console.log(`headerProps: `, headerProps);
     const deepCopiedCell = new Cell({
         value: cell.value,
         type: cell.type,
         header: new Header(headerProps), // Deep copy nested Header object
-        status: 'update this copy', // Deep copy nested Status object
+        status: new Status(), // Deep copy nested Status object
     });
-
+    // console.log(`deepCopiedCell`, deepCopiedCell, deepCopiedCell);
     return deepCopiedCell;
 }
 
@@ -36,7 +36,7 @@ function deepCopyCell(cell) {
  * @param {Object.<number, Cell>} object - The original object with numbered keys and values of type Cell.
  * @returns {Object.<number, Cell>} - A new object with the same structure and deep-copied Cell instances.
  */
-function duplicateObjectWithCells(object) {
+function deepCopyObjectWithCells(object) {
     // Create a new object to hold the duplicated keys and deep-copied Cell instances
     const duplicatedObject = {};
 
@@ -44,12 +44,16 @@ function duplicateObjectWithCells(object) {
     for (const key in object) {
         if (object.hasOwnProperty(key)) {
             const cell = object[key];
+            if (cell instanceof Cell) {
+                
+                // Perform a deep copy of the Cell instance
+                const copiedCell = deepCopyCell(cell);
 
-            // Perform a deep copy of the Cell instance
-            const copiedCell = deepCopyCell(cell);
-
-            // Add the deep-copied Cell instance to the new object using the same key
-            duplicatedObject[key] = copiedCell;
+                // Add the deep-copied Cell instance to the new object using the same key
+                duplicatedObject[key] = copiedCell;
+            } else {
+                console.error('unexpected type')
+            }
         }
     }
 
@@ -63,14 +67,14 @@ function duplicateObjectWithCells(object) {
  * @param {Object.<number, Cell>} obj - The object structure to search through.
  * @returns {number|null} - The key (number) of the Cell instance whose type is 'INGREDIENT_TYPE', or null if not found.
  */
-function getCellKeyByType(obj) {
+function getCellKeyBy(cell_type, obj) {
     // Iterate through the object structure
     for (const key in obj) {
         if (obj.hasOwnProperty(key)) {
             const cell = obj[key];
 
             // Check if the Cell instance's type is 'INGREDIENT_TYPE'
-            if (cell.type === 'MERGED_INGREDIENTS') {
+            if (cell.type === cell_type) {
                 // Return the key (number) if the type matches
                 return parseInt(key, 10); // Convert the key to a number and return it
             }
@@ -88,12 +92,14 @@ function getCellKeyByType(obj) {
  * @param {Array<Object.<number, Cell>>} rows - An array of merged JSON data.
  * @returns {Array<ObjectWithEntity>} - An array of objects representing rows of ingredients.
  */
-function per_ingred_per_partCode_2(rows) {
+function per_ingred_per_partcode_2(rows) {
     const rowsOfIngredients = [];
 
     rows.forEach((row_as_obj) => {
         // console.log(row_as_obj);
 
+        // TODO: remove for loop like in process_3 Access directly.
+        // For each obj, get it's cell
         for (const obj in row_as_obj) {
             // console.log(`obj`, obj);
             /** @type {Cell} */
@@ -118,11 +124,13 @@ function per_ingred_per_partCode_2(rows) {
 
                     //duplicate all the Cells and update the MERGED_INGREDIENT value to tilde
                     const duplicatedObject =
-                        duplicateObjectWithCells(row_as_obj);
+                        deepCopyObjectWithCells(row_as_obj);
 
                     // Retrieve the key of the Cell instance with type 'MERGED_INGREDIENTS'
-                    const ingredientTypeKey =
-                        getCellKeyByType(duplicatedObject);
+                    const ingredientTypeKey = getCellKeyBy(
+                        MERGED_INGREDIENTS.id,
+                        duplicatedObject
+                    );
 
                     duplicatedObject[ingredientTypeKey].value = tilde;
 

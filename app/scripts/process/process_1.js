@@ -14,28 +14,15 @@ function removeStringsFromArray(originalArray, valuesToRemove) {
     return originalArray.filter((value) => !valuesToRemoveSet.has(value));
 }
 
-//* Used in 1st
-// function abbreviateIngredientType(type) {
-//     if (type === LABEL_DATASET_NUTRIENT_A.id) {
-//         return LABEL_DATASET_NUTRIENT_A.abbr;
-//     } else if (type === LABEL_DATASET_INGREDIENTS_A.id) {
-//         return LABEL_DATASET_INGREDIENTS_A.abbr;
-//     } else if (type === LABEL_DATASET_OTHER_INGREDS_A.id) {
-//         return LABEL_DATASET_OTHER_INGREDS_A.abbr;
-//     } else {
-//         return 'error';
-//     }
-// }
-
 /**
- * //* 1st
- * Creates an array of entities from rows of data by merging specified ingredients and types.
+ * Creates a new row of Cell instances for each key in the `ingredients_to_merge` Set.
  *
- * @param {Array<Object.<number, Cell>>} rows - The array of rows of data to process.
- * @param {Array<string>} columnNames - 
- * @param {Array<string>} ingredients_to_merge - The array of keys representing ingredients to merge.
- * @param {} substitute_values - 
- * @returns {Array<Object>} - An array of entities created from the rows of data.
+ * @param {Object} options - The options object.
+ * @param {Array<Object<string,string>} options.rows - An array of objects representing each row of data.
+ * @param {Set<string>} options.ingredients_to_merge - A set of column names to merge into one Cell.
+ * @param {Array<string>} options.columnNames - An array of column names for which to create Cell instances.
+ * @param {Array<string>} options.substitute_values - An array of column names for which to create Cell instances.
+ * @returns {Array<Cell[]>} - An array of arrays, each representing a new row with Cell instances for a key in the ingredients_to_merge Set.
  */
 function per_type_per_partcode_1({
     rows,
@@ -43,113 +30,77 @@ function per_type_per_partcode_1({
     ingredients_to_merge,
     substitute_values,
 }) {
-    /** @type {Row[]} - return this */
-    const rowsOfCells = [];
+    /** @type {Cell[]} - final rows of Cells */
+    const rowsOfrowsOfCells = [];
 
-    // remove LABEL_DATASET_OTHER_INGREDS_A and others
+    // Filter column names to remove ingredients to merge
     const salsifyKeys = removeStringsFromArray(
         columnNames,
         ingredients_to_merge
     );
-    // console.log(`salsifyKeys`, salsifyKeys);
 
+    // Process each row
     rows.forEach((row) => {
-        /** create this...
-         {
-            0: <Cell> {
-                header: {id: '', name: ''},
-                value: '',
-                type: '',
-            }
-         }
-         */
-
-        /** Get the non-ingredient Cells. Do this once outside the for loop below. (PARTCODE, Product ID) */
-        // object to hold all the Cells
-        const salsify_cells = {};
-
-        // capture the last index so ingredients can continue
-        let nextIndex = 0;
-
-        salsifyKeys.forEach((name, index) => {
-            // console.log(`key`, key);
-            const value = row[name] || ''; // return '' if not found
-            const type = name;
-            const header = new Header({ id: name, name: name });
-
-            const salsify_cell = new Cell({
-                value,
-                type,
-                header,
-            });
-
-            // add Cells to the object
-            salsify_cells[index] = salsify_cell;
-
-            // capture the last index so ingredients can continue
-            nextIndex = index;
+        // Create an array to hold Cells for non-ingredient columns (PARTCODE, Product ID)
+        const salsifyCells = salsifyKeys.map((name) => {
+            const value = row[name] || '';
+            const header = new Header({ id: name, name });
+            return new Cell({ value, type: name, header });
         });
-        // console.log(`salsify_cells`, salsify_cells);
-        /** end */
 
-        //do these second
-        //* Create 3 rows, 1 for each type
-        for (const ingredient_type of ingredients_to_merge) {
-            //LABEL_DATASET_OTHER_INGREDS_A
-            /** If the row[key] matches an ingredient to merge... */
-            const ingredient_value = row[ingredient_type] || '';
+        // Process each ingredient type in the `ingredients_to_merge` set.Create up to 3 rows, 1 for each type
+        ingredients_to_merge.forEach((ingredientType) => {
+            // Get the value for the ingredient type
+            const ingredientValue = row[ingredientType] || '';
 
-            // don't create a row if there is no LABEL_DATASET_OTHER_INGREDS_A
-            if (ingredient_value) {
-                let index = (nextIndex += 1);
-                // console.log(ingredient_type, ingredient_value);
+            // Skip if no value is found
+            if (!ingredientValue) return;
+            // console.log(`ingredient_value`, ingredient_value);
 
-                /** Substitutions */
-                const substitution_found = substitute_values.find(
-                    (obj) => obj.id === ingredient_type
-                );
-                // console.log(`substitution_found`, substitution_found);
+            // Create a new row by copying salsifyCells
+            const rowForType = [...salsifyCells];
 
-                let type_value = ''
+            /** Substitutions for ingredient type */
+            const substitutionFound = substitute_values.find(
+                (obj) => obj.id === ingredientType
+            );
 
-                if (substitution_found) {
-                    type_value = substitution_found.abbr;
-                } else {
-                    type_value = ingredient_type;
-                }
+            let typeValue = '';
 
-                // create Type Cell to add to type_row
-                const type_cell = new Cell({
-                    value: type_value,
-                    type: INGREDIENT_TYPE.id,
-                    header: new Header({
-                        id: INGREDIENT_TYPE.id,
-                        name: INGREDIENT_TYPE.abbr,
-                    }),
-                });
-                // copy existing props into new object
-                const type_row = { ...salsify_cells };
-
-                // {4: type_cell}
-                type_row[index] = type_cell;
-                // console.log(`type_row`, type_row);
-
-                const merged_ingred_cell = new Cell({
-                    value: ingredient_value,
-                    type: MERGED_INGREDIENTS.id,
-                    header: new Header({
-                        id: MERGED_INGREDIENTS.id,
-                        name: MERGED_INGREDIENTS.abbr,
-                    }),
-                });
-
-                // {5: merged_ingred_cell}
-                type_row[(index += 1)] = merged_ingred_cell;
-
-                rowsOfCells.push(type_row);
+            if (substitutionFound) {
+                typeValue = substitutionFound.abbr;
+            } else {
+                typeValue = ingredientType;
             }
-        }
+
+            // Create a Cell for the ingredient type
+            const typeCell = new Cell({
+                value: typeValue,
+                type: INGREDIENT_TYPE.id,
+                header: new Header({
+                    id: INGREDIENT_TYPE.id,
+                    name: INGREDIENT_TYPE.abbr,
+                }),
+            });
+            // Add the type Cell to the row
+            rowForType.push(typeCell);
+
+            // Create a Cell for the merged ingredient value
+            const mergedIngredientCell = new Cell({
+                value: ingredientValue,
+                type: MERGED_INGREDIENTS.id,
+                header: new Header({
+                    id: MERGED_INGREDIENTS.id,
+                    name: MERGED_INGREDIENTS.abbr,
+                }),
+            });
+            // Add the merged ingredient Cell to the row
+            rowForType.push(mergedIngredientCell);
+
+            // Add the row to the final array of Cell arrays
+            rowsOfrowsOfCells.push(rowForType);
+        });
     });
 
-    return rowsOfCells;
+    return rowsOfrowsOfCells;
 }
