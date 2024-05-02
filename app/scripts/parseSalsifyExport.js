@@ -275,8 +275,8 @@ function switch_parsingOptions(mergedJsonData, parsingOption) {
                 /**
                  * cases:
                  * incorrect number of pipes per Type
-                 * 
-                 * 
+                 *
+                 *
                  */
                 return errorCheckedColumns;
             }
@@ -324,7 +324,8 @@ function process_parsing_option(parsingOption) {
 
     /* //! DOM doesnt need workbook Create DOM elements */
     // const htmlTable = create_html_table(reorderedData, null);
-    const htmlTable = create_html_table_with_entities(entityRows, null);
+    // const htmlTable = create_html_table_with_entities(entityRows, null);
+    const htmlTable = create_html_table_rows_and_errors(entityRows, null);
 
     // Get container element to append the table
     const tableContainer = document.getElementById('table-container');
@@ -541,15 +542,108 @@ function storeJsonObjectInLocalStorage(key, jsonObject) {
 }
 
 /** ************************************************************* */
+/**
+ * Creates rows for an HTML table and handles row status.
+ *
+ * @param {Row[]} rows - An array of Row instances to create the table rows from.
+ * @returns {HTMLTableElement} - The created HTML table element.
+ */
+function create_html_table_rows_and_errors(rows) {
+    // Create the table element
+    const myTable = document.createElement('table');
+    myTable.setAttribute('id', 'my-table');
+
+    // Check if any row has a status
+    let hasMessages = false;
+    for (const row of rows) {
+        if (row.status.hasMessages) {
+            hasMessages = true;
+            break;
+        }
+    }
+
+    // Add the table header if rows are present and if there is any status
+    if (rows.length > 0) {
+        const headerRow = document.createElement('tr');
+
+        // Add the status header column if there is a status
+        if (hasMessages) {
+            const statusHeader = document.createElement('th');
+            statusHeader.textContent = '';
+            headerRow.appendChild(statusHeader);
+        }
+
+        // Add other headers
+        rows[0].cells.forEach((cell) => {
+            const th = document.createElement('th');
+            th.textContent = cell.header.name;
+            headerRow.appendChild(th);
+        });
+        myTable.appendChild(headerRow);
+    }
+
+    // Add table rows
+    rows.forEach((row) => {
+        const tableRow = document.createElement('tr');
+
+        // Add a status cell at the beginning of the row if there is a status
+        if (hasMessages) {
+            const statusCell = document.createElement('td');
+            // Determine the content for the status cell (an "x" if there is an error or warning)
+            let statusSymbol = 'x';
+
+            if (row.status.errors.length > 0) {
+                tableRow.classList.add('error-row');
+            }
+            if (row.status.warnings.length > 0) {
+                tableRow.classList.add('warning-row');
+            }
+            if (row.status.info.length > 0) {
+                tableRow.classList.add('info-row');
+            }
+
+            // Set the status cell content
+            statusCell.textContent = statusSymbol;
+            // Add the status cell to the beginning of the row
+            tableRow.appendChild(statusCell);
+        }
+
+        // Add cells to the row
+        row.cells.forEach((cell) => {
+            const td = document.createElement('td');
+            td.textContent = cell.value;
+
+            // Handle the cell status if it exists
+            if (cell.status.hasMessages) {
+                // Apply CSS classes based on cell status
+                if (row.status.errors.length > 0) {
+                    td.classList.add('error-cell');
+                }
+                if (row.status.warnings.length > 0) {
+                    td.classList.add('warning-cell');
+                }
+                if (row.status.info.length > 0) {
+                    td.classList.add('info-cell');
+                }
+            }
+
+            tableRow.appendChild(td);
+        });
+
+        // Add the row to the table
+        myTable.appendChild(tableRow);
+    });
+
+    return myTable;
+}
 
 /**
  * Creates an HTML table from the provided data, with an option to customize using a radio option.
  *
- * @param {Array<Object>} data - The data to create the table from.
- * @param {string|null} [radioOption=null] - An optional radio option to customize the table.
+ * @param {Cell[][]} data - The data to create the table from.
  * @returns {HTMLTableElement} - The created HTML table element.
  */
-function create_html_table_with_entities(data, radioOption = null) {
+function create_html_table_with_entities(data) {
     // Create the table element
     const myTable = document.createElement('table');
     myTable.setAttribute('id', 'my-table');

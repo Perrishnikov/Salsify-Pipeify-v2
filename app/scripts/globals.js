@@ -18,8 +18,77 @@ class Header {
     }
 }
 
-class Status {}
+class Status {
+    constructor() {
+        this.hasMessages = false; // Indicates if there are any errors
+        this.errors = []; // Array to hold error messages
+        this.warnings = []; // Array to hold warning messages
+        this.info = []; // Array to hold informational messages
+    }
 
+    // Adds an error message and sets hasMessages to true
+    addError(message) {
+        this.errors.push(message);
+        this.hasMessages = true;
+    }
+
+    // Adds a warning message
+    addWarning(message) {
+        this.warnings.push(message);
+        this.hasMessages = true;
+    }
+
+    // Adds an informational message
+    addInfo(message) {
+        this.info.push(message);
+        this.hasMessages = true;
+    }
+
+    // Clears all error messages and resets hasMessages
+    clearErrors() {
+        this.errors = [];
+        this.hasMessages = false;
+    }
+
+    // Clears all warning messages
+    clearWarnings() {
+        this.warnings = [];
+        this.hasMessages = false;
+    }
+
+    // Clears all informational messages
+    clearInfo() {
+        this.info = [];
+        this.hasMessages = false;
+    }
+
+    // Clears all messages and resets hasMessages
+    reset() {
+        this.clearErrors();
+        this.clearWarnings();
+        this.clearInfo();
+    }
+}
+
+class Row {
+    /**@type {Status} */
+    status;
+
+    /** @type {Cell[]} */
+    cells;
+
+    constructor(cells) {
+        // Iterate over the arguments array and add each as a property on the instance
+        // cells.forEach((value, index) => {
+            // Assign the argument value to a property named 'argX' where X is the argument index
+            // this[`arg${index}`] = value;
+            
+        // });
+        this.cells = cells;
+
+        this.status = new Status();
+    }
+}
 class Cell {
     /** @type {string} */
     value = '';
@@ -33,11 +102,11 @@ class Cell {
     /** @type {Status} */
     status;
 
-    constructor({ value, header, type, status = null }) {
+    constructor({ value, header, type }) {
         this.value = value;
         this.type = type;
         this.header = header;
-        this.status = status;
+        this.status = new Status();
     }
 }
 
@@ -57,91 +126,3 @@ function cloneCell(cell) {
         }),
     });
 }
-
-// function createOrderCell(value) {
-//     const ORDER = new Header({
-//         id: 'ORDER',
-//         name: 'Order',
-//     });
-//     const orderCell = new Cell({
-//         value: value,
-//         type: ORDER.id,
-//         header: ORDER,
-//     });
-//     return orderCell;
-// }
-// function createDescCell(value) {
-//     const DESC = new Header({
-//         id: 'DESCRIPTION',
-//         name: 'Description',
-//     });
-//     const descCell = new Cell({
-//         value: value,
-//         type: DESC.id,
-//         header: DESC,
-//     });
-//     return descCell;
-// }
-
-// function createQtyCell(value) {
-//     const QTY = new Header({
-//         id: 'QTY',
-//         name: 'Qty',
-//     });
-//     const qtyCell = new Cell({
-//         value: value,
-//         type: QTY.id,
-//         header: QTY,
-//     });
-//     return qtyCell;
-// }
-
-// function createUomCell(value) {
-//     const UOM = new Header({
-//         id: 'UOM',
-//         name: 'UOM',
-//     });
-
-//     const uomCell = new Cell({
-//         value: value,
-//         type: UOM.id,
-//         header: UOM,
-//     });
-//     return uomCell;
-// }
-
-// function createDvAmtCell(value) {
-//     const dvAmtCell = new Cell({
-//         value: value,
-//         type: 'DVA',
-//         header: new Header({
-//             id: 'DVA',
-//             name: 'DV %',
-//         }),
-//     });
-//     return dvAmtCell;
-// }
-
-// function createSymbolCell(value) {
-//     const symbolCell = new Cell({
-//         value: value,
-//         type: 'SYMBOL',
-//         header: new Header({
-//             id: 'SYMBOL',
-//             name: 'Sym.',
-//         }),
-//     });
-//     return symbolCell;
-// }
-
-// function createFootnoteCell(value) {
-//         const footnoteCell = new Cell({
-//             value: value,
-//             type: 'FOOT',
-//             header: new Header({
-//                 id: 'FOOT',
-//                 name: 'Foot.',
-//             }),
-//         });
-//         return footnoteCell;
-// }

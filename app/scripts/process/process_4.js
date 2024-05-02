@@ -26,7 +26,6 @@ function createNutrientErrorChecking(pipes) {
     return nutrient;
 }
 
-
 function createIngredientErrorChecking(pipes) {
     // if (pipes.length !== 9) {
     //     throw new Error("Ingredient doesn't have length of 9");
@@ -68,7 +67,7 @@ function createIngredientErrorChecking(pipes) {
  * @returns {Array<Cell>} - An array of Cells representing table columns.
  */
 function createCellsForTableErrorChecking(obj) {
-    console.log(`createCellsForTableErrorChecking`, obj);
+    // console.log(`createCellsForTableErrorChecking`, obj);
     const cells = [];
 
     // Create Cell instances for each table column
@@ -157,6 +156,8 @@ function createCellsForTableErrorChecking(obj) {
     return cells;
 }
 
+
+
 /**
  * Creates an array of rows, each representing a single ingredient from `MERGED_INGREDIENTS` in each row.
  *
@@ -183,7 +184,11 @@ function per_pipe_per_partcode_4(rows) {
                 const ingredientTypeObject = getObjectByIngredientType(row);
 
                 // Create a new row without the MERGED_INGREDIENTS cell
-                const newRow = row.filter((c) => c !== cell).map(cloneCell);
+                const nonIngredientCells = row
+                    .filter((c) => c !== cell)
+                    .map(cloneCell);
+                // const newRow = new Row(nonIngredientCells);
+                // console.log(newRow);
 
                 // Process the type of ingredient
                 if (
@@ -203,7 +208,7 @@ function per_pipe_per_partcode_4(rows) {
                     });
 
                     // Add nutrient cells to the new row
-                    newRow.push(...nutrientCells);
+                    nonIngredientCells.push(...nutrientCells);
                 } else if (
                     ingredientTypeObject.value ===
                     LABEL_DATASET_INGREDIENTS_A.abbr
@@ -222,7 +227,7 @@ function per_pipe_per_partcode_4(rows) {
                     });
 
                     // Add ingredient cells to the new row
-                    newRow.push(...ingredientCells);
+                    nonIngredientCells.push(...ingredientCells);
                 } else if (
                     ingredientTypeObject.value ===
                     LABEL_DATASET_OTHER_INGREDS_A.abbr
@@ -238,9 +243,13 @@ function per_pipe_per_partcode_4(rows) {
                         foot: '',
                     });
                     // Add other cells to the new row
-                    newRow.push(...otherCells);
+                    nonIngredientCells.push(...otherCells);
                 }
                 // Add the processed new row to the array of ingredients rows
+                const newRow = new Row(nonIngredientCells);
+                // newRow.status.addInfo('ugh')
+                console.log(newRow);
+                // rowsOfIngredients.push(nonIngredientCells);
                 rowsOfIngredients.push(newRow);
             }
         });

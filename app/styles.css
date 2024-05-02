@@ -7,7 +7,7 @@
     --warning: hsl(48, 100%, 29%);
     --success: hsl(141, 53%, 31%);
     --info: hsl(204, 71%, 39%);
-    --background-light: hsl(0, 0%, 90%)
+    --background-light: hsl(0, 0%, 90%);
 }
 
 body {
@@ -119,12 +119,59 @@ td {
     padding: calc(var(--padding-margin) / 2);
 }
 /* Alternate row color */
-tr:nth-child(even) {
+/* tr:nth-child(even) {
+    background-color: #f9f9f9;
+} */
+/* Hover effect on rows */
+/* tr:hover {
+    background-color: #f2f2f2;
+} */
+
+/* Alternate row color for better visual separation */
+tr:nth-child(even):not(.error-row):not(.warning-row):not(.info-row) {
     background-color: #f9f9f9;
 }
+
 /* Hover effect on rows */
-tr:hover {
+tr:hover:not(.error-row):not(.warning-row):not(.warning-row):not(.info-row) {
     background-color: #f2f2f2;
+}
+
+.error-row {
+    background-color: var(--danger);
+    /* Remove hover effect on error rows */
+    cursor: default;
+}
+
+.warning-row {
+    background-color: var(--warning);
+    /* Remove hover effect on warning rows */
+    cursor: default;
+}
+
+.info-row {
+    background-color: var(--info);
+    /* Remove hover effect on error rows */
+    cursor: default;
+}
+
+/* Styles for cells with errors */
+.error-cell {
+    background-color: var(--danger);
+    /* Add border or other styles if needed */
+    /* border: 1px solid var(--danger); */
+}
+
+/* Styles for cells with warnings */
+.warning-cell {
+    background-color: var(--warning);
+    /* Add border or other styles if needed */
+    /* border: 1px solid var(--warning); */
+}
+.info-cell {
+    background-color: var(--info);
+    /* Add border or other styles if needed */
+    /* border: 1px solid var(--warning); */
 }
 
 /* DOWNLOAD BUTTON */
