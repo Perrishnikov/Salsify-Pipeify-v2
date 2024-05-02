@@ -88,24 +88,6 @@ function standardTestIsTrue(valueToTest) {
  * @property {string} Product_ID - The product ID.
  */
 
-// function indexTheEntities(headers_row, cleaned_rows) {
-//     const indexed_headers = headers_row.map((cell, index) => {
-//         cell.index = index;
-//         return cell;
-//     });
-
-//     const indexed_rows = cleaned_rows.map((row) => {
-//         return row.map((entity) => {
-//             const id = entity.id;
-//             const header = headers_row.filter((obj) => obj.id === id)[0];
-//             entity.index = header.index;
-//             return entity;
-//         });
-//     });
-
-//     return { indexed_headers, indexed_rows };
-// }
-
 /************************************************************************ */
 
 /**
@@ -141,11 +123,6 @@ const INGREDIENT_TYPE = {
     abbr: 'Type',
 };
 
-// const ingredients_to_merge = [
-//     LABEL_DATASET_NUTRIENT_A.id,
-//     LABEL_DATASET_INGREDIENTS_A.id,
-//     LABEL_DATASET_OTHER_INGREDS_A.id,
-// ];
 const ingredients_to_merge = new Set([
     LABEL_DATASET_NUTRIENT_A.id,
     LABEL_DATASET_INGREDIENTS_A.id,
@@ -174,12 +151,6 @@ function getUniqueColumnNames(arrayOfObjects) {
     // Convert the Set to an array and return it
     return Array.from(uniqueKeysSet);
 }
-
-/**
- * An array of objects, where each object has a numerical key and a value of type Entity.
- *
- * @typedef {Object.<number, Cell>} ObjectWithEntity
- */
 
 /**
  * Triggered when radio buttons change
@@ -253,9 +224,8 @@ function switch_parsingOptions(mergedJsonData, parsingOption) {
                     ],
                 });
 
-                const rowsOfIngredients = per_ingred_per_partcode_2(
-                    rowsOfCells,
-                );
+                const rowsOfIngredients =
+                    per_ingred_per_partcode_2(rowsOfCells);
 
                 return rowsOfIngredients;
             }
@@ -277,42 +247,39 @@ function switch_parsingOptions(mergedJsonData, parsingOption) {
                 const rowsOfIngredients =
                     per_ingred_per_partcode_2(rowsOfCells);
 
-                const columnOfPipes =
+                const depipedColumns =
                     per_pipe_per_partcode_3(rowsOfIngredients);
 
-                return columnOfPipes;
+                return depipedColumns;
             }
             break;
         case 'option4':
-            // {
-            //     const entityRows = per_type_per_partcode_1(
-            //         mergedJsonData,
-            //         ingredients_to_merge,
-            //         merged_ingredient_subst,
-            //         ingredient_type_subst
-            //     );
+            {
+                const rowsOfCells = per_type_per_partcode_1({
+                    rows: mergedJsonData,
+                    columnNames: orderedColumnNames,
+                    ingredients_to_merge,
+                    substitute_values: [
+                        LABEL_DATASET_NUTRIENT_A,
+                        LABEL_DATASET_INGREDIENTS_A,
+                        LABEL_DATASET_OTHER_INGREDS_A,
+                    ],
+                });
 
-            //     const rowsOfIngredients = per_ingred_per_partCode_2(entityRows);
-            //     // console.log(rowsOfIngredients);
+                const rowsOfIngredients =
+                    per_ingred_per_partcode_2(rowsOfCells);
 
-            //     const columnOfPipes =
-            //         per_pipe_per_partcode_3(rowsOfIngredients);
+                const errorCheckedColumns =
+                    per_pipe_per_partcode_4(rowsOfIngredients);
 
-            //     console.log(columnOfPipes);
-
-            //     columnOfPipes.map((row) => {
-            //         console.log(`row: `, row);
-            //         if (
-            //             row.INGREDIENT_TYPE ===
-            //             'LABEL_DATASET_NUTRIENT_A - en-US'
-            //         ) {
-            //             const order = row.ORDER;
-            //             console.log(`order: `, order);
-            //         }
-            //         return row;
-            //     });
-            //     return columnOfPipes;
-            // }
+                /**
+                 * cases:
+                 * incorrect number of pipes per Type
+                 * 
+                 * 
+                 */
+                return errorCheckedColumns;
+            }
             break;
         default:
             break;

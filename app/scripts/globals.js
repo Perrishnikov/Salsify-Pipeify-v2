@@ -58,90 +58,90 @@ function cloneCell(cell) {
     });
 }
 
-function createOrderCell(value) {
-    const ORDER = new Header({
-        id: 'ORDER',
-        name: 'Order',
-    });
-    const orderCell = new Cell({
-        value: value,
-        type: ORDER.id,
-        header: ORDER,
-    });
-    return orderCell;
-}
-function createDescCell(value) {
-    const DESC = new Header({
-        id: 'DESCRIPTION',
-        name: 'Description',
-    });
-    const descCell = new Cell({
-        value: value,
-        type: DESC.id,
-        header: DESC,
-    });
-    return descCell;
-}
+// function createOrderCell(value) {
+//     const ORDER = new Header({
+//         id: 'ORDER',
+//         name: 'Order',
+//     });
+//     const orderCell = new Cell({
+//         value: value,
+//         type: ORDER.id,
+//         header: ORDER,
+//     });
+//     return orderCell;
+// }
+// function createDescCell(value) {
+//     const DESC = new Header({
+//         id: 'DESCRIPTION',
+//         name: 'Description',
+//     });
+//     const descCell = new Cell({
+//         value: value,
+//         type: DESC.id,
+//         header: DESC,
+//     });
+//     return descCell;
+// }
 
-function createQtyCell(value) {
-    const QTY = new Header({
-        id: 'QTY',
-        name: 'Qty',
-    });
-    const qtyCell = new Cell({
-        value: value,
-        type: QTY.id,
-        header: QTY,
-    });
-    return qtyCell;
-}
+// function createQtyCell(value) {
+//     const QTY = new Header({
+//         id: 'QTY',
+//         name: 'Qty',
+//     });
+//     const qtyCell = new Cell({
+//         value: value,
+//         type: QTY.id,
+//         header: QTY,
+//     });
+//     return qtyCell;
+// }
 
-function createUomCell(value) {
-    const UOM = new Header({
-        id: 'UOM',
-        name: 'UOM',
-    });
+// function createUomCell(value) {
+//     const UOM = new Header({
+//         id: 'UOM',
+//         name: 'UOM',
+//     });
 
-    const uomCell = new Cell({
-        value: value,
-        type: UOM.id,
-        header: UOM,
-    });
-    return uomCell;
-}
+//     const uomCell = new Cell({
+//         value: value,
+//         type: UOM.id,
+//         header: UOM,
+//     });
+//     return uomCell;
+// }
 
-function createDvAmtCell(value) {
-    const dvAmtCell = new Cell({
-        value: value,
-        type: 'DVA',
-        header: new Header({
-            id: 'DVA',
-            name: 'DV %',
-        }),
-    });
-    return dvAmtCell;
-}
+// function createDvAmtCell(value) {
+//     const dvAmtCell = new Cell({
+//         value: value,
+//         type: 'DVA',
+//         header: new Header({
+//             id: 'DVA',
+//             name: 'DV %',
+//         }),
+//     });
+//     return dvAmtCell;
+// }
 
-function createSymbolCell(value) {
-    const symbolCell = new Cell({
-        value: value,
-        type: 'SYMBOL',
-        header: new Header({
-            id: 'SYMBOL',
-            name: 'Sym.',
-        }),
-    });
-    return symbolCell;
-}
+// function createSymbolCell(value) {
+//     const symbolCell = new Cell({
+//         value: value,
+//         type: 'SYMBOL',
+//         header: new Header({
+//             id: 'SYMBOL',
+//             name: 'Sym.',
+//         }),
+//     });
+//     return symbolCell;
+// }
 
-function createFootnoteCell(value) {
-        const footnoteCell = new Cell({
-            value: value,
-            type: 'FOOT',
-            header: new Header({
-                id: 'FOOT',
-                name: 'Foot.',
-            }),
-        });
-        return footnoteCell;
-}
+// function createFootnoteCell(value) {
+//         const footnoteCell = new Cell({
+//             value: value,
+//             type: 'FOOT',
+//             header: new Header({
+//                 id: 'FOOT',
+//                 name: 'Foot.',
+//             }),
+//         });
+//         return footnoteCell;
+// }
