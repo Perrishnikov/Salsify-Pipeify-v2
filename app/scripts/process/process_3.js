@@ -1,29 +1,29 @@
-// class Type {
-//     constructor() {}
-// }
-// class Nutrient extends Type {
-//     /**@type {number} */
-//     order;
-//     /**@type {string} */
-//     shortDesc;
-//     /**@type {string} */
-//     longDesc;
-//     /**@type {string} */
-//     desc;
-//     /**@type {number | undefined} */
-//     qty;
-//     /**@type {number | undefined} */
-//     uom;
-//     /**@type {number | undefined} */
-//     dvAmt;
-//     /**@type {string} */
-//     symbol;
-//     /**@type {string} */
-//     foot;
-//     constructor() {
-//         super();
-//     }
-// }
+class Type {
+    constructor() {}
+}
+class Nutrient extends Type {
+    /**@type {number} */
+    order;
+    /**@type {string} */
+    shortDesc;
+    /**@type {string} */
+    longDesc;
+    /**@type {string} */
+    desc;
+    /**@type {number | undefined} */
+    qty;
+    /**@type {number | undefined} */
+    uom;
+    /**@type {number | undefined} */
+    dvAmt;
+    /**@type {string} */
+    symbol;
+    /**@type {string} */
+    foot;
+    constructor() {
+        super();
+    }
+}
 
 function createNutrient(pipes) {
     if (pipes.length !== 8) {
@@ -53,25 +53,25 @@ function createNutrient(pipes) {
     return nutrient;
 }
 
-// class Ingredient extends Type {
-//     /**@type {number} */
-//     order;
-//     /**@type {string} */
-//     shortDesc;
-//     /**@type {number | undefined} */
-//     qty;
-//     /**@type {number | undefined} */
-//     uom;
-//     /**@type {number | undefined} */
-//     dvAmt;
-//     /**@type {SYMBOL} */
-//     symbol;
-//     /**@type {string} */
-//     foot;
-//     constructor() {
-//         super();
-//     }
-// }
+class Ingredient extends Type {
+    /**@type {number} */
+    order;
+    /**@type {string} */
+    shortDesc;
+    /**@type {number | undefined} */
+    qty;
+    /**@type {number | undefined} */
+    uom;
+    /**@type {number | undefined} */
+    dvAmt;
+    /**@type {SYMBOL} */
+    symbol;
+    /**@type {string} */
+    foot;
+    constructor() {
+        super();
+    }
+}
 
 function createIngredient(pipes) {
     if (pipes.length !== 9) {

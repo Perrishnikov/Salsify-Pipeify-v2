@@ -483,7 +483,7 @@ function create_html_table_rows_and_errors(rows) {
     // Check if any Row has a status
     let rowHasMessages = false;
     for (const row of rows) {
-        if (row.status.hasMessages) {
+        if (row.status && row.status.hasMessages) {
             rowHasMessages = true;
             break;
         }
@@ -566,29 +566,21 @@ function create_html_table_rows_and_errors(rows) {
 
         // Add cells to the row
         row.cells.forEach((cell) => {
-            // for (const cell of cell) {
-                // console.log(cell.status);
-                if (cell.status.hasMessages) {
-                    // console.log('cell', cell);
-                    // rowHasMessages = true;
-                    // break;
-                }
-            // }
-            
 
             const td = document.createElement('td');
             td.textContent = cell.value;
 
             // Handle the cell status if it exists
             if (cell.status.hasMessages) {
+                console.log('cell', cell);
                 // Apply CSS classes based on cell status
-                if (row.status.errors.length > 0) {
+                if (cell.status.errors.length > 0) {
                     td.classList.add('error-cell');
                 }
-                if (row.status.warnings.length > 0) {
+                if (cell.status.warnings.length > 0) {
                     td.classList.add('warning-cell');
                 }
-                if (row.status.info.length > 0) {
+                if (cell.status.info.length > 0) {
                     td.classList.add('info-cell');
                 }
             }
