@@ -74,21 +74,16 @@ class Row {
     /**@type {Status} */
     status;
 
-    /** @type {Cell[]} */
+    /** @type {Cell[]} "row status" */
     cells;
 
     constructor(cells, status = new Status()) {
-        // Iterate over the arguments array and add each as a property on the instance
-        // cells.forEach((value, index) => {
-            // Assign the argument value to a property named 'argX' where X is the argument index
-            // this[`arg${index}`] = value;
-            
-        // });
         this.cells = cells;
 
         this.status = status;
     }
 }
+
 class Cell {
     /** @type {string} */
     value = '';
@@ -99,14 +94,14 @@ class Cell {
     /** @type {Header} */
     header;
 
-    /** @type {Status} */
+    /** @type {Status} "cell status" */
     status;
 
-    constructor({ value, header, type }) {
+    constructor({ value, header, type, status = new Status() }) {
         this.value = value;
         this.type = type;
         this.header = header;
-        this.status = new Status();
+        this.status = status;
     }
 }
 

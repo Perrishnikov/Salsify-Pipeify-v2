@@ -23,41 +23,6 @@ function coalesce(value1, value2) {
     return value;
 }
 
-/**
- * Removes HTML tags from the given string.
- * @param {string} string - The string containing HTML tags to be stripped.
- * @returns {string} The string with HTML tags removed.
- */
-function stripHTML(string) {
-    // 03242 has <sub> tag
-    var regex = /(<([^>]+)>)/gi;
-
-    return string.replace(regex, '');
-}
-
-function standardTestIsTrue(valueToTest) {
-    // if the value is found, return true, else false
-    if (
-        valueToTest.toLowerCase().includes('calories') |
-        valueToTest.toLowerCase().includes('carbohydrate') |
-        valueToTest.toLowerCase().includes('total sugars') |
-        valueToTest.toLowerCase().includes('total sugar') |
-        valueToTest.toLowerCase().includes('added sugars') |
-        valueToTest.toLowerCase().includes('added sugar') |
-        valueToTest.toLowerCase().includes('dietary') |
-        valueToTest.toLowerCase().includes('total fat') |
-        valueToTest.toLowerCase().includes('protein') |
-        valueToTest.toLowerCase().includes('saturated') |
-        valueToTest.toLowerCase().includes('trans fat') |
-        valueToTest.toLowerCase().includes('transfat') |
-        valueToTest.toLowerCase().includes('cholesteral')
-    ) {
-        return true;
-    } else {
-        return false;
-    }
-}
-
 /** ********************************************************************* */
 
 /**
@@ -515,11 +480,11 @@ function create_html_table_rows_and_errors(rows) {
     const myTable = document.createElement('table');
     myTable.setAttribute('id', 'my-table');
 
-    // Check if any row has a status
-    let hasMessages = false;
+    // Check if any Row has a status
+    let rowHasMessages = false;
     for (const row of rows) {
         if (row.status.hasMessages) {
-            hasMessages = true;
+            rowHasMessages = true;
             break;
         }
     }
@@ -529,7 +494,7 @@ function create_html_table_rows_and_errors(rows) {
         const headerRow = document.createElement('tr');
 
         // Add the status header column if there is a status
-        if (hasMessages) {
+        if (rowHasMessages) {
             const statusHeader = document.createElement('th');
             statusHeader.textContent = '';
             headerRow.appendChild(statusHeader);
@@ -549,58 +514,68 @@ function create_html_table_rows_and_errors(rows) {
         const tableRow = document.createElement('tr');
 
         // Add a status cell at the beginning of the row if there is a status
-        if (hasMessages) {
-           const statusCell = document.createElement('td');
-           let statusSymbol = '';
-           let popoverContent = '';
+        if (rowHasMessages) {
+            const statusCell = document.createElement('td');
+            let statusSymbol = '';
+            let popoverContent = '';
 
-           // Determine the appropriate Heroicon and message for the popover
-           if (row.status.errors.length > 0) {
-               tableRow.classList.add('error-row');
-               statusSymbol = `<span class="material-symbols-outlined" role="button" >error</span>`;
-               popoverContent = row.status.errors.join('<br>');
-           } else if (row.status.warnings.length > 0) {
-               tableRow.classList.add('warning-row');
-               statusSymbol = `<span class="material-symbols-outlined " role="button" >warning</span>`;
-               popoverContent = row.status.warnings.join('<br>');
-           } else if (row.status.info.length > 0) {
-               tableRow.classList.add('info-row');
-               statusSymbol = `<span class="material-symbols-outlined " role="button">info</span>`;
-               popoverContent = row.status.info.join('<br>');
-           }
+            // Determine the appropriate Heroicon and message for the popover
+            if (row.status.errors.length > 0) {
+                tableRow.classList.add('error-row');
+                statusSymbol = `<span class="material-symbols-outlined" role="button" >error</span>`;
+                popoverContent = row.status.errors.join('<br>');
+            } else if (row.status.warnings.length > 0) {
+                tableRow.classList.add('warning-row');
+                statusSymbol = `<span class="material-symbols-outlined " role="button" >warning</span>`;
+                popoverContent = row.status.warnings.join('<br>');
+            } else if (row.status.info.length > 0) {
+                tableRow.classList.add('info-row');
+                statusSymbol = `<span class="material-symbols-outlined " role="button">info</span>`;
+                popoverContent = row.status.info.join('<br>');
+            }
 
-           // Set the status cell content
-           statusCell.innerHTML = statusSymbol;
-           statusCell.classList.add('pointer-icon');
+            // Set the status cell content
+            statusCell.innerHTML = statusSymbol;
+            statusCell.classList.add('pointer-icon');
 
-           // Create the popover element and append it to the status cell
-           const popover = document.createElement('div');
-           popover.innerHTML = popoverContent;
+            // Create the popover element and append it to the status cell
+            const popover = document.createElement('div');
+            popover.innerHTML = popoverContent;
 
-           //TODO: Move to CSS  Customize popover styles here
-           popover.style.display = 'none';
-           popover.style.position = 'absolute';
-           popover.style.backgroundColor = '#fff';
-           popover.style.border = '1px solid #ccc';
-           popover.style.padding = '8px';
-           popover.style.zIndex = '10';
+            //TODO: Move to CSS  Customize popover styles here
+            popover.style.display = 'none';
+            popover.style.position = 'absolute';
+            popover.style.backgroundColor = '#fff';
+            popover.style.border = '1px solid #ccc';
+            popover.style.padding = '8px';
+            popover.style.zIndex = '10';
 
-           // Append the popover to the status cell
-           statusCell.appendChild(popover);
+            // Append the popover to the status cell
+            statusCell.appendChild(popover);
 
-           // Add a click event listener to the status cell to toggle popover visibility
-           statusCell.addEventListener('click', () => {
-               // Toggle popover visibility
-               const isVisible = popover.style.display === 'block';
-               popover.style.display = isVisible ? 'none' : 'block';
-           });
+            // Add a click event listener to the status cell to toggle popover visibility
+            statusCell.addEventListener('click', () => {
+                // Toggle popover visibility
+                const isVisible = popover.style.display === 'block';
+                popover.style.display = isVisible ? 'none' : 'block';
+            });
 
-           // Add the status cell to the beginning of the row
-           tableRow.insertAdjacentElement('afterbegin', statusCell);
+            // Add the status cell to the beginning of the row
+            tableRow.insertAdjacentElement('afterbegin', statusCell);
         }
 
         // Add cells to the row
         row.cells.forEach((cell) => {
+            // for (const cell of cell) {
+                // console.log(cell.status);
+                if (cell.status.hasMessages) {
+                    // console.log('cell', cell);
+                    // rowHasMessages = true;
+                    // break;
+                }
+            // }
+            
+
             const td = document.createElement('td');
             td.textContent = cell.value;
 

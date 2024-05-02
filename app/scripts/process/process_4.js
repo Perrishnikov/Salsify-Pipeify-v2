@@ -3,6 +3,106 @@ function canBeParsedAsNumber(str) {
     return !isNaN(parsedNumber);
 }
 
+/**
+ * Removes HTML tags from the given string.
+ * @param {string} string - The string containing HTML tags to be stripped.
+ * @returns {string} The string with HTML tags removed.
+ */
+function stripHTML(string) {
+    // 03242 has <sub> tag
+    var regex = /(<([^>]+)>)/gi;
+
+    return string.replace(regex, '');
+}
+
+function standardTestIsTrue(valueToTest) {
+    // if the value is found, return true, else false
+    if (
+        valueToTest.toLowerCase().includes('calories') |
+        valueToTest.toLowerCase().includes('carbohydrate') |
+        valueToTest.toLowerCase().includes('total sugars') |
+        valueToTest.toLowerCase().includes('total sugar') |
+        valueToTest.toLowerCase().includes('added sugars') |
+        valueToTest.toLowerCase().includes('added sugar') |
+        valueToTest.toLowerCase().includes('dietary') |
+        valueToTest.toLowerCase().includes('total fat') |
+        valueToTest.toLowerCase().includes('protein') |
+        valueToTest.toLowerCase().includes('saturated') |
+        valueToTest.toLowerCase().includes('trans fat') |
+        valueToTest.toLowerCase().includes('transfat') |
+        valueToTest.toLowerCase().includes('cholesteral')
+    ) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+const validateTests = {
+    isNotEmpty: (str1, status) => {
+        const pattern = /\S+/;
+        if (!pattern.test(str1)) {
+            status.addError('! isNotEmpty');
+        }
+        console.assert(pattern.test(str1), `! isNotEmpty`);
+        return validateTests;
+    },
+    canBeParsedAsNumber(str, status) {
+        const parsedNumber = !isNaN(Number(str));
+        console.log(`parsedNumber`, parsedNumber);
+        if (!parsedNumber) {
+            status.addError('! isNumber');
+            console.log(status);
+        }
+        return validateTests;
+    },
+    isNumber: (str1, status) => {
+        const pattern = /^\d+$/;
+        if (!pattern.test(str1)) {
+            status.addError('! isNumber');
+        }
+        console.log(pattern.test(str1), '! isNumber');
+        return validateTests;
+    },
+    isNotSame: (str1, str2, status) => {
+        if (str1 !== str2) {
+            status.addError('! isNotSame');
+        }
+        return validateTests;
+    },
+    isLessThan: (str1, max, status) => {
+        if (str1.length >= max) {
+            status.addError('! isLessThan');
+        }
+        return validateTests;
+    },
+    isGreaterThan: (str1, min, status) => {
+        if (str1.length <= min) {
+            status.addError('! isGreaterThan');
+        }
+        return validateTests;
+    },
+    isValidUOM: (value, status) => {
+        const validUOMs = [
+            'mg',
+            'mcg',
+            'g',
+            'ml',
+            'l',
+            'oz',
+            'CFU',
+            'mcg DFE',
+            'mg DFE',
+            '',
+            'IU',
+        ];
+        if (!validUOMs.includes(value)) {
+            status.addError('! isValidUOM');
+        }
+        return validateTests;
+    },
+};
+
 class Type {
     constructor() {}
     /**
@@ -21,11 +121,11 @@ class Type {
                 // console.log(`${key}: ${value}`);
                 switch (key) {
                     case 'order':
-                        console.log(`order`, value);
-                        const bool = canBeParsedAsNumber(value);
-                        if (bool) {
-                            status.addInfo('good')
-                        }
+                        console.log(`order =`, value);
+                        validateTests
+                            .canBeParsedAsNumber(value, status)
+                            .isNotEmpty(value, status);
+
                         break;
 
                     default:
@@ -73,6 +173,8 @@ class Ingredient extends Type {
     symbol;
     /**@type {string} */
     foot;
+    /**@type {string} */
+    unknown;
     constructor() {
         super();
     }
@@ -87,9 +189,13 @@ class Ingredient extends Type {
 function createNutrientErrorChecking(pipes, status) {
     //Row validation
     if (pipes.length < 8) {
-        status.addError('Nutrient is less than 9');
+        status.addError(
+            'Nutrient pipes are less than 8. Cell data is likely incorrect'
+        );
     } else if (pipes.length > 8) {
-        status.addError('Nutrient is greater than 9');
+        status.addError(
+            'Nutrient pipes are greater than 8. Cell data is likely incorrect'
+        );
     } else if (pipes.length == 8) {
         // status.addInfo('Just right');
     }
@@ -103,7 +209,7 @@ function createNutrientErrorChecking(pipes, status) {
     const symbol = pipes[6].trim();
     const foot = pipes[7].trim();
 
-    let nutrient = new Nutrient();
+    const nutrient = new Nutrient();
     nutrient.order = order;
     nutrient.shortDesc = shortDesc;
     nutrient.longDesc = longDesc;
@@ -120,41 +226,45 @@ function createNutrientErrorChecking(pipes, status) {
 /**
  *
  * @param {string[]} pipes
- * @param {Status} status
+ * @param {Status} rowStatus
  * @returns
  */
-function createIngredientErrorChecking(pipes, status) {
+function createIngredient_ErrorChecking(pipes, rowStatus) {
     //Row validation
     if (pipes.length < 9) {
-        status.addError('Ingredient is less than 9');
+        rowStatus.addError(
+            'Ingredient pipes are less than 9. Cell data is likely incorrect'
+        );
     } else if (pipes.length > 9) {
-        status.addError('Ingredient is greater than 9');
+        rowStatus.addError(
+            'Ingredient paipes are greater than 9. Cell data is likely incorrect'
+        );
     } else if (pipes.length == 9) {
         // status.addInfo('Just right');
     }
     if (pipes[4]) {
         // throw new Error('Ingredient has unaccounted pipe [4]');
-        status.addWarning('Ingredient has unaccounted pipe [4]');
+        rowStatus.addWarning('Ingredient has unaccounted pipe [4]');
     }
     if (pipes[7]) {
         // throw new Error('Ingredient has unaccounted pipe [7]');
-        status.addWarning('Ingredient has unaccounted pipe [7]');
+        rowStatus.addWarning('Ingredient has unaccounted pipe [7]');
     }
     if (pipes[8]) {
         // throw new Error('Ingredient has unaccounted pipe [8]');
-        status.addWarning('Ingredient has unaccounted pipe [8]');
+        rowStatus.addWarning('Ingredient has unaccounted pipe [8]');
     }
     const order = pipes[0].trim();
     const shortDesc = pipes[1].trim();
     const qty = pipes[2].trim();
     const uom = pipes[3].trim();
-    // const unk = pipes[4].trim();
+    const unknown4 = pipes[4].trim();
     const dvAmt = pipes[5].trim();
     const symbol = pipes[6].trim();
     const foot = pipes[7].trim();
-    const unk = pipes[8].trim();
+    const unknown8 = pipes[8].trim();
 
-    let ingredient = new Ingredient();
+    const ingredient = new Ingredient();
     ingredient.order = order;
     ingredient.shortDesc = shortDesc;
     ingredient.qty = qty;
@@ -162,8 +272,11 @@ function createIngredientErrorChecking(pipes, status) {
     ingredient.dvAmt = dvAmt;
     ingredient.symbol = symbol;
     ingredient.foot = foot;
+    ingredient.unknown = coalesce(unknown4, unknown8);
 
-    ingredient.validate(status);
+    //! Cell Validate here
+    const cellStatus = new Status();
+    ingredient.validate(cellStatus);
 
     return ingredient;
 }
@@ -175,7 +288,7 @@ function createIngredientErrorChecking(pipes, status) {
  * @returns {Array<Cell>} - An array of Cells representing table columns.
  */
 function createCellsForTableErrorChecking(obj) {
-    // console.log(`createCellsForTableErrorChecking`, obj);
+    console.log(`createCellsForTableErrorChecking`, obj);
     const cells = [];
 
     // Create Cell instances for each table column
@@ -183,6 +296,7 @@ function createCellsForTableErrorChecking(obj) {
     const orderCell = new Cell({
         value: obj.order,
         type: 'ORDER',
+        status: obj.status,
         header: new Header({
             id: 'ORDER',
             name: 'Order',
@@ -295,38 +409,38 @@ function per_pipe_per_partcode_4(rows) {
                     .map(cloneCell);
                 // const newRow = new Row(nonIngredientCells);
                 // console.log(newRow);
-                const status = new Status();
+                const rowStatus = new Status();
 
                 // Process the type of ingredient
                 if (
                     ingredientTypeObject.value === LABEL_DATASET_NUTRIENT_A.abbr
                 ) {
                     // Create nutrient cells for the table
-                    const nutrient = createNutrientErrorChecking(
-                        ingredientsArray,
-                        status
-                    );
+                    // const nutrient = createNutrientErrorChecking(
+                    //     ingredientsArray,
+                    //     rowStatus
+                    // );
 
-                    const nutrientCells = createCellsForTableErrorChecking({
-                        order: nutrient.order,
-                        desc: nutrient.desc,
-                        qty: nutrient.qty,
-                        uom: nutrient.uom,
-                        dvAmt: nutrient.dvAmt,
-                        symbol: nutrient.symbol,
-                        foot: nutrient.foot,
-                    });
+                    // const nutrientCells = createCellsForTableErrorChecking({
+                    //     order: nutrient.order,
+                    //     desc: nutrient.desc,
+                    //     qty: nutrient.qty,
+                    //     uom: nutrient.uom,
+                    //     dvAmt: nutrient.dvAmt,
+                    //     symbol: nutrient.symbol,
+                    //     foot: nutrient.foot,
+                    // });
 
-                    // Add nutrient cells to the new row
-                    nonIngredientCells.push(...nutrientCells);
+                    // // Add nutrient cells to the new row
+                    // nonIngredientCells.push(...nutrientCells);
                 } else if (
                     ingredientTypeObject.value ===
                     LABEL_DATASET_INGREDIENTS_A.abbr
                 ) {
                     // Create ingredient cells for the table
-                    const ingredient = createIngredientErrorChecking(
+                    const ingredient = createIngredient_ErrorChecking(
                         ingredientsArray,
-                        status
+                        rowStatus
                     );
 
                     const ingredientCells = createCellsForTableErrorChecking({
@@ -359,14 +473,12 @@ function per_pipe_per_partcode_4(rows) {
                     nonIngredientCells.push(...otherCells);
                 }
                 // Add the processed new row to the array of ingredients rows
-                const newRow = new Row(nonIngredientCells, status);
-                // newRow.status.addInfo('ugh')
-                // console.log(newRow);
-                // rowsOfIngredients.push(nonIngredientCells);
+                const newRow = new Row(nonIngredientCells, rowStatus);
+
                 rowsOfIngredients.push(newRow);
             }
         });
     });
-    // console.log(`rowsOfIngredients`, rowsOfIngredients);
+    console.log(`rowsOfIngredients`, rowsOfIngredients);
     return rowsOfIngredients;
 }
