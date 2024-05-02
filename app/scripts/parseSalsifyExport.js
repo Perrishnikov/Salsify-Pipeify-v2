@@ -490,44 +490,6 @@ Object.defineProperty(Array.prototype, 'moveToEndById', {
 });
 
 /**
- * Moves specified columns to the end of each object in an array of objects.
- *
- * @param {Array<Object>} data - The original array of objects.
- * @param {Array<string>} columnsToMove - An array of property keys to move to the end of each object.
- * @returns {Array<Object>} - A new array of objects with specified columns moved to the end of each object.
- */
-// function moveColumnsToEnd(data, columnsToMove) {
-//     // Create a new array to hold the reordered objects
-//     const reorderedData = [];
-
-//     // Iterate through each object in the original data
-//     data.forEach((obj) => {
-//         // Create a new object
-//         const reorderedObj = {};
-
-//         // Add remaining columns (not in the specified list) to the new object
-//         for (const key in obj) {
-//             if (!columnsToMove.includes(key)) {
-//                 reorderedObj[key] = obj[key];
-//             }
-//         }
-
-//         // Add specified columns to the end of the object
-//         columnsToMove.forEach((key) => {
-//             if (obj.hasOwnProperty(key)) {
-//                 reorderedObj[key] = obj[key];
-//             }
-//         });
-
-//         // Add the reordered object to the new array
-//         reorderedData.push(reorderedObj);
-//     });
-
-//     // Return the new array of objects with specified columns moved to the end
-//     return reorderedData;
-// }
-
-/**
  * Stores a JSON object in localStorage.
  *
  * @param {string} key - The key under which the JSON object should be stored.
@@ -588,24 +550,53 @@ function create_html_table_rows_and_errors(rows) {
 
         // Add a status cell at the beginning of the row if there is a status
         if (hasMessages) {
-            const statusCell = document.createElement('td');
-            // Determine the content for the status cell (an "x" if there is an error or warning)
-            let statusSymbol = 'x';
+           const statusCell = document.createElement('td');
+           let statusSymbol = '';
+           let popoverContent = '';
 
-            if (row.status.errors.length > 0) {
-                tableRow.classList.add('error-row');
-            }
-            if (row.status.warnings.length > 0) {
-                tableRow.classList.add('warning-row');
-            }
-            if (row.status.info.length > 0) {
-                tableRow.classList.add('info-row');
-            }
+           // Determine the appropriate Heroicon and message for the popover
+           if (row.status.errors.length > 0) {
+               tableRow.classList.add('error-row');
+               statusSymbol = `<span class="material-symbols-outlined" role="button" >error</span>`;
+               popoverContent = row.status.errors.join('<br>');
+           } else if (row.status.warnings.length > 0) {
+               tableRow.classList.add('warning-row');
+               statusSymbol = `<span class="material-symbols-outlined " role="button" >warning</span>`;
+               popoverContent = row.status.warnings.join('<br>');
+           } else if (row.status.info.length > 0) {
+               tableRow.classList.add('info-row');
+               statusSymbol = `<span class="material-symbols-outlined " role="button">info</span>`;
+               popoverContent = row.status.info.join('<br>');
+           }
 
-            // Set the status cell content
-            statusCell.textContent = statusSymbol;
-            // Add the status cell to the beginning of the row
-            tableRow.appendChild(statusCell);
+           // Set the status cell content
+           statusCell.innerHTML = statusSymbol;
+           statusCell.classList.add('pointer-icon');
+
+           // Create the popover element and append it to the status cell
+           const popover = document.createElement('div');
+           popover.innerHTML = popoverContent;
+
+           //TODO: Move to CSS  Customize popover styles here
+           popover.style.display = 'none';
+           popover.style.position = 'absolute';
+           popover.style.backgroundColor = '#fff';
+           popover.style.border = '1px solid #ccc';
+           popover.style.padding = '8px';
+           popover.style.zIndex = '10';
+
+           // Append the popover to the status cell
+           statusCell.appendChild(popover);
+
+           // Add a click event listener to the status cell to toggle popover visibility
+           statusCell.addEventListener('click', () => {
+               // Toggle popover visibility
+               const isVisible = popover.style.display === 'block';
+               popover.style.display = isVisible ? 'none' : 'block';
+           });
+
+           // Add the status cell to the beginning of the row
+           tableRow.insertAdjacentElement('afterbegin', statusCell);
         }
 
         // Add cells to the row
@@ -635,6 +626,28 @@ function create_html_table_rows_and_errors(rows) {
     });
 
     return myTable;
+}
+
+/**
+ * Creates a popover element with the given ID and content.
+ *
+ * @param {string} id - The ID to assign to the popover element.
+ * @param {string} content - The content to display inside the popover.
+ */
+function createPopover(id, content) {
+    const popover = document.createElement('div');
+    popover.setAttribute('id', id);
+    popover.innerHTML = content;
+
+    // Customize popover styles here if needed
+    popover.style.position = 'absolute';
+    popover.style.backgroundColor = '#fff';
+    popover.style.border = '1px solid #ccc';
+    popover.style.padding = '10px';
+    // popover.style.display = 'none'; // Hide the popover initially
+
+    console.log(`popover`, popover);
+    document.body.appendChild(popover);
 }
 
 /**

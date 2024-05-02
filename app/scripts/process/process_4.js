@@ -1,6 +1,97 @@
-function createNutrientErrorChecking(pipes) {
-    if (pipes.length !== 8) {
-        throw new Error('Nutrient not expected length of 8');
+function canBeParsedAsNumber(str) {
+    const parsedNumber = Number(str);
+    return !isNaN(parsedNumber);
+}
+
+class Type {
+    constructor() {}
+    /**
+     * Validates the properties of the current instance and logs any issues to the provided status object.
+     *
+     * @param {Status} status - The status object where validation errors or warnings will be logged.
+     */
+    validate(status) {
+        const who = this.constructor.name;
+        console.log('Properties of MyClass instance:', who);
+
+        for (const key in this) {
+            const value = this[key];
+
+            if (this.hasOwnProperty(key)) {
+                // console.log(`${key}: ${value}`);
+                switch (key) {
+                    case 'order':
+                        console.log(`order`, value);
+                        const bool = canBeParsedAsNumber(value);
+                        if (bool) {
+                            status.addInfo('good')
+                        }
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+        }
+    }
+}
+class Nutrient extends Type {
+    /**@type {number} */
+    order;
+    /**@type {string} */
+    shortDesc;
+    /**@type {string} */
+    longDesc;
+    /**@type {string} */
+    desc;
+    /**@type {number | undefined} */
+    qty;
+    /**@type {number | undefined} */
+    uom;
+    /**@type {number | undefined} */
+    dvAmt;
+    /**@type {string} */
+    symbol;
+    /**@type {string} */
+    foot;
+    constructor() {
+        super();
+    }
+}
+class Ingredient extends Type {
+    /**@type {number} */
+    order;
+    /**@type {string} */
+    shortDesc;
+    /**@type {number | undefined} */
+    qty;
+    /**@type {number | undefined} */
+    uom;
+    /**@type {number | undefined} */
+    dvAmt;
+    /**@type {SYMBOL} */
+    symbol;
+    /**@type {string} */
+    foot;
+    constructor() {
+        super();
+    }
+}
+
+/**
+ *
+ * @param {string[]} pipes
+ * @param {Status} status
+ * @returns
+ */
+function createNutrientErrorChecking(pipes, status) {
+    //Row validation
+    if (pipes.length < 8) {
+        status.addError('Nutrient is less than 9');
+    } else if (pipes.length > 8) {
+        status.addError('Nutrient is greater than 9');
+    } else if (pipes.length == 8) {
+        // status.addInfo('Just right');
     }
     // console.log(`createNutrient pipes`, pipes.length, pipes);
     const order = pipes[0].trim();
@@ -26,19 +117,33 @@ function createNutrientErrorChecking(pipes) {
     return nutrient;
 }
 
-function createIngredientErrorChecking(pipes) {
-    // if (pipes.length !== 9) {
-    //     throw new Error("Ingredient doesn't have length of 9");
-    // }
-    // if (pipes[4]) {
-    //     throw new Error('Ingredient has unaccounted pipe [4]');
-    // }
-    // if (pipes[7]) {
-    //     throw new Error('Ingredient has unaccounted pipe [7]');
-    // }
-    // if (pipes[8]) {
-    //     throw new Error('Ingredient has unaccounted pipe [8]');
-    // }
+/**
+ *
+ * @param {string[]} pipes
+ * @param {Status} status
+ * @returns
+ */
+function createIngredientErrorChecking(pipes, status) {
+    //Row validation
+    if (pipes.length < 9) {
+        status.addError('Ingredient is less than 9');
+    } else if (pipes.length > 9) {
+        status.addError('Ingredient is greater than 9');
+    } else if (pipes.length == 9) {
+        // status.addInfo('Just right');
+    }
+    if (pipes[4]) {
+        // throw new Error('Ingredient has unaccounted pipe [4]');
+        status.addWarning('Ingredient has unaccounted pipe [4]');
+    }
+    if (pipes[7]) {
+        // throw new Error('Ingredient has unaccounted pipe [7]');
+        status.addWarning('Ingredient has unaccounted pipe [7]');
+    }
+    if (pipes[8]) {
+        // throw new Error('Ingredient has unaccounted pipe [8]');
+        status.addWarning('Ingredient has unaccounted pipe [8]');
+    }
     const order = pipes[0].trim();
     const shortDesc = pipes[1].trim();
     const qty = pipes[2].trim();
@@ -47,6 +152,7 @@ function createIngredientErrorChecking(pipes) {
     const dvAmt = pipes[5].trim();
     const symbol = pipes[6].trim();
     const foot = pipes[7].trim();
+    const unk = pipes[8].trim();
 
     let ingredient = new Ingredient();
     ingredient.order = order;
@@ -56,6 +162,8 @@ function createIngredientErrorChecking(pipes) {
     ingredient.dvAmt = dvAmt;
     ingredient.symbol = symbol;
     ingredient.foot = foot;
+
+    ingredient.validate(status);
 
     return ingredient;
 }
@@ -156,8 +264,6 @@ function createCellsForTableErrorChecking(obj) {
     return cells;
 }
 
-
-
 /**
  * Creates an array of rows, each representing a single ingredient from `MERGED_INGREDIENTS` in each row.
  *
@@ -189,14 +295,18 @@ function per_pipe_per_partcode_4(rows) {
                     .map(cloneCell);
                 // const newRow = new Row(nonIngredientCells);
                 // console.log(newRow);
+                const status = new Status();
 
                 // Process the type of ingredient
                 if (
                     ingredientTypeObject.value === LABEL_DATASET_NUTRIENT_A.abbr
                 ) {
                     // Create nutrient cells for the table
-                    const nutrient =
-                        createNutrientErrorChecking(ingredientsArray);
+                    const nutrient = createNutrientErrorChecking(
+                        ingredientsArray,
+                        status
+                    );
+
                     const nutrientCells = createCellsForTableErrorChecking({
                         order: nutrient.order,
                         desc: nutrient.desc,
@@ -214,8 +324,11 @@ function per_pipe_per_partcode_4(rows) {
                     LABEL_DATASET_INGREDIENTS_A.abbr
                 ) {
                     // Create ingredient cells for the table
-                    const ingredient =
-                        createIngredientErrorChecking(ingredientsArray);
+                    const ingredient = createIngredientErrorChecking(
+                        ingredientsArray,
+                        status
+                    );
+
                     const ingredientCells = createCellsForTableErrorChecking({
                         order: ingredient.order,
                         desc: ingredient.shortDesc,
@@ -246,9 +359,9 @@ function per_pipe_per_partcode_4(rows) {
                     nonIngredientCells.push(...otherCells);
                 }
                 // Add the processed new row to the array of ingredients rows
-                const newRow = new Row(nonIngredientCells);
+                const newRow = new Row(nonIngredientCells, status);
                 // newRow.status.addInfo('ugh')
-                console.log(newRow);
+                // console.log(newRow);
                 // rowsOfIngredients.push(nonIngredientCells);
                 rowsOfIngredients.push(newRow);
             }

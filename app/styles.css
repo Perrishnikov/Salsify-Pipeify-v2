@@ -173,6 +173,9 @@ tr:hover:not(.error-row):not(.warning-row):not(.warning-row):not(.info-row) {
     /* Add border or other styles if needed */
     /* border: 1px solid var(--warning); */
 }
+.pointer-icon {
+    cursor: pointer;
+}
 
 /* DOWNLOAD BUTTON */
 /* #download-btn {

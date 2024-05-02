@@ -77,7 +77,7 @@ class Row {
     /** @type {Cell[]} */
     cells;
 
-    constructor(cells) {
+    constructor(cells, status = new Status()) {
         // Iterate over the arguments array and add each as a property on the instance
         // cells.forEach((value, index) => {
             // Assign the argument value to a property named 'argX' where X is the argument index
@@ -86,7 +86,7 @@ class Row {
         // });
         this.cells = cells;
 
-        this.status = new Status();
+        this.status = status;
     }
 }
 class Cell {
