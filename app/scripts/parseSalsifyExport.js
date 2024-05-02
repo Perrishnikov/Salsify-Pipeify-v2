@@ -469,6 +469,41 @@ function storeJsonObjectInLocalStorage(key, jsonObject) {
 }
 
 /** ************************************************************* */
+
+function createPopover(type, content, index) {
+    const statusSymbol = `
+        <div id="pop-div-${(type, index)}">
+            <button class="icon" popovertarget="pop-row-${(type, index)}">
+            <span class="material-symbols-outlined" role="button" >${type}</span>
+            </button>
+            <div id="pop-row-${
+                (type, index)
+            }" popover anchor="pop-div-${type,index}">
+                ${content}
+            </div>
+        </div>`;
+
+    return statusSymbol;
+}
+
+function createCellWithPopover(type, content, index, value) {
+                // <span class="material-symbols-outlined" role="button">
+                //     ${type}
+                // </span>;
+    const statusSymbol = `
+        <div id="pop-div-${index}">
+            <button class="icon" popovertarget="pop-row-${index}">
+                ${value}
+            </button>
+            <div id="pop-row-${index}" popover anchor="pop-div-${index}">
+                ${content}
+            </div>
+            
+        </div>`;
+
+    return statusSymbol;
+}
+
 /**
  * Creates rows for an HTML table and handles row status.
  *
@@ -510,7 +545,7 @@ function create_html_table_rows_and_errors(rows) {
     }
 
     // Add table rows
-    rows.forEach((row) => {
+    rows.forEach((row, index) => {
         const tableRow = document.createElement('tr');
 
         // Add a status cell at the beginning of the row if there is a status
@@ -519,54 +554,36 @@ function create_html_table_rows_and_errors(rows) {
             let statusSymbol = '';
             let popoverContent = '';
 
-            // Determine the appropriate Heroicon and message for the popover
+            // Determine the appropriate icon and message for the popover
             if (row.status.errors.length > 0) {
-                tableRow.classList.add('error-row');
-                statusSymbol = `<span class="material-symbols-outlined" role="button" >error</span>`;
-                popoverContent = row.status.errors.join('<br>');
-            } else if (row.status.warnings.length > 0) {
-                tableRow.classList.add('warning-row');
-                statusSymbol = `<span class="material-symbols-outlined " role="button" >warning</span>`;
-                popoverContent = row.status.warnings.join('<br>');
-            } else if (row.status.info.length > 0) {
-                tableRow.classList.add('info-row');
-                statusSymbol = `<span class="material-symbols-outlined " role="button">info</span>`;
-                popoverContent = row.status.info.join('<br>');
+                popoverContent += row.status.errors.join('<br>');
+            }
+            if (row.status.warnings.length > 0) {
+                popoverContent += row.status.warnings.join('<br>');
+            }
+            if (row.status.info.length > 0) {
+                popoverContent += row.status.info.join('<br>');
             }
 
-            // Set the status cell content
+            //TODO: account for multiple classes in the same row
+            if (row.status.errors.length > 0) {
+                statusSymbol = createPopover('error', popoverContent, index);
+                tableRow.classList.add('error-row');
+            } else if (row.status.warnings.length > 0) {
+                statusSymbol = createPopover('warning', popoverContent, index);
+                tableRow.classList.add('warning-row');
+            } else if (row.status.info.length > 0) {
+                statusSymbol = createPopover('info', popoverContent, index);
+                tableRow.classList.add('info-row');
+            }
+
             statusCell.innerHTML = statusSymbol;
-            statusCell.classList.add('pointer-icon');
 
-            // Create the popover element and append it to the status cell
-            const popover = document.createElement('div');
-            popover.innerHTML = popoverContent;
-
-            //TODO: Move to CSS  Customize popover styles here
-            popover.style.display = 'none';
-            popover.style.position = 'absolute';
-            popover.style.backgroundColor = '#fff';
-            popover.style.border = '1px solid #ccc';
-            popover.style.padding = '8px';
-            popover.style.zIndex = '10';
-
-            // Append the popover to the status cell
-            statusCell.appendChild(popover);
-
-            // Add a click event listener to the status cell to toggle popover visibility
-            statusCell.addEventListener('click', () => {
-                // Toggle popover visibility
-                const isVisible = popover.style.display === 'block';
-                popover.style.display = isVisible ? 'none' : 'block';
-            });
-
-            // Add the status cell to the beginning of the row
-            tableRow.insertAdjacentElement('afterbegin', statusCell);
+            tableRow.appendChild(statusCell);
         }
 
         // Add cells to the row
-        row.cells.forEach((cell) => {
-
+        row.cells.forEach((cell, cellIndex) => {
             const td = document.createElement('td');
             td.textContent = cell.value;
 
@@ -576,6 +593,9 @@ function create_html_table_rows_and_errors(rows) {
                 // Apply CSS classes based on cell status
                 if (cell.status.errors.length > 0) {
                     td.classList.add('error-cell');
+                    const pc = cell.status.errors.join('<br>');
+                    const goodies = createCellWithPopover('error', pc, cellIndex, cell.value);
+                    td.innerHTML = goodies
                 }
                 if (cell.status.warnings.length > 0) {
                     td.classList.add('warning-cell');
@@ -601,21 +621,21 @@ function create_html_table_rows_and_errors(rows) {
  * @param {string} id - The ID to assign to the popover element.
  * @param {string} content - The content to display inside the popover.
  */
-function createPopover(id, content) {
-    const popover = document.createElement('div');
-    popover.setAttribute('id', id);
-    popover.innerHTML = content;
+// function createPopover(id, content) {
+//     const popover = document.createElement('div');
+//     popover.setAttribute('id', id);
+//     popover.innerHTML = content;
 
-    // Customize popover styles here if needed
-    popover.style.position = 'absolute';
-    popover.style.backgroundColor = '#fff';
-    popover.style.border = '1px solid #ccc';
-    popover.style.padding = '10px';
-    // popover.style.display = 'none'; // Hide the popover initially
+//     // Customize popover styles here if needed
+//     popover.style.position = 'absolute';
+//     popover.style.backgroundColor = '#fff';
+//     popover.style.border = '1px solid #ccc';
+//     popover.style.padding = '10px';
+//     // popover.style.display = 'none'; // Hide the popover initially
 
-    console.log(`popover`, popover);
-    document.body.appendChild(popover);
-}
+//     console.log(`popover`, popover);
+//     document.body.appendChild(popover);
+// }
 
 /**
  * Creates an HTML table from the provided data, with an option to customize using a radio option.

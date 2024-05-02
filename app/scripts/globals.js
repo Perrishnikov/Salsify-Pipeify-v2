@@ -97,11 +97,15 @@ class Cell {
     /** @type {Status} "cell status" */
     status;
 
-    constructor({ value, header, type, status = new Status() }) {
+    /** @type {boolean} */
+    isEditable;
+
+    constructor({ value, header, type, status = new Status(), isEditable = false }) {
         this.value = value;
         this.type = type;
         this.header = header;
         this.status = status;
+        this.isEditable = isEditable;
     }
 }
 

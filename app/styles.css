@@ -99,7 +99,7 @@ input[type='checkbox'] {
 /* TABLE */
 #table-container {
     flex-basis: auto;
-    /* border-collapse: collapse; */
+    border-collapse: collapse;
     /* border: 1px solid #ddd; */
 }
 /* Style for the table */
@@ -159,7 +159,7 @@ tr:hover:not(.error-row):not(.warning-row):not(.warning-row):not(.info-row) {
 .error-cell {
     background-color: var(--danger);
     /* Add border or other styles if needed */
-    /* border: 1px solid var(--danger); */
+    /* border: 1px solid var(--warning); */
 }
 
 /* Styles for cells with warnings */
@@ -174,7 +174,7 @@ tr:hover:not(.error-row):not(.warning-row):not(.warning-row):not(.info-row) {
     /* border: 1px solid var(--warning); */
 }
 .pointer-icon {
-    cursor: pointer;
+    /* cursor: pointer; */
 }
 
 /* DOWNLOAD BUTTON */
@@ -185,6 +185,35 @@ tr:hover:not(.error-row):not(.warning-row):not(.warning-row):not(.info-row) {
     border: 1px solid #000;
     cursor: pointer;
 } */
+/* Button as a container with no styling */
+button.icon {
+    border: none;
+    padding: 0;
+    background: transparent;
+    cursor: pointer;
+}
+
+[popover] {
+    position: absolute;
+    inset: unset;
+    width: fit-content;
+    height: fit-content;
+    margin: auto;
+    border: solid;
+    padding: calc(var(--padding-margin) / 2);
+    overflow: auto;
+    /* margin-top: 30px; */
+}
+:popover-open {
+    background-color: #333;
+    padding: calc(var(--padding-margin) / 2);
+    font-size: var(--font-size);
+    /* border-radius: calc(var(--padding-margin) / 2); */
+    border: 1px solid #000;
+    cursor: pointer;
+    margin-top: calc(var(--padding-margin) / 2);
+    translate: -16px;
+}
 
 button {
     padding: calc(var(--padding-margin) / 2);

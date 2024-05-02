@@ -373,11 +373,13 @@ function createIngredientCells_ErrorChecking(pipes, rowStatus) {
         );
     } else if (pipes.length > 9) {
         rowStatus.addError(
-            'Ingredient paipes are greater than 9. Cell data is likely incorrect'
+            'Ingredient pipes are greater than 9. Cell data is likely incorrect'
         );
     } else if (pipes.length == 9) {
         // status.addInfo('Just right');
     }
+
+    //? Maybe these belong in Cell validation instead?
     if (pipes[4]) {
         // throw new Error('Ingredient has unaccounted pipe [4]');
         rowStatus.addWarning('Ingredient has unaccounted pipe [4]');
@@ -400,7 +402,7 @@ function createIngredientCells_ErrorChecking(pipes, rowStatus) {
     const dvAmt = pipes[5].trim();
     const symbol = pipes[6].trim();
     const foot = pipes[7].trim();
-    const unknown8 = pipes[8].trim();
+    // const unknown8 = pipes[8].trim();
 
     // Column 1: Order
     const orderCell = createCell.order(order);
