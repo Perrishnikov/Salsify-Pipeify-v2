@@ -1,92 +1,36 @@
 /**
- * Creates a workbook from the provided data and returns JSON data and binary string representations.
- * @param {Array<Array<*>>} data - The data to be included in the workbook. Each inner array represents a row of data.
- * @returns {{jsonData: Object[], wbString: string}} An object containing JSON data and a binary string representation of the workbook.
+ { 
+    "LABEL_DATASET_INGREDIENTS_A - en-US": "6|Black Elder (Sambucus nigra L.) Extract (berry) standardized to anthocyanins from 3,200 mg of premium cultivar elderberries per teaspoon|100|mg|||**||"
+    "LABEL_DATASET_NUTRIENT_A - en-US": "1|Calories||25| |||"
+    "LABEL_DATASET_NUTRIENT_A - en-US_1": "2|Total Carbohydrate||8|g|3|%|†"
+    "LABEL_DATASET_NUTRIENT_A - en-US_2": "3|Total Sugars||0|g|**||"
+    "LABEL_DATASET_NUTRIENT_A - en-US_3": "4|Includes 0 g Added Sugars||0||||"
+    "LABEL_DATASET_NUTRIENT_A - en-US_4": "5|Sugar Alcohol||8|g|**||"    ​​
+    LABEL_DATASET_OTHER_INGREDS_A: "sorbitol, purified water, glycerin, natural flavor, preservatives to maintain freshness (citric acid, potassium sorbate"
+    PARTCODE: "6971"
+    "Product ID": "00033674069714"
+    __rowNum__: 1
+    "salsify:data_inheritance_hierarchy_level_id": "variant"
+    "salsify:parent_id": "6971"
+ }
  */
-function xlsx_create_workbook(data) {
-    // Specify metadata properties
-    const props = {
-        Title: 'Pipeify Export',
-        CreatedDate: new Date(),
-        Company: "Nature's Way",
-        Comments: '...',
-    };
 
-    // Sample data
-    // let data = [
-    //     ['Name', 'Age', 'City'],
-    //     ['John', 30, 'New York'],
-    //     ['Alice', 25, 'Los Angeles'],
-    //     ['Bob', 35, 'Chicago'],
-    // ];
+/**
+ * Represents a data structure containing various attributes and their values.
+ *
+ * @typedef {Object} SalsifyObject
+ * @property {string} LABEL_DATASET_INGREDIENTS_A - The ingredient data in en-US format.
+ * @property {string} LABEL_DATASET_NUTRIENT_A - The nutrient data in en-US format.
+ * @property {string} LABEL_DATASET_OTHER_INGREDS_A - The other ingredient data.
+ * @property {string} PARTCODE - The part code.
+ * @property {string} Product_ID - The product ID.
+ */
 
-    const workbook = XLSX.utils.book_new();
-
-    // Convert data to a worksheet
-    const worksheet = XLSX.utils.aoa_to_sheet(data);
-
-    const numberOfColumns = data[0].length;
-    // worksheet['!cols'] = [
-    //     { wch: 10 }, // Column A width
-    //     { wch: 10 }, // Column B width
-    //     { wch: 5 }, // Column C width
-    //     { wch: 5 }, // Column C width
-    // ];
-    // TODO: create option for [line breaks] instead of new rows for data with the same partcode
-    let cols = new Array(numberOfColumns).fill({ wch: 15 });
-
-    // set the last column (data) to be wider
-    cols[numberOfColumns - 1] = { wch: 30 };
-
-    worksheet['!cols'] = cols;
-
-    // Add the worksheet to the workbook
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Pipeify');
-
-    // Convert the workbook to a binary string
-    const wbString = XLSX.write(workbook, {
-        type: 'binary',
-        bookType: 'xlsx',
-        props: props,
-    });
-
-    // Convert data to JSON object
-    const jsonDataSheet = XLSX.utils.sheet_to_json(worksheet);
-
-    return { jsonDataSheet, wbString };
-}
-
-function create_AoO_sheet(data) {
-    // Create a worksheet from the array of objects
-    const worksheet = XLSX.utils.json_to_sheet(data);
-
-    // Create a new workbook
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Pipeify');
-
-    // Write the workbook to a binary string
-    const wbString = XLSX.write(workbook, {
-        type: 'binary',
-        bookType: 'xlsx',
-        props: {
-            Title: 'Pipeify v2 Export',
-            CreatedDate: new Date(),
-            Company: "Nature's Way",
-            Comments: '...',
-        },
-    });
-
-    // Convert worksheet to JSON with headers option
-    // The header option specifies how to handle the first row:
-    // - 1: Use the first row as headers
-    // - 0: Treat the first row as data
-    const jsonDataSheet = XLSX.utils.sheet_to_json(worksheet, {
-        header: 0, // Try 0 if you are not sure the first row contains headers
-        // defval: '', // Default value for missing cells
-    });
-
-    // console.log(jsonDataSheet);
-    return { jsonDataSheet, wbString };
+/**
+ * TODO
+ */
+function pipeify_preprocess() {
+    console.log(`TODO: pipeify_preprocess`);
 }
 
 /**
@@ -97,6 +41,98 @@ function create_AoO_sheet(data) {
  */
 function hasProductId(data) {
     return data.some((obj) => 'Product ID' | ('PARTCODE' in obj));
+}
+
+/**
+ * Merges columns in the provided JSON data based on specified prefixes and returns a new array of objects with merged data.
+ *
+ * This function takes a JSON array of rows (objects) as input, iterates through each row, and combines values in columns
+ * that match specified prefixes (e.g., "LABEL_DATASET_INGREDIENTS_A - en-US" and "LABEL_DATASET_NUTRIENT_A - en-US").
+ * It then constructs a new array of rows with the merged data, keeping non-merged columns intact.
+ *
+ * @param {Array<Object>} jsonData - The JSON array of rows (objects) containing data from the Excel file.
+ * @returns {Array<Object>} - A new JSON array of rows (objects) with merged data.
+ */
+function salsify_mergeIngredients(jsonData) {
+    // Define the column prefixes you want to merge
+    const mergePrefixes = [
+        LABEL_DATASET_NUTRIENT_A.id,
+        LABEL_DATASET_INGREDIENTS_A.id,
+    ];
+
+    // Create an array to hold the new JSON data with merged columns
+    const mergedJsonData = jsonData.map((row) => {
+        // Create a new object to hold the merged row
+        let mergedRow = {};
+
+        // Iterate through the merge prefixes
+        mergePrefixes.forEach((prefix) => {
+            // Initialize a variable to hold the combined value
+            let combinedValue = '';
+
+            // Iterate through the keys in the row to find columns matching the prefix
+            Object.keys(row).forEach((key) => {
+                if (key.startsWith(prefix)) {
+                    // Add the value to the combinedValue with a ~ delimiter if not the first value
+                    if (combinedValue) {
+                        combinedValue += `${importDelimiter}${row[key]}`;
+                    } else {
+                        combinedValue = row[key];
+                    }
+                }
+            });
+
+            // If there's a combined value, add it to the merged row under the prefix key
+            if (combinedValue) {
+                mergedRow[prefix] = combinedValue;
+            }
+        });
+
+        // Add all the non-merged keys and values from the original row to the merged row
+        Object.keys(row).forEach((key) => {
+            // If the key doesn't match any merge prefix, add it to the merged row
+            const isMergedPrefix = mergePrefixes.some((prefix) =>
+                key.startsWith(prefix)
+            );
+            if (!isMergedPrefix) {
+                mergedRow[key] = row[key];
+            }
+        });
+
+        return mergedRow;
+    });
+
+    return mergedJsonData;
+}
+
+function salsify_preprocess(jsonData, parsingOption) {
+    //* Clean jsonData first before storing it */
+    /** Filter out parents - EA only */
+    const varientsOnly = [...jsonData].filter(
+        (obj) =>
+            obj['salsify:data_inheritance_hierarchy_level_id'] === 'variant'
+    );
+
+    /* Remove props that start woth "salsify:" */
+    const nonSalsifyPropsOnly = varientsOnly.map((obj) => {
+        Object.keys(obj).forEach((key) => {
+            // If the key starts with the prefix "salsify:", delete the key and its value from the object
+            if (key.startsWith('salsify:')) {
+                delete obj[key];
+            }
+        });
+        return obj;
+    });
+    // console.dir(nonSalsifyPropsOnly);
+
+    /** @type {SalsifyObject[]} */
+    const mergedJsonData = salsify_mergeIngredients(nonSalsifyPropsOnly);
+    // console.log('mergedJsonData', mergedJsonData);
+
+    setLocalStorage(mergedJsonData);
+
+    //* Done with Salsify processing */
+    process(parsingOption);
 }
 
 /* XLSX Processing */
@@ -110,53 +146,46 @@ async function xlsx_import_file(file, parsingOption) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
 
-        // Initialize fileType
-        let fileType = '';
-
         reader.onload = async (e) => {
             try {
-                // Read the file data
                 const data = new Uint8Array(e.target.result);
                 const workbook = XLSX.read(data, { type: 'array' });
                 const sheet = workbook.Sheets[workbook.SheetNames[0]];
                 const jsonData = XLSX.utils.sheet_to_json(sheet);
 
-                // Access workbook metadata
-                const metadata = workbook.Props; // Alternatively: workbook.props
+                const metadata = workbook.Props;
 
-                console.log({ metadata });
                 // Check if 'Pipeify' is in the title
-                // const fileType =
-                //     metadata.Title && metadata.Title.includes('Pipeify')
-                //         ? 'PIPEIFY'
-                //         : 'UNKNOWN';
+                const isPipeify =
+                    metadata.Title && metadata.Title.includes('Pipeify')
+                        ? 'PIPEIFY'
+                        : null;
 
                 // Validate the file type
                 if (hasProductId(jsonData)) {
-                    fileType = 'SALSIFY';
                     salsify_preprocess(jsonData, parsingOption);
 
-                    // Resolve the promise with the file type
+                    // Resolve the promise with the fileType
                     resolve('SALSIFY');
+                } else if (isPipeify) {
+                    //TODO: process Pipeify Option instead
+                    // salsify_preprocess(jsonData, parsingOption);
+                    pipeify_preprocess(jsonData, parsingOption);
+                    // Resolve the promise with the fileType
+                    resolve('PIPEIFY');
                 } else {
-                    // fileType = 'PIPEIFY'; // Assuming the alternative file type is PIPEIFY
                     reject(
                         'Spreadsheet must contain Salsify props or be a Pipeify export.'
                     );
                 }
-
-                // Process the file
             } catch (error) {
-                // Handle any errors that may occur
                 console.error('Error processing file:', error);
                 reject(error);
             }
         };
 
-        reader.onerror = (e) => {
-            // Handle error event
-            console.error('Error reading file:', e);
-            reject(e);
+        reader.onerror = (error) => {
+            reject(error);
         };
 
         // Start reading the file
@@ -164,9 +193,8 @@ async function xlsx_import_file(file, parsingOption) {
     });
 }
 
-// Called from parseSalsify
+/** EXPORT *************************************************** */
 function xlsx_export_current_table(data) {
-
     // Convert the data to a worksheet
     const worksheet = XLSX.utils.aoa_to_sheet(data);
 
@@ -176,7 +204,7 @@ function xlsx_export_current_table(data) {
     workbook.Props = {
         Title: 'Pipeify v2 Export',
         CreatedDate: new Date(),
-        Company: 'Nature\'s Way',
+        Company: "Nature's Way",
         Comments: '...',
     };
 
@@ -185,19 +213,4 @@ function xlsx_export_current_table(data) {
 
     // Write the workbook to a file
     XLSX.writeFile(workbook, 'Pipeify.xlsx');
-}
-
-// Called from parseSalsify
-function xlsx_export_for_salsify(data) {
-    // Convert the data to a worksheet
-    const worksheet = XLSX.utils.aoa_to_sheet(data);
-
-    // Create a new workbook
-    const workbook = XLSX.utils.book_new();
-
-    // Append the worksheet to the workbook
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
-
-    // Write the workbook to a file
-    XLSX.writeFile(workbook, 'output.xlsx');
 }

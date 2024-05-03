@@ -115,6 +115,8 @@ class Cell {
     }
 }
 
+const importDelimiter = `~`;
+
 /**
  * Helper function to create a deep copy of a Cell instance.
  *
@@ -130,4 +132,42 @@ function cloneCell(cell) {
             name: cell.header.name,
         }),
     });
+}
+
+/**
+ * Stores a JSON object in localStorage.
+ *
+ * @param {Object} jsonObject - The JSON object to store.
+ */
+function setLocalStorage(jsonObject) {
+    // Convert the JSON object to a JSON string using JSON.stringify()
+    const jsonString = JSON.stringify(jsonObject);
+
+    // Store the JSON string in localStorage under the given key
+    localStorage.setItem('original_merged', jsonString);
+}
+
+function getLocalStorage(){
+    const jsonString = localStorage.getItem('original_merged');
+    const jsonObject = JSON.parse(jsonString);
+    return jsonObject;
+}
+
+/**
+ * Returns the first non-null value from the provided values.
+ * @param {*} value1 - The first value to check.
+ * @param {*} value2 - The second value to check.
+ * @returns {*} The first non-null value, or null if both values are null.
+ */
+function coalesce(value1, value2) {
+    // return 1at value if there is one, else 2nd, or nothing
+    let value;
+
+    if (value1) {
+        value = value1;
+    } else if (value2) value = value2;
+    else {
+        value = null;
+    }
+    return value;
 }

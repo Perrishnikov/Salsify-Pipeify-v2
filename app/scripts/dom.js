@@ -8,7 +8,7 @@ if (radioButtonsDiv) {
         console.log(`change table columns to ${selectedOption}`);
 
         const parsingOption = getCheckedRadioButtonId();
-        process_parsing_option(parsingOption);
+        process(parsingOption);
     });
 }
 
@@ -57,9 +57,9 @@ async function dom_importFileHandler(file) {
 
         // Update the DOM with the imported file name and type
         fileNameArea.textContent = `Imported File [${fileType}]: ${fileName}`;
-
     } catch (error) {
-
+        // localStorage.clear();
+        
         showToast(`Issue handling file: ${error}`, 'error');
 
         console.error('Error reading file:', error);
@@ -107,7 +107,6 @@ if (dropArea) {
 
 const button_current_table = document.getElementById('download-wysiwyg-btn');
 if (button_current_table) {
-    
     button_current_table.addEventListener('click', (e) => {
         const parsingOption = getCheckedRadioButtonId();
         // Retrieve the binary string from localStorage
@@ -116,17 +115,6 @@ if (button_current_table) {
         // xlsx_export_current_table(retrievedWbString);
         preprocess_export_file(parsingOption);
         // // Convert the binary string back to a workbook
-        // const workbook = XLSX.read(retrievedWbString, { type: 'binary' });
-
-        // const currentDate = new Date();
-        // const options = { day: '2-digit', month: '2-digit', year: '2-digit' };
-        // const formattedDate = currentDate.toLocaleDateString('en-GB', options);
-
-        // // Write the workbook to a file
-        // XLSX.writeFile(
-        //     workbook,
-        //     `pipeify - ingedients - ${formattedDate}.xlsx`
-        // );
     });
 }
 
@@ -134,28 +122,14 @@ const button_salsify_reimport = document.getElementById(
     'download-for-salsify-btn'
 );
 if (button_salsify_reimport) {
-    button_salsify_reimport.addEventListener('click', (e) => {
-        // Retrieve the binary string from localStorage
-        // const retrievedWbString = localStorage.getItem('workbook');
-        // // Convert the binary string back to a workbook
-        // const workbook = XLSX.read(retrievedWbString, { type: 'binary' });
-        // const currentDate = new Date();
-        // const options = { day: '2-digit', month: '2-digit', year: '2-digit' };
-        // const formattedDate = currentDate.toLocaleDateString('en-GB', options);
-        // // Write the workbook to a file
-        // XLSX.writeFile(
-        //     workbook,
-        //     `pipeify - ingedients - ${formattedDate}.xlsx`
-        // );
-    });
+    button_salsify_reimport.addEventListener('click', (e) => {});
 }
+
 /**
  * Clears localStorage when the button with ID 'clear-localstorage-btn' is pressed.
  */
 const clearButton = document.getElementById('clear-localstorage-btn');
-// Check if the button exists
 if (clearButton) {
-    // Add a click event listener to the button
     clearButton.addEventListener('click', () => {
         localStorage.clear();
 
@@ -164,10 +138,9 @@ if (clearButton) {
         const table = document.getElementById('table-container');
         const fileName = document.getElementById('fileName');
 
-        const hasChildren = table.childNodes.length > 0; // Using childNodes
-        // or
-        // const hasChildren = div.children.length > 0; // Using children
+        const hasChildren = table.childNodes.length > 0;
 
+        //Clear the table
         if (hasChildren) {
             table.innerHTML = '';
             fileName.innerHTML = '';
