@@ -104,7 +104,7 @@ const validationTests = {
 };
 
 const createCell = {
-    order: (value, exception = null) => {
+    order: ({ value, exception = null, isEditable = true }) => {
         const orderCell = new Cell({
             value: value,
             type: 'ORDER',
@@ -113,6 +113,7 @@ const createCell = {
                 id: 'ORDER',
                 name: 'Order',
             }),
+            isEditable: isEditable,
         });
         return orderCell;
     },
@@ -121,7 +122,6 @@ const createCell = {
 
         /**@type {number} */
         if (exception === 'OTHER') {
-            console.log('OTHER');
             validationTests.canBeParsedAsNumber(value, status);
         } else {
             validationTests
@@ -132,7 +132,7 @@ const createCell = {
         return status;
     },
     // DESC
-    description: (value) => {
+    description: ({ value, exception = null, isEditable = true }) => {
         const descCell = new Cell({
             value: value,
             type: 'DESCRIPTION',
@@ -141,6 +141,7 @@ const createCell = {
                 id: 'DESCRIPTION',
                 name: 'Description',
             }),
+            isEditable: isEditable,
         });
         return descCell;
     },
@@ -150,7 +151,7 @@ const createCell = {
         return status;
     },
     //QTY
-    quantity: (value) => {
+    quantity: ({ value, exception = null, isEditable = true }) => {
         const qtyCell = new Cell({
             value: value,
             type: 'QUANTITY',
@@ -159,6 +160,7 @@ const createCell = {
                 id: 'QUANTITY',
                 name: 'Qty',
             }),
+            isEditable: isEditable,
         });
         return qtyCell;
     },
@@ -168,7 +170,7 @@ const createCell = {
         return status;
     },
     // UOM
-    uom: (value) => {
+    uom: ({ value, exception = null, isEditable = true }) => {
         const uomCell = new Cell({
             value: value,
             type: 'UOM',
@@ -177,6 +179,7 @@ const createCell = {
                 id: 'UOM',
                 name: 'UOM',
             }),
+            isEditable: isEditable,
         });
         return uomCell;
     },
@@ -186,7 +189,7 @@ const createCell = {
         return status;
     },
     //DVAMT
-    dvAmount: (value) => {
+    dvAmount: ({ value, exception = null, isEditable = true }) => {
         const dvAmtCell = new Cell({
             value: value,
             type: 'DV',
@@ -195,6 +198,7 @@ const createCell = {
                 id: 'DV',
                 name: 'DV',
             }),
+            isEditable: isEditable,
         });
         return dvAmtCell;
     },
@@ -204,7 +208,7 @@ const createCell = {
         return status;
     },
     //SYMBOL
-    symbol: (value) => {
+    symbol: ({ value, exception = null, isEditable = true }) => {
         const symbolCell = new Cell({
             value: value,
             type: 'SYMBOL',
@@ -213,6 +217,7 @@ const createCell = {
                 id: 'SYMBOL',
                 name: 'Sym.',
             }),
+            isEditable: isEditable,
         });
         return symbolCell;
     },
@@ -222,7 +227,7 @@ const createCell = {
         return status;
     },
     //FOOTNOTE
-    footnote: (value) => {
+    footnote: ({ value, exception = null, isEditable = true }) => {
         const footnoteCell = new Cell({
             value: value,
             type: 'FOOT',
@@ -231,6 +236,7 @@ const createCell = {
                 id: 'FOOT',
                 name: 'Foot.',
             }),
+            isEditable: isEditable,
         });
         return footnoteCell;
     },
@@ -240,66 +246,6 @@ const createCell = {
         return status;
     },
 };
-
-// class Type {
-//     constructor() {}
-
-//     validateOrder() {
-//         const order = this.order;
-//         const cellStatus = new Status();
-
-//         // console.log(`ValidateOrder`);
-//         validateTests
-//             .canBeParsedAsNumber(order, cellStatus)
-//             .isNotEmpty(order, cellStatus);
-
-//         return cellStatus;
-//     }
-// }
-// class Nutrient extends Type {
-//     /**@type {number} */
-//     order;
-//     /**@type {string} */
-//     shortDesc;
-//     /**@type {string} */
-//     longDesc;
-//     /**@type {string} */
-//     desc;
-//     /**@type {number | undefined} */
-//     qty;
-//     /**@type {number | undefined} */
-//     uom;
-//     /**@type {number | undefined} */
-//     dvAmt;
-//     /**@type {string} */
-//     symbol;
-//     /**@type {string} */
-//     foot;
-//     constructor() {
-//         super();
-//     }
-// }
-// class Ingredient extends Type {
-//     /**@type {number} */
-//     order;
-//     /**@type {string} */
-//     shortDesc;
-//     /**@type {number | undefined} */
-//     qty;
-//     /**@type {number | undefined} */
-//     uom;
-//     /**@type {number | undefined} */
-//     dvAmt;
-//     /**@type {SYMBOL} */
-//     symbol;
-//     /**@type {string} */
-//     foot;
-//     /**@type {string} */
-//     unknown;
-//     constructor() {
-//         super();
-//     }
-// }
 
 /**
  *
@@ -331,19 +277,21 @@ function createNutrientCells_ErrorChecking(pipes, rowStatus) {
     const foot = pipes[7].trim();
 
     // Column 1: Order
-    const orderCell = createCell.order(order);
+    const orderCell = createCell.order({ value: order });
     // Column 2: Description
-    const descCell = createCell.description(coalesce(longDesc, shortDesc));
+    const descCell = createCell.description({
+        value: coalesce(longDesc, shortDesc),
+    });
     // Column 3: Quantity
-    const qtyCell = createCell.quantity(qty);
+    const qtyCell = createCell.quantity({ value: qty });
     // Column 4: Unit of Measure
-    const uomCell = createCell.uom(uom);
+    const uomCell = createCell.uom({ value: uom });
     // Column 5: Daily Value
-    const dvAmtCell = createCell.dvAmount(dvAmt);
+    const dvAmtCell = createCell.dvAmount({ value: dvAmt });
     // Column 6: Symbol
-    const symbolCell = createCell.symbol(symbol);
+    const symbolCell = createCell.symbol({ value: symbol });
     // Column 7: Footnote
-    const footnoteCell = createCell.footnote(foot);
+    const footnoteCell = createCell.footnote({ value: foot });
 
     const cells = [];
     cells.push(
@@ -405,20 +353,20 @@ function createIngredientCells_ErrorChecking(pipes, rowStatus) {
     // const unknown8 = pipes[8].trim();
 
     // Column 1: Order
-    const orderCell = createCell.order(order);
+    const orderCell = createCell.order({ value: order });
     // console.log(`orderCell`, orderCell);
     // Column 2: Description
-    const descCell = createCell.description(shortDesc);
+    const descCell = createCell.description({ value: shortDesc });
     // Column 3: Quantity
-    const qtyCell = createCell.quantity(qty);
+    const qtyCell = createCell.quantity({ value: qty });
     // Column 4: Unit of Measure
-    const uomCell = createCell.uom(uom);
+    const uomCell = createCell.uom({ value: uom });
     // Column 5: Daily Value
-    const dvAmtCell = createCell.dvAmount(dvAmt);
+    const dvAmtCell = createCell.dvAmount({ value: dvAmt });
     // Column 6: Symbol
-    const symbolCell = createCell.symbol(symbol);
+    const symbolCell = createCell.symbol({ value: symbol });
     // Column 7: Footnote
-    const footnoteCell = createCell.footnote(foot);
+    const footnoteCell = createCell.footnote({ value: foot });
 
     const cells = [];
     cells.push(
@@ -436,19 +384,23 @@ function createIngredientCells_ErrorChecking(pipes, rowStatus) {
 
 function createOtherCells_ErrorChecking(value, rowStatus) {
     // Column 1: Order
-    const orderCell = createCell.order('', 'OTHER');
+    const orderCell = createCell.order({
+        value: '',
+        exception: 'OTHER',
+        isEditable: false,
+    });
     // Column 2: Description
-    const descCell = createCell.description(value);
+    const descCell = createCell.description({ value });
     // Column 3: Quantity
-    const qtyCell = createCell.quantity('');
+    const qtyCell = createCell.quantity({ value: '', isEditable: false });
     // Column 4: Unit of Measure
-    const uomCell = createCell.uom('');
+    const uomCell = createCell.uom({ value: '', isEditable: false });
     // Column 5: Daily Value
-    const dvAmtCell = createCell.dvAmount('');
+    const dvAmtCell = createCell.dvAmount({ value: '', isEditable: false });
     // Column 6: Symbol
-    const symbolCell = createCell.symbol('');
+    const symbolCell = createCell.symbol({ value: '', isEditable: false });
     // Column 7: Footnote
-    const footnoteCell = createCell.footnote('');
+    const footnoteCell = createCell.footnote({ value: '', isEditable: false });
 
     const cells = [];
     cells.push(
@@ -462,95 +414,6 @@ function createOtherCells_ErrorChecking(value, rowStatus) {
     );
 
     return cells;
-}
-
-/**
- * Creates an array of Cells for table columns from the given nutrient or ingredient object.
- *
- * @param {Nutrient | Ingredient} obj - The nutrient or ingredient object to process.
- * @returns {Array<Cell>} - An array of Cells representing table columns.
- */
-function createCellsForTableErrorChecking(obj) {
-    // console.log(`createCellsForTableErrorChecking`, obj);
-    // const cells = [];
-    // // Create Cell instances for each table column
-    // // Column 1: Order
-    // const orderCell = new Cell({
-    //     value: obj.order,
-    //     type: 'ORDER',
-    //     status: obj.status,
-    //     header: new Header({
-    //         id: 'ORDER',
-    //         name: 'Order',
-    //     }),
-    // });
-    // // Column 2: Description
-    // const descCell = new Cell({
-    //     value: obj.desc,
-    //     type: 'DESCRIPTION',
-    //     header: new Header({
-    //         id: 'DESCRIPTION',
-    //         name: 'Description',
-    //     }),
-    // });
-    // // Column 3: Quantity
-    // const qtyCell = new Cell({
-    //     value: obj.qty,
-    //     type: 'QUANTITY',
-    //     header: new Header({
-    //         id: 'QUANTITY',
-    //         name: 'Qty',
-    //     }),
-    // });
-    // // Column 4: Unit of Measure
-    // const uomCell = new Cell({
-    //     value: obj.uom,
-    //     type: 'UOM',
-    //     header: new Header({
-    //         id: 'UOM',
-    //         name: 'UOM',
-    //     }),
-    // });
-    // // Column 5: Daily Value
-    // const dvAmtCell = new Cell({
-    //     value: obj.dvAmt,
-    //     type: 'DV',
-    //     header: new Header({
-    //         id: 'DV',
-    //         name: 'DV',
-    //     }),
-    // });
-    // // Column 6: Symbol
-    // const symbolCell = new Cell({
-    //     value: obj.symbol,
-    //     type: 'SYMBOL',
-    //     header: new Header({
-    //         id: 'SYMBOL',
-    //         name: 'Sym.',
-    //     }),
-    // });
-    // // Column 7: Footnote
-    // const footnoteCell = new Cell({
-    //     value: obj.foot,
-    //     type: 'FOOT',
-    //     header: new Header({
-    //         id: 'FOOT',
-    //         name: 'Foot.',
-    //     }),
-    // });
-    // // Add the created Cell instances to the array
-    // cells.push(
-    //     orderCell,
-    //     descCell,
-    //     qtyCell,
-    //     uomCell,
-    //     dvAmtCell,
-    //     symbolCell,
-    //     footnoteCell
-    // );
-    // // Return the array of Cells
-    // console.log(`cells`, cells);
-    // return cells;
 }
 
 /**

@@ -153,7 +153,7 @@ function switch_parsingOptions(mergedJsonData, parsingOption) {
                         LABEL_DATASET_OTHER_INGREDS_A,
                     ],
                 });
-
+                console.log({rowsOfCells});
                 return rowsOfCells;
             }
             break;
@@ -237,12 +237,7 @@ function switch_parsingOptions(mergedJsonData, parsingOption) {
                 const errorCheckedColumns =
                     per_pipe_per_partcode_4(rowsOfIngredients);
 
-                /**
-                 * cases:
-                 * incorrect number of pipes per Type
-                 *
-                 *
-                 */
+                console.log({errorCheckedColumns});
                 return errorCheckedColumns;
             }
             break;
@@ -307,6 +302,8 @@ function process_parsing_option(parsingOption) {
     //             break;
     //     }
     // }
+    // Call the function to set the initial height
+    setTableContainerHeight();
 }
 
 /** MAIN ****************************************************************/
@@ -476,9 +473,9 @@ function createPopover(type, content, index) {
             <button class="icon" popovertarget="pop-row-${(type, index)}">
             <span class="material-symbols-outlined" role="button" >${type}</span>
             </button>
-            <div id="pop-row-${
-                (type, index)
-            }" popover anchor="pop-div-${type,index}">
+            <div id="pop-row-${(type, index)}" popover anchor="pop-div-${
+        (type, index)
+    }">
                 ${content}
             </div>
         </div>`;
@@ -487,9 +484,9 @@ function createPopover(type, content, index) {
 }
 
 function createCellWithPopover(type, content, index, value) {
-                // <span class="material-symbols-outlined" role="button">
-                //     ${type}
-                // </span>;
+    // <span class="material-symbols-outlined" role="button">
+    //     ${type}
+    // </span>;
     const statusSymbol = `
         <div id="pop-div-${index}">
             <button class="icon" popovertarget="pop-row-${index}">
@@ -527,6 +524,7 @@ function create_html_table_rows_and_errors(rows) {
     // Add the table header if rows are present and if there is any status
     if (rows.length > 0) {
         const headerRow = document.createElement('tr');
+        headerRow.classList.add('sticky-header');
 
         // Add the status header column if there is a status
         if (rowHasMessages) {
@@ -585,17 +583,52 @@ function create_html_table_rows_and_errors(rows) {
         // Add cells to the row
         row.cells.forEach((cell, cellIndex) => {
             const td = document.createElement('td');
-            td.textContent = cell.value;
+
+            // Create a container for the cell content and chevron icon
+            const cellContainer = document.createElement('div');
+            cellContainer.classList.add('cell-container');
+
+            // Set the cell text content to the cell value
+            const cellValue = document.createElement('span');
+            cellValue.textContent = cell.value;
+            cellValue.classList.add('cell-value');
+
+            // Set the cell as content editable if it is editable
+            if (cell.isEditable) {
+                // td.setAttribute('contenteditable', 'true');
+                cellValue.setAttribute('contenteditable', 'true');
+
+                // Create a span element for the chevron icon
+                const chevron = document.createElement('span');
+                chevron.innerHTML = '▶'; // Unicode character for down chevron
+
+                // Apply a CSS class for styling the chevron
+                chevron.classList.add('chevron-icon');
+
+                // Append the chevron to the cell container
+                cellContainer.appendChild(chevron);
+            }
+
+            // Append the cell value to the cell container
+            cellContainer.appendChild(cellValue);
+
+            // Append the cell container to the table cell
+            td.appendChild(cellContainer);
 
             // Handle the cell status if it exists
             if (cell.status.hasMessages) {
-                console.log('cell', cell);
+                console.log({ cell });
                 // Apply CSS classes based on cell status
                 if (cell.status.errors.length > 0) {
                     td.classList.add('error-cell');
                     const pc = cell.status.errors.join('<br>');
-                    const goodies = createCellWithPopover('error', pc, cellIndex, cell.value);
-                    td.innerHTML = goodies
+                    const goodies = createCellWithPopover(
+                        'error',
+                        pc,
+                        cellIndex,
+                        cell.value
+                    );
+                    td.innerHTML = goodies;
                 }
                 if (cell.status.warnings.length > 0) {
                     td.classList.add('warning-cell');
@@ -612,30 +645,93 @@ function create_html_table_rows_and_errors(rows) {
         myTable.appendChild(tableRow);
     });
 
+    // makeTableCellsEditable(myTable);
+
+    
+
     return myTable;
 }
 
-/**
- * Creates a popover element with the given ID and content.
- *
- * @param {string} id - The ID to assign to the popover element.
- * @param {string} content - The content to display inside the popover.
- */
-// function createPopover(id, content) {
-//     const popover = document.createElement('div');
-//     popover.setAttribute('id', id);
-//     popover.innerHTML = content;
 
-//     // Customize popover styles here if needed
-//     popover.style.position = 'absolute';
-//     popover.style.backgroundColor = '#fff';
-//     popover.style.border = '1px solid #ccc';
-//     popover.style.padding = '10px';
-//     // popover.style.display = 'none'; // Hide the popover initially
+//TODO: Add an event listener to adjust the height when the window is resized
+window.addEventListener('resize', setTableContainerHeight);
 
-//     console.log(`popover`, popover);
-//     document.body.appendChild(popover);
+
+//TODO: Function to calculate and set the height of the table container
+function setTableContainerHeight() {
+    // Get the table container element
+    const tableContainer = document.querySelector('#table-container');
+
+    // Calculate the height of any fixed elements above the table (e.g., headers, navigation)
+    const headerHeight =
+        document.querySelector('#radioButtons')?.offsetHeight || 0;
+    const navigationHeight = document.querySelector('nav')?.offsetHeight || 0;
+
+    // Calculate the available height for the table container
+    const availableHeight = window.innerHeight - headerHeight - navigationHeight;
+
+    // Set the height of the table container
+    tableContainer.style.height = `${availableHeight}px`;
+}
+
+// function makeTableCellsEditable(table) {
+//     console.log(`makeTableCellsEditable`, table);
+//     // Add a double-click event listener to each table cell (`td`)
+//     table.querySelectorAll('td').forEach((td) => {
+//         td.addEventListener('dblclick', handleCellDoubleClick);
+//     });
 // }
+
+function handleCellDoubleClick(event) {
+    const cell = event.target;
+    console.log(cell);
+    // Get the associated `Cell` instance from the data attribute
+    const cellInstance = cell.cellInstance;
+
+    // Check if the cell is editable
+    if (!cellInstance || !cellInstance.isEditable) {
+        // If the cell is not editable, do nothing
+        return;
+    }
+
+    // Proceed with editing the cell if `isEditable` is `true`
+    const originalContent = cell.textContent;
+
+    // Create an input element
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.value = originalContent;
+
+    // Replace the cell content with the input element
+    cell.textContent = '';
+    cell.appendChild(input);
+
+    // Focus the input element and select its content
+    input.focus();
+    input.select();
+
+    // Add an event listener to handle changes to the input
+    input.addEventListener('blur', function () {
+        // When the input loses focus, save the changes
+        const newContent = input.value;
+
+        // Update the cell content to the new value
+        cell.textContent = newContent;
+
+        // Update the `Cell` instance value with the new content
+        cellInstance.value = newContent;
+
+        // Perform any other necessary actions here, such as saving to a data structure or server
+    });
+
+    // Optionally, handle the Enter key to save changes
+    input.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter') {
+            // When Enter is pressed, trigger a blur event to save changes
+            input.blur();
+        }
+    });
+}
 
 /**
  * Creates an HTML table from the provided data, with an option to customize using a radio option.

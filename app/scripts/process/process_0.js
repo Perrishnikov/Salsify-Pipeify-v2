@@ -46,6 +46,6 @@ function option_0({ rows, columnNames, substitute_headers }) {
         rowsOfCells.push(cells);
     });
 
-    // console.log(`rowsOfCells`, rowsOfCells);
+    
     return rowsOfCells;
 }
