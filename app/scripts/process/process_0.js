@@ -12,13 +12,13 @@ function option_0({ rows, columnNames, substitute_headers }) {
     // create an new Entity for each row of objects()
 
     rows.forEach((row) => {
-        // console.log(`row`, row);
-
+        // const rowStatus = new Status();
         // basically hold anonymous object {0: Entity, 1: Entity}
         // its a Cell and not Entity because the number of Cells in unknown
         // each object needs to be able to return a KEY and VALUE to sheetsjs
 
-        const cells = {};
+        // const cells = {};
+        const cells = []
 
         columnNames.forEach((name, index) => {
             const substitution_found = substitute_headers.find(
@@ -26,7 +26,7 @@ function option_0({ rows, columnNames, substitute_headers }) {
             );
             // console.log(`substitution_found`, substitution_found);
 
-            const header = new Header({ id: name });
+            const header = new Header({ id: name, name: name });
 
             if (substitution_found) {
                 header.name = substitution_found.abbr;
@@ -40,12 +40,15 @@ function option_0({ rows, columnNames, substitute_headers }) {
                 header: header,
             });
 
-            cells[index] = cell;
+            // cells[index] = cell;
+            cells.push(cell)
+            
         });
 
-        rowsOfCells.push(cells);
+        const newRow = new Row(cells);
+        rowsOfCells.push(newRow);
+        // rowsOfCells.push(cells);
     });
 
-    
     return rowsOfCells;
 }

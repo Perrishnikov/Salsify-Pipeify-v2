@@ -104,7 +104,7 @@ const validationTests = {
 };
 
 const createCell = {
-    order: ({ value, exception = null, isEditable = true }) => {
+    order: ({ value, exception = null, isEditable = true, shouldValidate = true }) => {
         const orderCell = new Cell({
             value: value,
             type: 'ORDER',
@@ -430,7 +430,7 @@ function per_pipe_per_partcode_4(rows) {
         // Process each cell in the row
         // console.log(`row`, row);
 
-        row.forEach((cell) => {
+        row.cells.forEach((cell) => {
             // console.log(`cell`, cell);
 
             // Check if the cell is of type MERGED_INGREDIENTS
@@ -439,10 +439,10 @@ function per_pipe_per_partcode_4(rows) {
                 // console.log(`ingredientsArray`,cell.type, ingredientsArray);
 
                 // Split the merged ingredient value by the import delimiter
-                const ingredientTypeObject = getObjectByIngredientType(row);
+                const ingredientTypeObject = getObjectByIngredientType(row.cells);
 
                 // Create a new row without the MERGED_INGREDIENTS cell
-                const nonIngredientCells = row
+                const nonIngredientCells = row.cells
                     .filter((c) => c !== cell)
                     .map(cloneCell);
 
@@ -457,16 +457,7 @@ function per_pipe_per_partcode_4(rows) {
                         ingredientsArray,
                         rowStatus
                     );
-                    // const nutrientCells = createCellsForTableErrorChecking({
-                    //     order: nutrient.order,
-                    //     desc: nutrient.desc,
-                    //     qty: nutrient.qty,
-                    //     uom: nutrient.uom,
-                    //     dvAmt: nutrient.dvAmt,
-                    //     symbol: nutrient.symbol,
-                    //     foot: nutrient.foot,
-                    // });
-                    // Add nutrient cells to the new row
+
                     nonIngredientCells.push(...nutrientCells);
                 } else if (
                     ingredientTypeObject.value ===
@@ -478,39 +469,15 @@ function per_pipe_per_partcode_4(rows) {
                         rowStatus
                     );
                     nonIngredientCells.push(...ingredientCells);
-                    // const ingredientCells = createCellsForTableErrorChecking({
-                    //     order: ingredient.order,
-                    //     desc: ingredient.shortDesc,
-                    //     qty: ingredient.qty,
-                    //     uom: ingredient.uom,
-                    //     dvAmt: ingredient.dvAmt,
-                    //     symbol: ingredient.symbol,
-                    //     foot: ingredient.foot,
-                    // });
-
-                    // Add ingredient cells to the new row
-                    // nonIngredientCells.push(...ingredientCells);
                 } else if (
                     ingredientTypeObject.value ===
                     LABEL_DATASET_OTHER_INGREDS_A.abbr
                 ) {
-                    //
-                    // const otherCells = createOtherCells_ErrorChecking;
-                    // cell.value, rowStatus;
                     const otherCells = createOtherCells_ErrorChecking(
                         ingredientsArray,
                         rowStatus
                     );
-                    // Create other cells for the table
-                    // const otherCells = createCellsForTableErrorChecking({
-                    //     order: '',
-                    //     desc: cell.value,
-                    //     qty: '',
-                    //     uom: '',
-                    //     dvAmt: '',
-                    //     symbol: '',
-                    //     foot: '',
-                    // });
+
                     // Add other cells to the new row
                     nonIngredientCells.push(...otherCells);
                 }
@@ -521,6 +488,5 @@ function per_pipe_per_partcode_4(rows) {
             }
         });
     });
-    console.log(`rowsOfIngredients`, rowsOfIngredients);
     return rowsOfIngredients;
 }

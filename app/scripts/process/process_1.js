@@ -97,8 +97,11 @@ function per_type_per_partcode_1({
             // Add the merged ingredient Cell to the row
             rowForType.push(mergedIngredientCell);
 
+            const newRow = new Row(rowForType);
+
             // Add the row to the final array of Cell arrays
-            rowsOfrowsOfCells.push(rowForType);
+            // rowsOfrowsOfCells.push(rowForType);
+            rowsOfrowsOfCells.push(newRow);
         });
     });
 

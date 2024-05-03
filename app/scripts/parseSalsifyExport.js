@@ -532,7 +532,7 @@ function create_html_table_rows_and_errors(rows) {
             statusHeader.textContent = '';
             headerRow.appendChild(statusHeader);
         }
-
+        console.log({rows});
         // Add other headers
         rows[0].cells.forEach((cell) => {
             const th = document.createElement('th');
@@ -768,29 +768,80 @@ function create_html_table_with_entities(data) {
 }
 
 /* Function to generate HTML table from JSON data */
-function create_html_table(data, radioOption = null) {
-    const myTable = document.createElement('table');
-    myTable.setAttribute('id', 'my-table');
+// function create_html_table(data, radioOption = null) {
+//     const myTable = document.createElement('table');
+//     myTable.setAttribute('id', 'my-table');
 
-    // Add table header
-    const headerRow = document.createElement('tr');
-    for (const key in data[0]) {
-        const th = document.createElement('th');
-        th.textContent = key;
-        headerRow.appendChild(th);
-    }
-    myTable.appendChild(headerRow);
+//     // Add table header
+//     const headerRow = document.createElement('tr');
+//     for (const key in data[0]) {
+//         const th = document.createElement('th');
+//         th.textContent = key;
+//         headerRow.appendChild(th);
+//     }
+//     myTable.appendChild(headerRow);
 
-    // Add table rows
-    data.forEach((item) => {
-        const row = document.createElement('tr');
-        for (const key in item) {
-            const cell = document.createElement('td');
-            cell.textContent = item[key];
-            row.appendChild(cell);
-        }
-        myTable.appendChild(row);
+//     // Add table rows
+//     data.forEach((item) => {
+//         const row = document.createElement('tr');
+//         for (const key in item) {
+//             const cell = document.createElement('td');
+//             cell.textContent = item[key];
+//             row.appendChild(cell);
+//         }
+//         myTable.appendChild(row);
+//     });
+
+//     return myTable;
+// }
+
+function exportTableToSheetJS() {
+    //TODO: Unsubstitute Headers for reimport function
+    // Get the table element
+    const myTable = document.getElementById('my-table');
+
+    // Initialize an array to hold the data
+    const data = [];
+
+    // Get the table headers
+    const headers = Array.from(myTable.querySelectorAll('th')).map(
+        (th) => th.textContent
+    );
+    data.push(headers);
+
+    // Get the table rows
+    const rows = myTable.querySelectorAll('tr');
+
+    // Iterate over each row
+    rows.forEach((row, rowIndex) => {
+        // Skip the header row
+        if (rowIndex === 0) return;
+
+        // Initialize an array to hold the row data
+        const rowData = [];
+
+        // Get the cells in the row
+        const cells = row.querySelectorAll('.cell-value');
+
+        // Iterate over each cell
+        cells.forEach((cell) => {
+            // Add the cell value to the row data
+            rowData.push(cell.textContent);
+        });
+
+        // Add the row data to the data
+        data.push(rowData);
     });
 
-    return myTable;
+    // Convert the data to a worksheet
+    const worksheet = XLSX.utils.aoa_to_sheet(data);
+
+    // Create a new workbook
+    const workbook = XLSX.utils.book_new();
+
+    // Append the worksheet to the workbook
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+
+    // Write the workbook to a file
+    XLSX.writeFile(workbook, 'output.xlsx');
 }
