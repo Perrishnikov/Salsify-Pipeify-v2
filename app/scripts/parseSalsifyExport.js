@@ -292,18 +292,9 @@ function process_parsing_option(parsingOption) {
     // Clear any old table
     tableContainer.innerHTML = '';
     tableContainer.appendChild(htmlTable);
-    // } catch (error) {
-    //     switch (error.message) {
-    //         case 'arrayOfObjects is null':
-    //             break;
-    //         default:
-    //             console.dir(error);
-    //             showToast(`Unexpected error: ${error}`, 'error');
-    //             break;
-    //     }
-    // }
+
     // Call the function to set the initial height
-    setTableContainerHeight();
+    // setTableContainerHeight();
 }
 
 /** MAIN ****************************************************************/
@@ -532,7 +523,7 @@ function create_html_table_rows_and_errors(rows) {
             statusHeader.textContent = '';
             headerRow.appendChild(statusHeader);
         }
-        console.log({rows});
+        // console.log({rows});
         // Add other headers
         rows[0].cells.forEach((cell) => {
             const th = document.createElement('th');
@@ -654,7 +645,7 @@ function create_html_table_rows_and_errors(rows) {
 
 
 //TODO: Add an event listener to adjust the height when the window is resized
-window.addEventListener('resize', setTableContainerHeight);
+// window.addEventListener('resize', setTableContainerHeight);
 
 
 //TODO: Function to calculate and set the height of the table container
@@ -739,33 +730,33 @@ function handleCellDoubleClick(event) {
  * @param {Cell[][]} data - The data to create the table from.
  * @returns {HTMLTableElement} - The created HTML table element.
  */
-function create_html_table_with_entities(data) {
-    // Create the table element
-    const myTable = document.createElement('table');
-    myTable.setAttribute('id', 'my-table');
+// function create_html_table_with_entities(data) {
+//     // Create the table element
+//     const myTable = document.createElement('table');
+//     myTable.setAttribute('id', 'my-table');
 
-    // Add the table header
-    const headerRow = document.createElement('tr');
-    Object.values(data[0]).forEach((cell) => {
-        const th = document.createElement('th');
-        th.textContent = cell.header.name;
-        headerRow.appendChild(th);
-    });
-    myTable.appendChild(headerRow);
+//     // Add the table header
+//     const headerRow = document.createElement('tr');
+//     Object.values(data[0]).forEach((cell) => {
+//         const th = document.createElement('th');
+//         th.textContent = cell.header.name;
+//         headerRow.appendChild(th);
+//     });
+//     myTable.appendChild(headerRow);
 
-    // Add table rows
-    data.forEach((item) => {
-        const row = document.createElement('tr');
-        Object.values(item).forEach((cell) => {
-            const td = document.createElement('td');
-            td.textContent = cell.value;
-            row.appendChild(td);
-        });
-        myTable.appendChild(row);
-    });
+//     // Add table rows
+//     data.forEach((item) => {
+//         const row = document.createElement('tr');
+//         Object.values(item).forEach((cell) => {
+//             const td = document.createElement('td');
+//             td.textContent = cell.value;
+//             row.appendChild(td);
+//         });
+//         myTable.appendChild(row);
+//     });
 
-    return myTable;
-}
+//     return myTable;
+// }
 
 /* Function to generate HTML table from JSON data */
 // function create_html_table(data, radioOption = null) {
@@ -795,7 +786,8 @@ function create_html_table_with_entities(data) {
 //     return myTable;
 // }
 
-function exportTableToSheetJS() {
+function preprocess_export_file(parsingOption) {
+
     //TODO: Unsubstitute Headers for reimport function
     // Get the table element
     const myTable = document.getElementById('my-table');
@@ -807,6 +799,7 @@ function exportTableToSheetJS() {
     const headers = Array.from(myTable.querySelectorAll('th')).map(
         (th) => th.textContent
     );
+    //TODO: Unsubstitute here
     data.push(headers);
 
     // Get the table rows
@@ -831,17 +824,26 @@ function exportTableToSheetJS() {
 
         // Add the row data to the data
         data.push(rowData);
+
+
     });
 
-    // Convert the data to a worksheet
-    const worksheet = XLSX.utils.aoa_to_sheet(data);
 
-    // Create a new workbook
-    const workbook = XLSX.utils.book_new();
+    xlsx_export_current_table(data)
+    
+    if(parsingOption !== 'option4'){
+        showToast(`Data is not validated`, 'warning');
+    }
 
-    // Append the worksheet to the workbook
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+    // // Convert the data to a worksheet
+    // const worksheet = XLSX.utils.aoa_to_sheet(data);
 
-    // Write the workbook to a file
-    XLSX.writeFile(workbook, 'output.xlsx');
+    // // Create a new workbook
+    // const workbook = XLSX.utils.book_new();
+
+    // // Append the worksheet to the workbook
+    // XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+
+    // // Write the workbook to a file
+    // XLSX.writeFile(workbook, 'output.xlsx');
 }

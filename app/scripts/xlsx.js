@@ -69,7 +69,7 @@ function create_AoO_sheet(data) {
         type: 'binary',
         bookType: 'xlsx',
         props: {
-            Title: 'Pipeify Export',
+            Title: 'Pipeify v2 Export',
             CreatedDate: new Date(),
             Company: "Nature's Way",
             Comments: '...',
@@ -88,23 +88,116 @@ function create_AoO_sheet(data) {
     // console.log(jsonDataSheet);
     return { jsonDataSheet, wbString };
 }
+
+/**
+ * Checks if any object in the array has a key named "Product ID".
+ *
+ * @param {Array<Object>} data - The array of objects to check.
+ * @returns {boolean} - Returns true if any object has a key named "Product ID".
+ */
+function hasProductId(data) {
+    return data.some((obj) => 'Product ID' | ('PARTCODE' in obj));
+}
+
 /* XLSX Processing */
 /**
  * Processes an Excel file.
  * @param {File} file - The Excel file to be processed.
- * @returns {void}
+ * @param {string} parsingOption - The parsing option to use.
+ * @returns {Promise<string>} - A promise that resolves with the file type.
  */
-function xlsx_import_file(file, parsingOption) {
-    const reader = new FileReader();
+async function xlsx_import_file(file, parsingOption) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
 
-    reader.onload = (e) => {
-        const data = new Uint8Array(e.target.result);
-        const workbook = XLSX.read(data, { type: 'array' });
-        const sheet = workbook.Sheets[workbook.SheetNames[0]];
-        const jsonData = XLSX.utils.sheet_to_json(sheet);
+        // Initialize fileType
+        let fileType = '';
 
-        salsify_preprocess(jsonData, parsingOption);
+        reader.onload = async (e) => {
+            try {
+                // Read the file data
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                const jsonData = XLSX.utils.sheet_to_json(sheet);
+
+                // Access workbook metadata
+                const metadata = workbook.Props; // Alternatively: workbook.props
+
+                console.log({ metadata });
+                // Check if 'Pipeify' is in the title
+                // const fileType =
+                //     metadata.Title && metadata.Title.includes('Pipeify')
+                //         ? 'PIPEIFY'
+                //         : 'UNKNOWN';
+
+                // Validate the file type
+                if (hasProductId(jsonData)) {
+                    fileType = 'SALSIFY';
+                    salsify_preprocess(jsonData, parsingOption);
+
+                    // Resolve the promise with the file type
+                    resolve('SALSIFY');
+                } else {
+                    // fileType = 'PIPEIFY'; // Assuming the alternative file type is PIPEIFY
+                    reject(
+                        'Spreadsheet must contain Salsify props or be a Pipeify export.'
+                    );
+                }
+
+                // Process the file
+            } catch (error) {
+                // Handle any errors that may occur
+                console.error('Error processing file:', error);
+                reject(error);
+            }
+        };
+
+        reader.onerror = (e) => {
+            // Handle error event
+            console.error('Error reading file:', e);
+            reject(e);
+        };
+
+        // Start reading the file
+        reader.readAsArrayBuffer(file);
+    });
+}
+
+// Called from parseSalsify
+function xlsx_export_current_table(data) {
+
+    // Convert the data to a worksheet
+    const worksheet = XLSX.utils.aoa_to_sheet(data);
+
+    // Create a new workbook
+    const workbook = XLSX.utils.book_new();
+
+    workbook.Props = {
+        Title: 'Pipeify v2 Export',
+        CreatedDate: new Date(),
+        Company: 'Nature\'s Way',
+        Comments: '...',
     };
 
-    reader.readAsArrayBuffer(file);
+    // Append the worksheet to the workbook
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+
+    // Write the workbook to a file
+    XLSX.writeFile(workbook, 'Pipeify.xlsx');
+}
+
+// Called from parseSalsify
+function xlsx_export_for_salsify(data) {
+    // Convert the data to a worksheet
+    const worksheet = XLSX.utils.aoa_to_sheet(data);
+
+    // Create a new workbook
+    const workbook = XLSX.utils.book_new();
+
+    // Append the worksheet to the workbook
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+
+    // Write the workbook to a file
+    XLSX.writeFile(workbook, 'output.xlsx');
 }

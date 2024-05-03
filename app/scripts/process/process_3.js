@@ -290,7 +290,7 @@ function per_pipe_per_partcode_3(rows) {
         // console.log(`row`, row);
 
         row.cells.forEach((cell) => {
-            console.log(`cell`, cell);
+            // console.log(`cell`, cell);
 
             if (cell.type === MERGED_INGREDIENTS.id) {
                 const ingredientsArray = cell.value.split('|');

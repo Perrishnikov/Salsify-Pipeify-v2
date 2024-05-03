@@ -97,19 +97,19 @@ input[type='checkbox'] {
 
 /* TABLE */
 /* Style for the sticky header row */
-.sticky-header {
+/* .sticky-header {
     position: sticky;
     top: 0;
-    background-color: white; /* Set background color for the sticky header */
-    z-index: 1; /* Ensure the header is above other content */
-}
+    background-color: white; 
+    z-index: 1;
+} */
 #table-container {
     flex-basis: auto;
     border-collapse: collapse;
-    overflow-x: auto;
-    overflow-y: auto; /* Enable vertical scrolling */
+    /* overflow-x: auto; */
+    /* overflow-y: auto; Enable vertical scrolling */
     /* height: 300px;  */
-    height:600px;
+    /* height:600px; */
 }
 /* Style for the table */
 table {

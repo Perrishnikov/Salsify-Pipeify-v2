@@ -36,21 +36,34 @@ function getCheckedRadioButtonId() {
 }
 
 /**
- * Handles file import, appends the file name to the DOM, and initiates file processing.
+ * Handles the import of the file and updates the DOM.
  *
- * @param {File} file - The file to import and process.
+ * @param {File} file - The file to be imported.
  */
-function importFileHandler(file) {
+async function dom_importFileHandler(file) {
     const fileName = file.name;
 
-    // dom_append_filename(fileName);
-    const fileNameArea = document.getElementById('fileName');
     // Append file name to DOM
-    fileNameArea.textContent = `Imported File: ${fileName}`;
+    const fileNameArea = document.getElementById('fileName');
+    // fileNameArea.textContent = `Imported File: ${fileName}`;
+
+    // Get the parsing option from the DOM
     const parsingOption = getCheckedRadioButtonId();
-    
-    // xlsx.js
-    xlsx_import_file(file, parsingOption);
+
+    // Try to import the file and handle errors
+    try {
+        // Use await to wait for the promise to resolve and retrieve the file type
+        const fileType = await xlsx_import_file(file, parsingOption);
+
+        // Update the DOM with the imported file name and type
+        fileNameArea.textContent = `Imported File [${fileType}]: ${fileName}`;
+
+    } catch (error) {
+
+        showToast(`Issue handling file: ${error}`, 'error');
+
+        console.error('Error reading file:', error);
+    }
 }
 
 /* DROP BOX LISTENER */
@@ -68,7 +81,7 @@ if (dropArea) {
         // Check if files were dropped
         if (e.dataTransfer) {
             const file = e.dataTransfer.files[0];
-            importFileHandler(file);
+            dom_importFileHandler(file);
         } else {
             console.log('No files were dropped.');
         }
@@ -83,7 +96,7 @@ if (dropArea) {
 
         fileInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
-            importFileHandler(file);
+            dom_importFileHandler(file);
         });
 
         document.body.appendChild(fileInput);
@@ -92,27 +105,50 @@ if (dropArea) {
     });
 }
 
-const button_download = document.getElementById('download-btn');
-if (button_download) {
-    button_download.addEventListener('click', (e) => {
+const button_current_table = document.getElementById('download-wysiwyg-btn');
+if (button_current_table) {
+    
+    button_current_table.addEventListener('click', (e) => {
+        const parsingOption = getCheckedRadioButtonId();
         // Retrieve the binary string from localStorage
-        const retrievedWbString = localStorage.getItem('workbook');
+        // const retrievedWbString = localStorage.getItem('original_merged');
 
-        // Convert the binary string back to a workbook
-        const workbook = XLSX.read(retrievedWbString, { type: 'binary' });
+        // xlsx_export_current_table(retrievedWbString);
+        preprocess_export_file(parsingOption);
+        // // Convert the binary string back to a workbook
+        // const workbook = XLSX.read(retrievedWbString, { type: 'binary' });
 
-        const currentDate = new Date();
-        const options = { day: '2-digit', month: '2-digit', year: '2-digit' };
-        const formattedDate = currentDate.toLocaleDateString('en-GB', options);
+        // const currentDate = new Date();
+        // const options = { day: '2-digit', month: '2-digit', year: '2-digit' };
+        // const formattedDate = currentDate.toLocaleDateString('en-GB', options);
 
-        // Write the workbook to a file
-        XLSX.writeFile(
-            workbook,
-            `pipeify - ingedients - ${formattedDate}.xlsx`
-        );
+        // // Write the workbook to a file
+        // XLSX.writeFile(
+        //     workbook,
+        //     `pipeify - ingedients - ${formattedDate}.xlsx`
+        // );
     });
 }
 
+const button_salsify_reimport = document.getElementById(
+    'download-for-salsify-btn'
+);
+if (button_salsify_reimport) {
+    button_salsify_reimport.addEventListener('click', (e) => {
+        // Retrieve the binary string from localStorage
+        // const retrievedWbString = localStorage.getItem('workbook');
+        // // Convert the binary string back to a workbook
+        // const workbook = XLSX.read(retrievedWbString, { type: 'binary' });
+        // const currentDate = new Date();
+        // const options = { day: '2-digit', month: '2-digit', year: '2-digit' };
+        // const formattedDate = currentDate.toLocaleDateString('en-GB', options);
+        // // Write the workbook to a file
+        // XLSX.writeFile(
+        //     workbook,
+        //     `pipeify - ingedients - ${formattedDate}.xlsx`
+        // );
+    });
+}
 /**
  * Clears localStorage when the button with ID 'clear-localstorage-btn' is pressed.
  */
@@ -138,7 +174,4 @@ if (clearButton) {
             showToast(`Local Storage cleared`, 'info');
         }
     });
-} else {
-    // console.warn('Button with ID "clear-localstorage-btn" not found');
-    showToast(`Button with ID "clear-localstorage-btn" not found`, 'error');
 }

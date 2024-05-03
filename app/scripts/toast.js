@@ -5,7 +5,7 @@
  * @param {string} type - The type of toast (info, warning, or error).
  * @param {number} [duration=3000] - The duration (in milliseconds) the toast is visible.
  */
-function showToast(message, type, duration = 3000) {
+function showToast(message, type, duration = 4000) {
     // Convert the type argument to lowercase
     const toastType = type.toLowerCase();
 
