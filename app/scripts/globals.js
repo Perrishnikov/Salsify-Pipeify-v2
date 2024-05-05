@@ -47,19 +47,25 @@ class Status {
     // Clears all error messages and resets hasMessages
     clearErrors() {
         this.errors = [];
-        this.hasMessages = false;
+        if ((this.info.length === 0) & (this.warnings.length === 0)) {
+            this.hasMessages = false;
+        }
     }
 
     // Clears all warning messages
     clearWarnings() {
         this.warnings = [];
-        this.hasMessages = false;
+        if ((this.info.length === 0) & (this.errors.length === 0)) {
+            this.hasMessages = false;
+        }
     }
 
     // Clears all informational messages
     clearInfo() {
         this.info = [];
-        this.hasMessages = false;
+        if ((this.warnings.length === 0) & (this.errors.length === 0)) {
+            this.hasMessages = false;
+        }
     }
 
     // Clears all messages and resets hasMessages
@@ -115,8 +121,6 @@ class Cell {
     }
 }
 
-const importDelimiter = `~`;
-
 /**
  * Helper function to create a deep copy of a Cell instance.
  *
@@ -147,7 +151,7 @@ function setLocalStorage(jsonObject) {
     localStorage.setItem('original_merged', jsonString);
 }
 
-function getLocalStorage(){
+function getLocalStorage() {
     const jsonString = localStorage.getItem('original_merged');
     const jsonObject = JSON.parse(jsonString);
     return jsonObject;

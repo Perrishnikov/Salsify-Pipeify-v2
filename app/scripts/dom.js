@@ -4,11 +4,10 @@ if (radioButtonsDiv) {
     radioButtonsDiv.addEventListener('change', function (e) {
         const selectedOption = e.target.id;
 
-        // TODO: Update xlsx.js Table Format
-        console.log(`change table columns to ${selectedOption}`);
+        // console.log(`change table columns to ${selectedOption}`);
 
         const parsingOption = getCheckedRadioButtonId();
-        process(parsingOption);
+        main_process(parsingOption);
     });
 }
 
@@ -58,9 +57,9 @@ async function dom_importFileHandler(file) {
         // Update the DOM with the imported file name and type
         fileNameArea.textContent = `Imported File [${fileType}]: ${fileName}`;
     } catch (error) {
-        // localStorage.clear();
-        
         showToast(`Issue handling file: ${error}`, 'error');
+
+        clearLocalStorageAndTable();
 
         console.error('Error reading file:', error);
     }
@@ -105,46 +104,48 @@ if (dropArea) {
     });
 }
 
+/** Export WSYWIG File */
 const button_current_table = document.getElementById('download-wysiwyg-btn');
 if (button_current_table) {
     button_current_table.addEventListener('click', (e) => {
         const parsingOption = getCheckedRadioButtonId();
-        // Retrieve the binary string from localStorage
-        // const retrievedWbString = localStorage.getItem('original_merged');
 
-        // xlsx_export_current_table(retrievedWbString);
         preprocess_export_file(parsingOption);
-        // // Convert the binary string back to a workbook
     });
 }
 
+/** Export for Salsify file */
 const button_salsify_reimport = document.getElementById(
     'download-for-salsify-btn'
 );
 if (button_salsify_reimport) {
-    button_salsify_reimport.addEventListener('click', (e) => {});
+    button_salsify_reimport.addEventListener('click', (e) => {
+        console.log(`download-for-salsify-btn`);
+    });
 }
 
-/**
- * Clears localStorage when the button with ID 'clear-localstorage-btn' is pressed.
- */
+function clearLocalStorageAndTable() {
+    localStorage.clear();
+
+    // console.log('localStorage cleared');
+
+    const table = document.getElementById('table-container');
+    const fileName = document.getElementById('fileName');
+
+    const hasChildren = table.childNodes.length > 0;
+
+    //Clear the table
+    if (hasChildren) {
+        table.innerHTML = '';
+        fileName.innerHTML = '';
+        showToast(`Local Storage cleared`, 'info');
+    }
+}
+
+/** Clear Button */
 const clearButton = document.getElementById('clear-localstorage-btn');
 if (clearButton) {
     clearButton.addEventListener('click', () => {
-        localStorage.clear();
-
-        // console.log('localStorage cleared');
-
-        const table = document.getElementById('table-container');
-        const fileName = document.getElementById('fileName');
-
-        const hasChildren = table.childNodes.length > 0;
-
-        //Clear the table
-        if (hasChildren) {
-            table.innerHTML = '';
-            fileName.innerHTML = '';
-            showToast(`Local Storage cleared`, 'info');
-        }
+        clearLocalStorageAndTable();
     });
 }

@@ -75,7 +75,7 @@ function salsify_mergeIngredients(jsonData) {
                 if (key.startsWith(prefix)) {
                     // Add the value to the combinedValue with a ~ delimiter if not the first value
                     if (combinedValue) {
-                        combinedValue += `${importDelimiter}${row[key]}`;
+                        combinedValue += `~${row[key]}`;
                     } else {
                         combinedValue = row[key];
                     }
@@ -105,15 +105,20 @@ function salsify_mergeIngredients(jsonData) {
     return mergedJsonData;
 }
 
+/**
+ * Preprocesses Salsify data by filtering, cleaning, and merging ingredients.
+ * Sets the localStorage
+ * @param {Object[]} jsonData - The raw JSON data from Salsify.
+ * @param {string} parsingOption - The parsing option for processing.
+ */
 function salsify_preprocess(jsonData, parsingOption) {
-    //* Clean jsonData first before storing it */
-    /** Filter out parents - EA only */
+    // Filter out parents, keeping only variants
     const varientsOnly = [...jsonData].filter(
         (obj) =>
             obj['salsify:data_inheritance_hierarchy_level_id'] === 'variant'
     );
 
-    /* Remove props that start woth "salsify:" */
+    // Remove properties that start with "salsify:"
     const nonSalsifyPropsOnly = varientsOnly.map((obj) => {
         Object.keys(obj).forEach((key) => {
             // If the key starts with the prefix "salsify:", delete the key and its value from the object
@@ -132,7 +137,7 @@ function salsify_preprocess(jsonData, parsingOption) {
     setLocalStorage(mergedJsonData);
 
     //* Done with Salsify processing */
-    process(parsingOption);
+    main_process(parsingOption);
 }
 
 /* XLSX Processing */
@@ -168,8 +173,6 @@ async function xlsx_import_file(file, parsingOption) {
                     // Resolve the promise with the fileType
                     resolve('SALSIFY');
                 } else if (isPipeify) {
-                    //TODO: process Pipeify Option instead
-                    // salsify_preprocess(jsonData, parsingOption);
                     pipeify_preprocess(jsonData, parsingOption);
                     // Resolve the promise with the fileType
                     resolve('PIPEIFY');
@@ -194,11 +197,9 @@ async function xlsx_import_file(file, parsingOption) {
 }
 
 /** EXPORT *************************************************** */
-function xlsx_export_current_table(data) {
-    // Convert the data to a worksheet
+function xlsx_exportWYSIWYG(data) {
     const worksheet = XLSX.utils.aoa_to_sheet(data);
 
-    // Create a new workbook
     const workbook = XLSX.utils.book_new();
 
     workbook.Props = {
@@ -208,9 +209,7 @@ function xlsx_export_current_table(data) {
         Comments: '...',
     };
 
-    // Append the worksheet to the workbook
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
 
-    // Write the workbook to a file
     XLSX.writeFile(workbook, 'Pipeify.xlsx');
 }

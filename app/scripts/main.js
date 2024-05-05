@@ -114,7 +114,7 @@ function getUniqueColumnNames(arrayOfObjects) {
  * @param {*} parsingOption
  * @returns
  */
-function switch_parsingOptions(mergedJsonData, parsingOption) {
+function processOptionWithData(mergedJsonData, parsingOption) {
     // console.log('mergedJsonData', mergedJsonData);
     // console.log(`parsingOption `, parsingOption);
 
@@ -228,7 +228,7 @@ function switch_parsingOptions(mergedJsonData, parsingOption) {
                 const errorCheckedColumns =
                     per_pipe_per_partcode_4(rowsOfIngredients);
 
-                console.log({ errorCheckedColumns });
+                // console.log({ errorCheckedColumns });
                 return errorCheckedColumns;
             }
             break;
@@ -238,67 +238,15 @@ function switch_parsingOptions(mergedJsonData, parsingOption) {
 }
 
 /** MAIN ****************************************************************/
-function process(parsingOption) {
+function main_process(parsingOption) {
     // try {
-
+    // set in salsify_preprocess
     const jsonObject = getLocalStorage();
-    
-    const entityRows = switch_parsingOptions(jsonObject, parsingOption);
 
-    const htmlTable = createHtmlTable(entityRows, null);
+    const rows = processOptionWithData(jsonObject, parsingOption);
 
-    // Get container element to append the table
-    const tableContainer = document.getElementById('table-container');
-    // Clear any old table
-    tableContainer.innerHTML = '';
-    tableContainer.appendChild(htmlTable);
+    // const htmlTable = createHtmlTable(rowsOfData, null);
 
-    // Call the function to set the initial height
-    // setTableContainerHeight();
-}
-
-/********************************************************************* */
-
-/** ************************************************************* */
-
-function createPopover(type, content, index) {
-    const statusSymbol = `
-        <div id="pop-div-${(type, index)}">
-            <button class="icon" popovertarget="pop-row-${(type, index)}">
-            <span class="material-symbols-outlined" role="button" >${type}</span>
-            </button>
-            <div id="pop-row-${(type, index)}" popover anchor="pop-div-${
-        (type, index)
-    }">
-                ${content}
-            </div>
-        </div>`;
-
-    return statusSymbol;
-}
-
-function createCellWithPopover(type, content, index, value) {
-    const statusSymbol = `
-        <div id="pop-div-${index}">
-            <button class="icon" popovertarget="pop-row-${index}">
-                ${value}
-            </button>
-            <div id="pop-row-${index}" popover anchor="pop-div-${index}">
-                ${content}
-            </div>
-            
-        </div>`;
-
-    return statusSymbol;
-}
-
-/**
- * Creates rows for an HTML table and handles row status.
- *
- * @param {Row[]} rows - An array of Row instances to create the table rows from.
- * @returns {HTMLTableElement} - The created HTML table element.
- */
-function createHtmlTable(rows) {
     // Create the table element
     const myTable = document.createElement('table');
     myTable.setAttribute('id', 'my-table');
@@ -386,7 +334,6 @@ function createHtmlTable(rows) {
 
             // Set the cell as content editable if it is editable
             if (cell.isEditable) {
-                // td.setAttribute('contenteditable', 'true');
                 cellValue.setAttribute('contenteditable', 'true');
 
                 // Create a span element for the chevron icon
@@ -436,30 +383,44 @@ function createHtmlTable(rows) {
         myTable.appendChild(tableRow);
     });
 
-    // makeTableCellsEditable(myTable);
+    // Get container element to append the table
+    const tableContainer = document.getElementById('table-container');
 
-    return myTable;
+    // Clear any old table
+    tableContainer.innerHTML = '';
+    tableContainer.appendChild(myTable);
 }
 
-//TODO: Add an event listener to adjust the height when the window is resized
-// window.addEventListener('resize', setTableContainerHeight);
 
-//TODO: Function to calculate and set the height of the table container
-function setTableContainerHeight() {
-    // Get the table container element
-    const tableContainer = document.querySelector('#table-container');
+function createPopover(type, content, index) {
+    const statusSymbol = `
+        <div id="pop-div-${(type, index)}">
+            <button class="icon" popovertarget="pop-row-${(type, index)}">
+            <span class="material-symbols-outlined" role="button" >${type}</span>
+            </button>
+            <div id="pop-row-${(type, index)}" popover anchor="pop-div-${
+        (type, index)
+    }">
+                ${content}
+            </div>
+        </div>`;
 
-    // Calculate the height of any fixed elements above the table (e.g., headers, navigation)
-    const headerHeight =
-        document.querySelector('#radioButtons')?.offsetHeight || 0;
-    const navigationHeight = document.querySelector('nav')?.offsetHeight || 0;
+    return statusSymbol;
+}
 
-    // Calculate the available height for the table container
-    const availableHeight =
-        window.innerHeight - headerHeight - navigationHeight;
+function createCellWithPopover(type, content, index, value) {
+    const statusSymbol = `
+        <div id="pop-div-${index}">
+            <button class="icon" popovertarget="pop-row-${index}">
+                ${value}
+            </button>
+            <div id="pop-row-${index}" popover anchor="pop-div-${index}">
+                ${content}
+            </div>
+            
+        </div>`;
 
-    // Set the height of the table container
-    tableContainer.style.height = `${availableHeight}px`;
+    return statusSymbol;
 }
 
 // TODO: Not needed, but get blur event
@@ -514,6 +475,7 @@ function handleCellDoubleClick(event) {
     });
 }
 
+/********************************************************************* */
 function preprocess_export_file(parsingOption) {
     //TODO: Unsubstitute Headers for reimport function
     // Get the table element
@@ -553,7 +515,7 @@ function preprocess_export_file(parsingOption) {
         data.push(rowData);
     });
 
-    xlsx_export_current_table(data);
+    xlsx_exportWYSIWYG(data);
 
     if (parsingOption !== 'option4') {
         showToast(`Data is not validated`, 'warning');
