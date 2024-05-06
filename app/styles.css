@@ -160,13 +160,13 @@ tr:nth-child(even):not(.error-row):not(.warning-row):not(.info-row) {
     background-color: var(--info);
     /* cursor: default; */
 }
-.error-cell::after {
+/* .error-cell::after {
     content: '\26A0';
     display: inline-block;
     font-size: 12px;
     margin-right: calc(var(--padding-margin) / 4);
     cursor: pointer;
-}
+} */
 .error-cell {
     background-color: var(--danger);
 }

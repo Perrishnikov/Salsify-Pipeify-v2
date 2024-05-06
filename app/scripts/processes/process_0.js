@@ -3,7 +3,7 @@
  *
  * @param {Array<Object.<number, Cell>>} rows - An array of merged JSON data.
  * @param {Array<string>} columnNames - An array of reordered keys for headers.
- * @param {Array<Substitution>} substitute_headers - An array of reordered keys for headers.
+ * @param {Array<Col>} substitute_headers - An array of reordered keys for headers.
  * @returns {Array<ObjectWithEntity>} - An array of objects representing rows of ingredients.
  */
 function option_0({ rows, columnNames, substitute_headers }) {
@@ -29,7 +29,7 @@ function option_0({ rows, columnNames, substitute_headers }) {
             const header = new Header({ id: name, name: name });
 
             if (substitution_found) {
-                header.name = substitution_found.abbr;
+                header.name = substitution_found.name;
             } else {
                 header.name = name;
             }

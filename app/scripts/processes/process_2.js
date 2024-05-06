@@ -30,7 +30,7 @@ function per_ingred_per_partcode_2(rows) {
                         type: MERGED_INGREDIENTS.id,
                         header: new Header({
                             id: MERGED_INGREDIENTS.id,
-                            name: MERGED_INGREDIENTS.abbr,
+                            name: MERGED_INGREDIENTS.name,
                         }),
                     });
 

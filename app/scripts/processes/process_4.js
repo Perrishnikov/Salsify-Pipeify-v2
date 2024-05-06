@@ -201,7 +201,7 @@ function per_pipe_per_partcode_4(rows) {
 
                 // Process the type of ingredient
                 if (
-                    ingredientTypeObject.value === LABEL_DATASET_NUTRIENT_A.abbr
+                    ingredientTypeObject.value === LABEL_DATASET_NUTRIENT_A.name
                 ) {
                     // Create nutrient cells for the table
                     const nutrientCells = createNutrientCells_ErrorChecking(
@@ -212,7 +212,7 @@ function per_pipe_per_partcode_4(rows) {
                     nonIngredientCells.push(...nutrientCells);
                 } else if (
                     ingredientTypeObject.value ===
-                    LABEL_DATASET_INGREDIENTS_A.abbr
+                    LABEL_DATASET_INGREDIENTS_A.name
                 ) {
                     // Create ingredient cells for the table
                     const ingredientCells = createIngredientCells_ErrorChecking(
@@ -222,7 +222,7 @@ function per_pipe_per_partcode_4(rows) {
                     nonIngredientCells.push(...ingredientCells);
                 } else if (
                     ingredientTypeObject.value ===
-                    LABEL_DATASET_OTHER_INGREDS_A.abbr
+                    LABEL_DATASET_OTHER_INGREDS_A.name
                 ) {
                     const otherCells = createOtherCells_ErrorChecking(
                         ingredientsArray,

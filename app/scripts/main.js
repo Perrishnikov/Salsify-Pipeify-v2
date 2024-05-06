@@ -46,8 +46,6 @@ Object.defineProperty(Array.prototype, 'moveToEndById', {
 
 /************************************************************************ */
 
-
-
 const ingredients_to_merge = new Set([
     LABEL_DATASET_NUTRIENT_A.id,
     LABEL_DATASET_INGREDIENTS_A.id,
@@ -326,7 +324,6 @@ function main_process(parsingOption) {
 
             // Handle the cell status if it exists
             if (cell.status.hasMessages) {
-                console.log({ cell });
                 // Apply CSS classes based on cell status
                 if (cell.status.errors.length > 0) {
                     td.classList.add('error-cell');
@@ -365,6 +362,8 @@ function main_process(parsingOption) {
 }
 
 function addErrorsToDom(status, parentClasslist) {
+    console.log({ status });
+    console.dir(parentClasslist);
     if (status.hasMessages) {
         if (status.errors.length > 0) {
             parentClasslist.add('error-cell');
@@ -386,7 +385,7 @@ function addErrorsToDom(status, parentClasslist) {
  * @param {HTMLTableElement} table - The HTML table element to monitor for blur events on its cells.
  */
 function attachBlurEventToTableCells(table) {
-    console.log(`attachBlurEventToTableCells`);
+    // console.log(`attachBlurEventToTableCells`);
     // Add a blur event listener to the table element
     table.addEventListener(
         'blur',
@@ -397,28 +396,48 @@ function attachBlurEventToTableCells(table) {
                 const cellType = cell.type;
                 // console.log({ cell });
                 // console.log(e.target);
-                let innerText = e.target.innerText;
+                let innerText = e.target.innerText.trim();
                 const parentClasslist = e.target.parentElement.classList;
+                let status = null;
 
                 switch (cellType) {
                     case ORDER.id:
-                        {
-                            const status = createCell.validateOrder(innerText);
+                        status = createCell.validateOrder(innerText);
 
-                            addErrorsToDom(status, parentClasslist);
-                        }
                         break;
-                    //TODO: id's
-                    case DESCRIPTION.id: {
-                        const status =
-                            createCell.validateDescription(innerText);
 
-                        addErrorsToDom(status, parentClasslist);
-                    }
+                    case DESCRIPTION.id:
+                        status = createCell.validateDescription(innerText);
 
+                        break;
+
+                    case QUANTITY.id:
+                        status = createCell.validateQuantity(innerText);
+
+                        break;
+
+                    case UOM.id:
+                        status = createCell.validateUom(innerText);
+
+                        break;
+
+                    case DV.id:
+                        status = createCell.validateDvAmount(innerText);
+
+                        break;
+
+                    case SYMBOL.id:
+                        status = createCell.validateSymbol(innerText);
+
+                        break;
+                    case FOOT.id:
+                        status = createCell.validateFootnote(innerText);
+
+                        break;
                     default:
                         break;
                 }
+                addErrorsToDom(status, parentClasslist);
             }
         },
         true

@@ -68,7 +68,7 @@ function per_type_per_partcode_1({
             let typeValue = '';
 
             if (substitutionFound) {
-                typeValue = substitutionFound.abbr;
+                typeValue = substitutionFound.name;
             } else {
                 typeValue = ingredientType;
             }
@@ -79,7 +79,7 @@ function per_type_per_partcode_1({
                 type: INGREDIENT_TYPE.id,
                 header: new Header({
                     id: INGREDIENT_TYPE.id,
-                    name: INGREDIENT_TYPE.abbr,
+                    name: INGREDIENT_TYPE.name,
                 }),
             });
             // Add the type Cell to the row
@@ -91,7 +91,7 @@ function per_type_per_partcode_1({
                 type: MERGED_INGREDIENTS.id,
                 header: new Header({
                     id: MERGED_INGREDIENTS.id,
-                    name: MERGED_INGREDIENTS.abbr,
+                    name: MERGED_INGREDIENTS.name,
                 }),
             });
             // Add the merged ingredient Cell to the row
