@@ -17,7 +17,7 @@ function per_ingred_per_partcode_2(rows) {
             // Check if the cell is of type MERGED_INGREDIENTS
             if (cell.type === MERGED_INGREDIENTS.id) {
                 // Split the merged ingredient value by the import delimiter
-                const ingredientsArray = cell.value.split(importDelimiter);
+                const ingredientsArray = cell.value.split('~');
 
                 // Create a new row for each ingredient
                 ingredientsArray.forEach((ingredient) => {

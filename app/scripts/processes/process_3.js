@@ -1,112 +1,3 @@
-// class Type {
-//     constructor() {}
-// }
-// class Nutrient extends Type {
-//     /**@type {number} */
-//     order;
-//     /**@type {string} */
-//     shortDesc;
-//     /**@type {string} */
-//     longDesc;
-//     /**@type {string} */
-//     desc;
-//     /**@type {number | undefined} */
-//     qty;
-//     /**@type {number | undefined} */
-//     uom;
-//     /**@type {number | undefined} */
-//     dvAmt;
-//     /**@type {string} */
-//     symbol;
-//     /**@type {string} */
-//     foot;
-//     constructor() {
-//         super();
-//     }
-// }
-
-// function createNutrient(pipes) {
-//     if (pipes.length !== 8) {
-//         throw new Error('Nutrient not expected length of 8');
-//     }
-//     // console.log(`createNutrient pipes`, pipes.length, pipes);
-//     const order = pipes[0].trim();
-//     const shortDesc = pipes[1].trim();
-//     const longDesc = pipes[2].trim();
-//     const qty = pipes[3].trim();
-//     const uom = pipes[4].trim();
-//     const dvAmt = pipes[5].trim();
-//     const symbol = pipes[6].trim();
-//     const foot = pipes[7].trim();
-
-//     let nutrient = new Nutrient();
-//     nutrient.order = order;
-//     nutrient.shortDesc = shortDesc;
-//     nutrient.longDesc = longDesc;
-//     nutrient.desc = coalesce(longDesc, shortDesc);
-//     nutrient.qty = qty;
-//     nutrient.uom = uom;
-//     nutrient.dvAmt = dvAmt;
-//     nutrient.symbol = symbol; //"%"
-//     nutrient.foot = foot; //"†"
-
-//     return nutrient;
-// }
-
-// class Ingredient extends Type {
-//     /**@type {number} */
-//     order;
-//     /**@type {string} */
-//     shortDesc;
-//     /**@type {number | undefined} */
-//     qty;
-//     /**@type {number | undefined} */
-//     uom;
-//     /**@type {number | undefined} */
-//     dvAmt;
-//     /**@type {SYMBOL} */
-//     symbol;
-//     /**@type {string} */
-//     foot;
-//     constructor() {
-//         super();
-//     }
-// }
-
-// function createIngredient(pipes) {
-//     if (pipes.length !== 9) {
-//         throw new Error("Ingredient doesn't have length of 9");
-//     }
-//     if (pipes[4]) {
-//         throw new Error('Ingredient has unaccounted pipe [4]');
-//     }
-//     if (pipes[7]) {
-//         throw new Error('Ingredient has unaccounted pipe [7]');
-//     }
-//     if (pipes[8]) {
-//         throw new Error('Ingredient has unaccounted pipe [8]');
-//     }
-//     const order = pipes[0].trim();
-//     const shortDesc = pipes[1].trim();
-//     const qty = pipes[2].trim();
-//     const uom = pipes[3].trim();
-//     // const unk = pipes[4].trim();
-//     const dvAmt = pipes[5].trim();
-//     const symbol = pipes[6].trim();
-//     const foot = pipes[7].trim();
-
-//     let ingredient = new Ingredient();
-//     ingredient.order = order;
-//     ingredient.shortDesc = shortDesc;
-//     ingredient.qty = qty;
-//     ingredient.uom = uom;
-//     ingredient.dvAmt = dvAmt;
-//     ingredient.symbol = symbol;
-//     ingredient.foot = foot;
-
-//     return ingredient;
-// }
-
 /**
  * Retrieves an object from an array where the `type` property equals 'INGREDIENT_TYPE'.
  *
@@ -119,119 +10,11 @@ function getObjectByIngredientType(array) {
 }
 
 /**
- * Creates an array of Cells for table columns from the given nutrient or ingredient object.
- *
- * @param {Nutrient | Ingredient} obj - The nutrient or ingredient object to process.
- * @returns {Array<Cell>} - An array of Cells representing table columns.
- */
-// function createCellsForTable(obj) {
-//     const cells = [];
-
-//     // Create Cell instances for each table column
-//     // Column 1: Order
-//     const orderCell = new Cell({
-//         value: obj.order,
-//         type: 'ORDER',
-//         header: new Header({
-//             id: 'ORDER',
-//             name: 'Order',
-//         }),
-//     });
-
-//     // Column 2: Description
-//     const descCell = new Cell({
-//         value: obj.desc,
-//         type: 'DESCRIPTION',
-//         header: new Header({
-//             id: 'DESCRIPTION',
-//             name: 'Description',
-//         }),
-//     });
-
-//     // Column 3: Quantity
-//     const qtyCell = new Cell({
-//         value: obj.qty,
-//         type: 'QUANTITY',
-//         header: new Header({
-//             id: 'QUANTITY',
-//             name: 'Qty',
-//         }),
-//     });
-
-//     // Column 4: Unit of Measure
-//     const uomCell = new Cell({
-//         value: obj.uom,
-//         type: 'UOM',
-//         header: new Header({
-//             id: 'UOM',
-//             name: 'UOM',
-//         }),
-//     });
-
-//     // Column 5: Daily Value
-//     const dvAmtCell = new Cell({
-//         value: obj.dvAmt,
-//         type: 'DV',
-//         header: new Header({
-//             id: 'DV',
-//             name: 'DV',
-//         }),
-//     });
-
-//     // Column 6: Symbol
-//     const symbolCell = new Cell({
-//         value: obj.symbol,
-//         type: 'SYMBOL',
-//         header: new Header({
-//             id: 'SYMBOL',
-//             name: 'Sym.',
-//         }),
-//     });
-
-//     // Column 7: Footnote
-//     const footnoteCell = new Cell({
-//         value: obj.foot,
-//         type: 'FOOT',
-//         header: new Header({
-//             id: 'FOOT',
-//             name: 'Foot.',
-//         }),
-//     });
-
-//     // Add the created Cell instances to the array
-//     cells.push(
-//         orderCell,
-//         descCell,
-//         qtyCell,
-//         uomCell,
-//         dvAmtCell,
-//         symbolCell,
-//         footnoteCell
-//     );
-
-//     // Return the array of Cells
-//     return cells;
-// }
-/**
- *
+ * No validations
  * @param {string[]} pipes
- * @param {Status} rowStatus
  * @returns
  */
 function createNutrientCells(pipes) {
-    //Row validation
-    // if (pipes.length < 8) {
-    //     rowStatus.addError(
-    //         'Nutrient pipes are less than 8. Cell data is likely incorrect'
-    //     );
-    // } else if (pipes.length > 8) {
-    //     rowStatus.addError(
-    //         'Nutrient pipes are greater than 8. Cell data is likely incorrect'
-    //     );
-    // } else if (pipes.length == 8) {
-    //     // status.addInfo('Just right');
-    // }
-
     const order = pipes[0].trim();
     const shortDesc = pipes[1].trim();
     const longDesc = pipes[2].trim();
@@ -242,7 +25,7 @@ function createNutrientCells(pipes) {
     const foot = pipes[7].trim();
 
     // Column 1: Order
-    const orderCell = createCell.order({ value: order, isEditable: false });
+    const orderCell = createCell.order({ value: order, isEditable: false});
     // Column 2: Description
     const descCell = createCell.description({
         value: coalesce(longDesc, shortDesc),
@@ -275,6 +58,101 @@ function createNutrientCells(pipes) {
 
     return cells;
 }
+
+/**
+ *
+ * @param {string[]} pipes
+ * @returns
+ */
+function createIngredientCells(pipes) {
+    /* Ingredient validation */
+    const order = pipes[0].trim();
+    const shortDesc = pipes[1].trim();
+    const qty = pipes[2].trim();
+    const uom = pipes[3].trim();
+    const unknown4 = pipes[4].trim();
+    const dvAmt = pipes[5].trim();
+    const symbol = pipes[6].trim();
+    const foot = pipes[7].trim();
+    // const unknown8 = pipes[8].trim();
+
+    // Column 1: Order
+    const orderCell = createCell.order({
+        value: order,
+        isEditable: false,
+    });
+    // console.log(`orderCell`, orderCell);
+    // Column 2: Description
+    const descCell = createCell.description({
+        value: shortDesc,
+        isEditable: false,
+    });
+    // Column 3: Quantity
+    const qtyCell = createCell.quantity({ value: qty, isEditable: false });
+    // Column 4: Unit of Measure
+    const uomCell = createCell.uom({ value: uom, isEditable: false });
+    // Column 5: Daily Value
+    const dvAmtCell = createCell.dvAmount({ value: dvAmt, isEditable: false });
+    // Column 6: Symbol
+    const symbolCell = createCell.symbol({ value: symbol, isEditable: false });
+    // Column 7: Footnote
+    const footnoteCell = createCell.footnote({
+        value: foot,
+        isEditable: false,
+    });
+
+    const cells = [];
+    cells.push(
+        orderCell,
+        descCell,
+        qtyCell,
+        uomCell,
+        dvAmtCell,
+        symbolCell,
+        footnoteCell
+    );
+
+    return cells;
+}
+
+/**
+ *
+ * @param {string} value
+ * @returns
+ */
+function createOtherCells(value) {
+    // Column 1: Order
+    const orderCell = createCell.order({
+        value: '',
+        isEditable: false,
+    });
+    // Column 2: Description
+    const descCell = createCell.description({ value, isEditable: false, shouldValidate: false });
+    // Column 3: Quantity
+    const qtyCell = createCell.quantity({ value: '', isEditable: false });
+    // Column 4: Unit of Measure
+    const uomCell = createCell.uom({ value: '', isEditable: false });
+    // Column 5: Daily Value
+    const dvAmtCell = createCell.dvAmount({ value: '', isEditable: false });
+    // Column 6: Symbol
+    const symbolCell = createCell.symbol({ value: '', isEditable: false });
+    // Column 7: Footnote
+    const footnoteCell = createCell.footnote({ value: '', isEditable: false });
+
+    const cells = [];
+    cells.push(
+        orderCell,
+        descCell,
+        qtyCell,
+        uomCell,
+        dvAmtCell,
+        symbolCell,
+        footnoteCell
+    );
+
+    return cells;
+}
+
 /**
  * Creates an array of rows, each representing a single ingredient from `MERGED_INGREDIENTS` in each row.
  *
@@ -297,7 +175,9 @@ function per_pipe_per_partcode_3(rows) {
                 // console.log(`ingredientsArray`,cell.type, ingredientsArray);
 
                 // Split the merged ingredient value by the import delimiter
-                const ingredientTypeObject = getObjectByIngredientType(row.cells);
+                const ingredientTypeObject = getObjectByIngredientType(
+                    row.cells
+                );
 
                 // Create a new row without the MERGED_INGREDIENTS cell
                 const nonIngredientCells = row.cells
@@ -312,7 +192,7 @@ function per_pipe_per_partcode_3(rows) {
                 ) {
                     // Create nutrient cells for the table
                     const nutrientCells = createNutrientCells(
-                        ingredientsArray,
+                        ingredientsArray
                         // rowStatus
                     );
 
@@ -322,8 +202,8 @@ function per_pipe_per_partcode_3(rows) {
                     LABEL_DATASET_INGREDIENTS_A.abbr
                 ) {
                     // Create ingredient cells for the table
-                    const ingredientCells = createIngredientCells_ErrorChecking(
-                        ingredientsArray,
+                    const ingredientCells = createIngredientCells(
+                        ingredientsArray
                         // rowStatus
                     );
                     nonIngredientCells.push(...ingredientCells);
@@ -331,8 +211,8 @@ function per_pipe_per_partcode_3(rows) {
                     ingredientTypeObject.value ===
                     LABEL_DATASET_OTHER_INGREDS_A.abbr
                 ) {
-                    const otherCells = createOtherCells_ErrorChecking(
-                        ingredientsArray,
+                    const otherCells = createOtherCells(
+                        ingredientsArray
                         // rowStatus
                     );
 

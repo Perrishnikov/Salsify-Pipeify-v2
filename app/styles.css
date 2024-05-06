@@ -3,8 +3,8 @@
     --font-size: 16px; /* Define a variable named --font-size */
     --font-size-smaller: 14px;
     --padding-margin: 16px;
-    --danger: hsla(348, 86%, 43%, .8);
-    --warning: hsla(48, 100%, 29%, .8);
+    --danger: hsla(348, 86%, 43%, 0.8);
+    --warning: hsla(48, 100%, 29%, 0.8);
     --success: hsl(141, 53%, 31%);
     --info: hsl(204, 71%, 39%);
     --background-light: hsl(0, 0%, 90%);
@@ -160,7 +160,13 @@ tr:nth-child(even):not(.error-row):not(.warning-row):not(.info-row) {
     background-color: var(--info);
     /* cursor: default; */
 }
-
+.error-cell::after {
+    content: '\26A0';
+    display: inline-block;
+    font-size: 12px;
+    margin-right: calc(var(--padding-margin) / 4);
+    cursor: pointer;
+}
 .error-cell {
     background-color: var(--danger);
 }

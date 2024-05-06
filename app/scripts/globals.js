@@ -1,3 +1,71 @@
+const ORDER = {
+    id: 'ORDER',
+    name: 'Order',
+};
+
+const DESCRIPTION = {
+    id: 'DESCRIPTION',
+    name: 'Description'
+};
+
+const QUANTITY = {
+    id: 'QUANTITY',
+    name: 'Qty'
+};
+
+const UOM = {
+    id: 'UOM',
+    name: 'UOM'
+};
+
+const DV = {
+    id: 'DV',
+    name: 'DV'
+}
+
+const SYMBOL = {
+    id: 'SYMBOL',
+    name: 'Sym.'
+};
+
+const FOOT = {
+    id: 'FOOT',
+    name: 'Foot.'
+};
+
+/**
+ * Represents a substitution object.
+ *
+ * @typedef {Object} Substitution
+ * @property {string} id - The unique identifier for the substitution.
+ * @property {string} abbr - The abbreviation for the substitution.
+ */
+/**@type {Substitution} */
+const LABEL_DATASET_NUTRIENT_A = {
+    id: 'LABEL_DATASET_NUTRIENT_A - en-US',
+    abbr: 'Nutrients',
+};
+/**@type {Substitution} */
+const LABEL_DATASET_INGREDIENTS_A = {
+    id: 'LABEL_DATASET_INGREDIENTS_A - en-US',
+    abbr: 'Ingredients',
+};
+/**@type {Substitution} */
+const LABEL_DATASET_OTHER_INGREDS_A = {
+    id: 'LABEL_DATASET_OTHER_INGREDS_A',
+    abbr: 'Other',
+};
+/**@type {Substitution} */
+const MERGED_INGREDIENTS = {
+    id: 'MERGED_INGREDIENTS',
+    abbr: 'Ingredient Info',
+};
+/**@type {Substitution} */
+const INGREDIENT_TYPE = {
+    id: 'INGREDIENT_TYPE',
+    abbr: 'Type',
+};
+
 /**
  * Represents a data cell with specified properties.
  * @class
@@ -91,8 +159,11 @@ class Row {
 }
 
 class Cell {
-    /** @type {string} */
+    /** @type {string | number} */
     value = '';
+
+    /** @type {string | number} - fails validation */
+    badValue = '';
 
     /** @type {string} PARTCODE, Product ID, MERGED_INGREDIENT, */
     type;

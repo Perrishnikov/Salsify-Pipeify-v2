@@ -46,38 +46,7 @@ Object.defineProperty(Array.prototype, 'moveToEndById', {
 
 /************************************************************************ */
 
-/**
- * Represents a substitution object.
- *
- * @typedef {Object} Substitution
- * @property {string} id - The unique identifier for the substitution.
- * @property {string} abbr - The abbreviation for the substitution.
- */
-/**@type {Substitution} */
-const LABEL_DATASET_NUTRIENT_A = {
-    id: 'LABEL_DATASET_NUTRIENT_A - en-US',
-    abbr: 'Nutrients',
-};
-/**@type {Substitution} */
-const LABEL_DATASET_INGREDIENTS_A = {
-    id: 'LABEL_DATASET_INGREDIENTS_A - en-US',
-    abbr: 'Ingredients',
-};
-/**@type {Substitution} */
-const LABEL_DATASET_OTHER_INGREDS_A = {
-    id: 'LABEL_DATASET_OTHER_INGREDS_A',
-    abbr: 'Other',
-};
-/**@type {Substitution} */
-const MERGED_INGREDIENTS = {
-    id: 'MERGED_INGREDIENTS',
-    abbr: 'Ingredient Info',
-};
-/**@type {Substitution} */
-const INGREDIENT_TYPE = {
-    id: 'INGREDIENT_TYPE',
-    abbr: 'Type',
-};
+
 
 const ingredients_to_merge = new Set([
     LABEL_DATASET_NUTRIENT_A.id,
@@ -331,6 +300,8 @@ function main_process(parsingOption) {
             const cellValue = document.createElement('span');
             cellValue.textContent = cell.value;
             cellValue.classList.add('cell-value');
+            // Attach the object directly to the cell using a custom property
+            cellValue.cell = cell;
 
             // Set the cell as content editable if it is editable
             if (cell.isEditable) {
@@ -389,8 +360,111 @@ function main_process(parsingOption) {
     // Clear any old table
     tableContainer.innerHTML = '';
     tableContainer.appendChild(myTable);
+
+    attachBlurEventToTableCells(myTable);
 }
 
+function addErrorsToDom(status, parentClasslist) {
+    if (status.hasMessages) {
+        if (status.errors.length > 0) {
+            parentClasslist.add('error-cell');
+        }
+        if (status.warnings.length > 0) {
+            parentClasslist.add('warning-cell');
+            //TODO: update cell.value to valid innerText
+        }
+    } else {
+        // e.target.parentElement.classList = [];
+        // e.target.parentElement.classList.add('cell-value');
+        parentClasslist.remove('error-cell', 'warning-cell');
+    }
+}
+
+/**
+ * Attaches a blur event listener to HTML table cells in a dynamically created table.
+ *
+ * @param {HTMLTableElement} table - The HTML table element to monitor for blur events on its cells.
+ */
+function attachBlurEventToTableCells(table) {
+    console.log(`attachBlurEventToTableCells`);
+    // Add a blur event listener to the table element
+    table.addEventListener(
+        'blur',
+        (e) => {
+            if (e.target.classList.contains('cell-value')) {
+                /** @type {Cell} */
+                const cell = e.target.cell;
+                const cellType = cell.type;
+                // console.log({ cell });
+                // console.log(e.target);
+                let innerText = e.target.innerText;
+                const parentClasslist = e.target.parentElement.classList;
+
+                switch (cellType) {
+                    case ORDER.id:
+                        {
+                            const status = createCell.validateOrder(innerText);
+
+                            addErrorsToDom(status, parentClasslist);
+                        }
+                        break;
+                    //TODO: id's
+                    case DESCRIPTION.id: {
+                        const status =
+                            createCell.validateDescription(innerText);
+
+                        addErrorsToDom(status, parentClasslist);
+                    }
+
+                    default:
+                        break;
+                }
+            }
+        },
+        true
+    ); // The true option makes the event listener capture the event during the capture phase
+
+    table.addEventListener('keydown', (event) => {
+        // Check if the event target is an editable cell
+        if (event.target.cell && event.key === 'Enter') {
+            // Prevent the default action of inserting a new line
+            event.preventDefault();
+        }
+    });
+
+    table.addEventListener('input', (event) => {
+        // Check if the event target is an editable cell (td element)
+        if (event.target.cell.type === 'ORDER') {
+            const cellContent = event.target.textContent;
+            console.log({ cellContent });
+            const charLimit = 3;
+            // If the content length exceeds the character limit
+            if (cellContent.length > charLimit) {
+                // Truncate the cell content to the character limit
+                event.target.textContent = cellContent.slice(0, charLimit);
+
+                // Optionally, place the cursor at the end of the truncated text
+                const range = document.createRange();
+                range.setStart(event.target.childNodes[0], charLimit);
+                range.collapse(true);
+                const selection = window.getSelection();
+                selection.removeAllRanges();
+                selection.addRange(range);
+            }
+        }
+    });
+}
+
+/**
+ * Handles the blur event on a table cell.
+ *
+ * @param {HTMLTableCellElement} cell - The table cell element that triggered the blur event.
+ */
+function handleCellBlur(cell) {
+    // Your code to handle the blur event on the cell
+    console.log('Cell blurred:', cell.cell, cell);
+    // Add your custom logic here
+}
 
 function createPopover(type, content, index) {
     const statusSymbol = `
