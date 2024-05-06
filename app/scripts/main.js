@@ -323,26 +323,27 @@ function main_process(parsingOption) {
             td.appendChild(cellContainer);
 
             // Handle the cell status if it exists
-            if (cell.status.hasMessages) {
-                // Apply CSS classes based on cell status
-                if (cell.status.errors.length > 0) {
-                    td.classList.add('error-cell');
-                    const pc = cell.status.errors.join('<br>');
-                    const goodies = createCellWithPopover(
-                        'error',
-                        pc,
-                        cellIndex,
-                        cell.value
-                    );
-                    td.innerHTML = goodies;
-                }
-                if (cell.status.warnings.length > 0) {
-                    td.classList.add('warning-cell');
-                }
-                if (cell.status.info.length > 0) {
-                    td.classList.add('info-cell');
-                }
-            }
+            // if (cell.status.hasMessages) {
+            //     // Apply CSS classes based on cell status
+            //     if (cell.status.errors.length > 0) {
+            //         td.classList.add('error-cell');
+            //         //! add the cell validation info here
+            //         // const pc = cell.status.errors.join('<br>');
+            //         // const goodies = createCellWithPopover(
+            //         //     'error',
+            //         //     pc,
+            //         //     cellIndex,
+            //         //     cell.value
+            //         // );
+            //         // td.innerHTML = goodies;
+            //     }
+            //     if (cell.status.warnings.length > 0) {
+            //         td.classList.add('warning-cell');
+            //     }
+            //     if (cell.status.info.length > 0) {
+            //         td.classList.add('info-cell');
+            //     }
+            // }
 
             tableRow.appendChild(td);
         });
@@ -362,8 +363,8 @@ function main_process(parsingOption) {
 }
 
 function addErrorsToDom(status, parentClasslist) {
-    console.log({ status });
-    console.dir(parentClasslist);
+    // console.log({ status });
+    // console.dir(parentClasslist);
     if (status.hasMessages) {
         if (status.errors.length > 0) {
             parentClasslist.add('error-cell');
@@ -451,38 +452,27 @@ function attachBlurEventToTableCells(table) {
         }
     });
 
-    table.addEventListener('input', (event) => {
-        // Check if the event target is an editable cell (td element)
-        if (event.target.cell.type === 'ORDER') {
-            const cellContent = event.target.textContent;
-            console.log({ cellContent });
-            const charLimit = 3;
-            // If the content length exceeds the character limit
-            if (cellContent.length > charLimit) {
-                // Truncate the cell content to the character limit
-                event.target.textContent = cellContent.slice(0, charLimit);
+    // table.addEventListener('input', (event) => {
+    //     // Check if the event target is an editable cell (td element)
+    //     if (event.target.cell.type === 'ORDER') {
+    //         const cellContent = event.target.textContent;
+    //         console.log({ cellContent });
+    //         const charLimit = 3;
+    //         // If the content length exceeds the character limit
+    //         if (cellContent.length > charLimit) {
+    //             // Truncate the cell content to the character limit
+    //             event.target.textContent = cellContent.slice(0, charLimit);
 
-                // Optionally, place the cursor at the end of the truncated text
-                const range = document.createRange();
-                range.setStart(event.target.childNodes[0], charLimit);
-                range.collapse(true);
-                const selection = window.getSelection();
-                selection.removeAllRanges();
-                selection.addRange(range);
-            }
-        }
-    });
-}
-
-/**
- * Handles the blur event on a table cell.
- *
- * @param {HTMLTableCellElement} cell - The table cell element that triggered the blur event.
- */
-function handleCellBlur(cell) {
-    // Your code to handle the blur event on the cell
-    console.log('Cell blurred:', cell.cell, cell);
-    // Add your custom logic here
+    //             // Optionally, place the cursor at the end of the truncated text
+    //             const range = document.createRange();
+    //             range.setStart(event.target.childNodes[0], charLimit);
+    //             range.collapse(true);
+    //             const selection = window.getSelection();
+    //             selection.removeAllRanges();
+    //             selection.addRange(range);
+    //         }
+    //     }
+    // });
 }
 
 function createPopover(type, content, index) {
@@ -516,57 +506,6 @@ function createCellWithPopover(type, content, index, value) {
     return statusSymbol;
 }
 
-// TODO: Not needed, but get blur event
-function handleCellDoubleClick(event) {
-    const cell = event.target;
-    console.log(cell);
-    // Get the associated `Cell` instance from the data attribute
-    const cellInstance = cell.cellInstance;
-
-    // Check if the cell is editable
-    if (!cellInstance || !cellInstance.isEditable) {
-        // If the cell is not editable, do nothing
-        return;
-    }
-
-    // Proceed with editing the cell if `isEditable` is `true`
-    const originalContent = cell.textContent;
-
-    // Create an input element
-    const input = document.createElement('input');
-    input.type = 'text';
-    input.value = originalContent;
-
-    // Replace the cell content with the input element
-    cell.textContent = '';
-    cell.appendChild(input);
-
-    // Focus the input element and select its content
-    input.focus();
-    input.select();
-
-    // Add an event listener to handle changes to the input
-    input.addEventListener('blur', function () {
-        // When the input loses focus, save the changes
-        const newContent = input.value;
-
-        // Update the cell content to the new value
-        cell.textContent = newContent;
-
-        // Update the `Cell` instance value with the new content
-        cellInstance.value = newContent;
-
-        // Perform any other necessary actions here, such as saving to a data structure or server
-    });
-
-    // Optionally, handle the Enter key to save changes
-    input.addEventListener('keydown', function (event) {
-        if (event.key === 'Enter') {
-            // When Enter is pressed, trigger a blur event to save changes
-            input.blur();
-        }
-    });
-}
 
 /********************************************************************* */
 function preprocess_export_file(parsingOption) {

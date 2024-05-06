@@ -95,8 +95,8 @@ class Tester {
     }
 
     shouldNotBeEmpty() {
-        const pattern = /\S+/;
         let test = new Test();
+        const pattern = /\S+/;
 
         if (!pattern.test(this.trimmedValue)) {
             const message = 'trimmedValue is Empty';
@@ -120,9 +120,9 @@ class Tester {
         return this;
     }
 
-    shouldBeLessThanLength(test) {
+    shouldBeLessThanLength() {
+        let test = new Test();
         const length = this.trimmedValue.length;
-        console.log({ length });
 
         if (length >= test) {
             const message = `${this.trimmedValue} is longer than ${test} characters`;
@@ -133,9 +133,9 @@ class Tester {
         return this;
     }
 
-    shouldBeMoreThanLength(test) {
+    shouldBeMoreThanLength() {
+        let test = new Test();
         const length = this.trimmedValue.length;
-        console.log({ length });
 
         if (length <= test) {
             const message = `${this.trimmedValue} is shorter than ${test} characters`;
@@ -146,93 +146,33 @@ class Tester {
         return this;
     }
 
-    mayContainCharacter(character) {}
-}
-const validationTests = {
-    isNotEmpty_Error: (str1, status) => {
-        const pattern = /\S+/;
-        if (!pattern.test(str1)) {
-            status.addError('! isNotEmpty');
-        }
-        // console.assert(pattern.test(str1), `! isNotEmpty`);
-        return validationTests;
-    },
-    isNotEmpty_Warning: (str1, status) => {
-        const pattern = /\S+/;
-        if (!pattern.test(str1)) {
-            status.addWarning('! isNotEmpty');
-        }
-        // console.assert(pattern.test(str1), `! isNotEmpty`);
-        return validationTests;
-    },
-    canBeParsedAsNumber_Error(str, status) {
-        const parsedNumber = !isNaN(Number(str));
-        // console.log(`parsedNumber`, parsedNumber);
-        if (!parsedNumber) {
-            status.addError('! isNumber');
-            // console.log(status);
-        }
-        return validationTests;
-    },
-    isNumber: (str1, status) => {
-        const pattern = /^\d+$/;
-        if (!pattern.test(str1)) {
-            status.addError('! isNumber');
-        }
-        // console.log(pattern.test(str1), '! isNumber');
-        return validationTests;
-    },
-    isNotSame: (str1, str2, status) => {
-        if (str1 !== str2) {
-            status.addError('! isNotSame');
-        }
-        return validationTests;
-    },
-    isLessThanLength: (str1, max, status) => {
-        if (str1.length >= max) {
-            status.addError('! isLessThan');
-        }
-        return validationTests;
-    },
-    isGreaterThanEqualToLength: (str1, test, status) => {
-        str1.trim();
-        console.log(`str length`, str1.length);
-        if (str1.length < test + 1) {
-            status.addError('! isGreaterThan');
-        }
-        return validationTests;
-    },
-    isGreaterThanValue: (num, test, status) => {},
-    isLessThanValue: (num, test, status) => {},
-    mayContainCharacter(symbol, status) {
-        console.log({ status });
-        console.log({ symbol });
-        console.log(validationTests);
-        return validationTests;
-    },
-    isValidUOM: (value, status) => {
-        const validUOMs = [
+    shouldBeValidOUM() {
+        let test = new Test();
+        const value = this.trimmedValue.toLowerCase();
+        let units = [
             'mg',
             'mcg',
             'g',
             'ml',
             'l',
             'oz',
-            'CFU',
-            'mcg DFE',
-            'mg DFE',
+            'CFU'.toLowerCase(),
+            'mcg DFE'.toLowerCase(),
+            'mg DFE'.toLowerCase(),
             '',
-            'IU',
+            'IU'.toLowerCase(),
         ];
-        if (!validUOMs.includes(value)) {
-            status.addError('! isValidUOM');
-        }
-        return validationTests;
-    },
-};
 
-// U+2020 	† 	Dagger 	0914
-// U+2021 	‡ 	Double dagger
+        if (!units.includes(value)) {
+            const message = `${this.value} may not be valid UOM`;
+            test = new Test(true, message, this.trimmedValue);
+            this.failed = true;
+        }
+        this.tests.push(test);
+        return this;
+    }
+}
+
 const createCell = {
     order: ({ value, isEditable = true }) => {
         const orderCell = new Cell({
@@ -282,7 +222,9 @@ const createCell = {
         const status = new Status();
         const trimmedValue = value.toString().trim();
 
-        validationTests.isNotEmpty_Warning(trimmedValue, status);
+        const testForWarnings = new Tester(trimmedValue)
+            .shouldNotBeEmpty()
+            .forEachFailure(status.addWarning.bind(status));
 
         return status;
     },
@@ -305,16 +247,20 @@ const createCell = {
     validateQuantity: (value) => {
         let status = new Status();
         const trimmedValue = value.toString().trim();
+        let charsToRemove = ['<', ','];
+        let cleanString = trimmedValue;
 
-        // if (){
+        charsToRemove.forEach((char) => {
+            cleanString = cleanString.split(char).join('');
+        });
 
-        // }
-        validationTests.canBeParsedAsNumber_Error(trimmedValue, status);
-        // console.log({bill});
-        // validationTests
-        //     .isNotEmpty_Warning(trimmedValue, status)
-        //     .mayContainCharacter('<', status);
+        const testForErrors = new Tester(cleanString)
+            .shouldBeParsedAsNumber()
+            .forEachFailure(status.addError.bind(status));
 
+        const testForWarnings = new Tester(trimmedValue)
+            .shouldNotBeEmpty()
+            .forEachFailure(status.addWarning.bind(status));
         return status;
     },
     // UOM
@@ -333,6 +279,11 @@ const createCell = {
     },
     validateUom: (value) => {
         const status = new Status();
+        const trimmedValue = value.toString().trim();
+
+        const testForWarnings = new Tester(trimmedValue)
+            .shouldBeValidOUM()
+            .forEachFailure(status.addWarning.bind(status));
 
         return status;
     },
@@ -374,6 +325,8 @@ const createCell = {
         return symbolCell;
     },
     validateSymbol: (value) => {
+        // U+2020 	† 	Dagger 	0914
+        // U+2021 	‡ 	Double dagger
         const status = new Status();
 
         return status;
