@@ -397,7 +397,9 @@ function attachBlurEventToTableCells(table) {
                 const cellType = cell.type;
                 // console.log({ cell });
                 // console.log(e.target);
-                let innerText = e.target.innerText.trim();
+                e.target.innerText = e.target.innerText.trim();
+                const innerText = e.target.innerText
+
                 const parentClasslist = e.target.parentElement.classList;
                 let status = null;
 
@@ -423,12 +425,62 @@ function attachBlurEventToTableCells(table) {
                         break;
 
                     case DV.id:
-                        status = createCell.validateDvAmount(innerText);
+                        {
+                            // Depending on the ingredient type, the validation cahnges
+                            const parentRow =
+                                e.target.parentNode.parentNode.parentNode;
 
+                            const ingredientCell = Array.from(parentRow.cells)
+                                .map((cell) => {
+                                    return Array.from(
+                                        cell.firstChild.childNodes
+                                    ).find(
+                                        (child) =>
+                                            child.cell &&
+                                            child.cell.type ===
+                                                'INGREDIENT_TYPE'
+                                    );
+                                })
+                                .filter((cell) => cell !== undefined); // Filter out undefined and null values
+
+                            // console.log({ ingredientCell });
+                            const ingredValue = ingredientCell[0].cell.value;
+
+                            status = createCell.validateDvAmount(
+                                innerText,
+                                ingredValue
+                            );
+                        }
                         break;
 
                     case SYMBOL.id:
-                        status = createCell.validateSymbol(innerText);
+                        {
+                            // Depending on the ingredient type, the validation cahnges
+                            const parentRow =
+                                e.target.parentNode.parentNode.parentNode;
+
+                            const ingredientCell = Array.from(parentRow.cells)
+                                .map((cell) => {
+                                    return Array.from(
+                                        cell.firstChild.childNodes
+                                    ).find(
+                                        (child) =>
+                                            child.cell &&
+                                            child.cell.type ===
+                                                'INGREDIENT_TYPE'
+                                    );
+                                })
+                                .filter((cell) => cell !== undefined); // Filter out undefined and null values
+
+                            // console.log({ ingredientCell });
+                            const ingredValue = ingredientCell[0].cell.value;
+
+
+                            status = createCell.validateSymbol(
+                                innerText,
+                                ingredValue
+                            );
+                        }
 
                         break;
                     case FOOT.id:
@@ -438,6 +490,7 @@ function attachBlurEventToTableCells(table) {
                     default:
                         break;
                 }
+
                 addErrorsToDom(status, parentClasslist);
             }
         },
@@ -505,7 +558,6 @@ function createCellWithPopover(type, content, index, value) {
 
     return statusSymbol;
 }
-
 
 /********************************************************************* */
 function preprocess_export_file(parsingOption) {

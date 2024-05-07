@@ -86,8 +86,6 @@ class Tester {
     forEachFailure(callback) {
         this.tests.forEach((test) => {
             if (test.failed) {
-                // console.log(`FAILED`, test.message);
-
                 callback.call(this, test.message);
             }
         });
@@ -100,6 +98,18 @@ class Tester {
 
         if (!pattern.test(this.trimmedValue)) {
             const message = 'trimmedValue is Empty';
+            test = new Test(true, message, '');
+            this.failed = true;
+        }
+        this.tests.push(test);
+        return this;
+    }
+    shouldBeEmpty() {
+        let test = new Test();
+        // const pattern = /\S+/;
+
+        if (this.trimmedValue !== '') {
+            const message = 'trimmedValue is not Empty';
             test = new Test(true, message, '');
             this.failed = true;
         }
@@ -149,7 +159,7 @@ class Tester {
     shouldBeValidOUM() {
         let test = new Test();
         const value = this.trimmedValue.toLowerCase();
-        let units = [
+        const units = [
             'mg',
             'mcg',
             'g',
@@ -165,6 +175,34 @@ class Tester {
 
         if (!units.includes(value)) {
             const message = `${this.value} may not be valid UOM`;
+            test = new Test(true, message, this.trimmedValue);
+            this.failed = true;
+        }
+        this.tests.push(test);
+        return this;
+    }
+
+    shouldBeValidSymbol_Nutrient() {
+        let test = new Test();
+        const value = this.trimmedValue.toLowerCase();
+        const allowedValues = ['%', ''];
+
+        if (!allowedValues.includes(value)) {
+            const message = `${this.value} may not be valid Symbol`;
+            test = new Test(true, message, this.trimmedValue);
+            this.failed = true;
+        }
+        this.tests.push(test);
+        return this;
+    }
+
+    shouldBeValidSymbol_Ingredient() {
+        let test = new Test();
+        const value = this.trimmedValue.toLowerCase();
+        const allowedValues = ['**', ''];
+
+        if (!allowedValues.includes(value)) {
+            const message = `${this.value} may not be valid Symbol`;
             test = new Test(true, message, this.trimmedValue);
             this.failed = true;
         }
@@ -247,7 +285,7 @@ const createCell = {
     validateQuantity: (value) => {
         let status = new Status();
         const trimmedValue = value.toString().trim();
-        let charsToRemove = ['<', ','];
+        const charsToRemove = ['<', ','];
         let cleanString = trimmedValue;
 
         charsToRemove.forEach((char) => {
@@ -303,8 +341,28 @@ const createCell = {
         });
         return dvAmtCell;
     },
-    validateDvAmount: (value) => {
+    validateDvAmount: (value, ingredType = '') => {
         const status = new Status();
+        const trimmedValue = value.toString().trim();
+        // const charsToRemove = ['**', '<', ','];
+        let cleanString = trimmedValue;
+
+        if (ingredType === LABEL_DATASET_NUTRIENT_A.name) {
+            const charsToRemove = ['**', '<', ','];
+            // console.log({ ingredType });
+            charsToRemove.forEach((char) => {
+                cleanString = cleanString.split(char).join('');
+            });
+
+            const testForErrors = new Tester(cleanString)
+                .shouldBeParsedAsNumber()
+                .forEachFailure(status.addError.bind(status));
+        } else if (ingredType === LABEL_DATASET_INGREDIENTS_A.name) {
+            const testForWarnings = new Tester(trimmedValue)
+                .shouldNotBeEmpty()
+                .shouldBeEmpty()
+                .forEachFailure(status.addWarning.bind(status));
+        }
 
         return status;
     },
@@ -324,11 +382,21 @@ const createCell = {
         });
         return symbolCell;
     },
-    validateSymbol: (value) => {
-        // U+2020 	† 	Dagger 	0914
-        // U+2021 	‡ 	Double dagger
+    validateSymbol: (value, ingredType = '') => {
         const status = new Status();
+        const trimmedValue = value.toString().trim();
 
+        if (ingredType === LABEL_DATASET_NUTRIENT_A.name) {
+
+            const testForErrors = new Tester(trimmedValue)
+                .shouldBeValidSymbol_Nutrient()
+                .forEachFailure(status.addError.bind(status));
+
+        } else if (ingredType === LABEL_DATASET_INGREDIENTS_A.name) {
+            const testForWarnings = new Tester(trimmedValue)
+                .shouldBeValidSymbol_Ingredient()
+                .forEachFailure(status.addError.bind(status));
+        }
         return status;
     },
     //FOOTNOTE
@@ -348,6 +416,8 @@ const createCell = {
         return footnoteCell;
     },
     validateFootnote: (value) => {
+        // U+2020 	† 	Dagger 	0914
+        // U+2021 	‡ 	Double dagger
         const status = new Status();
 
         return status;
