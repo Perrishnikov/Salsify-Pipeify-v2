@@ -22,7 +22,9 @@ function per_ingred_per_partcode_2(rows) {
                 // Create a new row for each ingredient
                 ingredientsArray.forEach((ingredient) => {
                     // Remove the original MERGED_INGREDIENTS Create a deep copy of the row without the MERGED_INGREDIENTS cell
-                    const rowForEachIngred = row.cells.filter((c) => c !== cell).map(cloneCell);
+                    const rowForEachIngred = row.cells
+                        .filter((c) => c !== cell)
+                        .map(cloneCell);
 
                     // Create a new Cell for the ingredient
                     const ingredientCell = new Cell({
@@ -39,12 +41,9 @@ function per_ingred_per_partcode_2(rows) {
                     const newRow = new Row(rowForEachIngred);
 
                     // Add the new row to the final array of rows
-                    // rowsOfIngredients.push(rowForEachIngred);
                     rowsOfIngredients.push(newRow);
                 });
             }
-
-            
         });
     });
 

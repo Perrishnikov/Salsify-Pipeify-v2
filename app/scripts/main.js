@@ -111,7 +111,6 @@ function processOptionWithData(mergedJsonData, parsingOption) {
                         LABEL_DATASET_OTHER_INGREDS_A,
                     ],
                 });
-                console.log({ rowsOfCells });
                 return rowsOfCells;
             }
             break;
@@ -170,6 +169,7 @@ function processOptionWithData(mergedJsonData, parsingOption) {
                 const rowsOfIngredients =
                     per_ingred_per_partcode_2(rowsOfCells);
 
+                // Row validation
                 const depipedColumns =
                     per_pipe_per_partcode_3(rowsOfIngredients);
 
@@ -192,11 +192,14 @@ function processOptionWithData(mergedJsonData, parsingOption) {
                 const rowsOfIngredients =
                     per_ingred_per_partcode_2(rowsOfCells);
 
-                const errorCheckedColumns =
-                    per_pipe_per_partcode_4(rowsOfIngredients);
+                // Row validation
+                const depipedColumns =
+                    per_pipe_per_partcode_3(rowsOfIngredients);
 
-                // console.log({ errorCheckedColumns });
-                return errorCheckedColumns;
+                const errorCheckedCells =
+                    per_pipe_per_partcode_4b(depipedColumns);
+
+                return errorCheckedCells;
             }
             break;
         default:
@@ -206,7 +209,6 @@ function processOptionWithData(mergedJsonData, parsingOption) {
 
 /** MAIN ****************************************************************/
 function main_process(parsingOption) {
-    // try {
     // set in salsify_preprocess
     const jsonObject = getLocalStorage();
 
@@ -251,6 +253,7 @@ function main_process(parsingOption) {
     // Add table rows
     rows.forEach((row, index) => {
         const tableRow = document.createElement('tr');
+        // console.log(row);
 
         // Add a status cell at the beginning of the row if there is a status
         if (rowHasMessages) {
@@ -322,29 +325,6 @@ function main_process(parsingOption) {
             // Append the cell container to the table cell
             td.appendChild(cellContainer);
 
-            // Handle the cell status if it exists
-            // if (cell.status.hasMessages) {
-            //     // Apply CSS classes based on cell status
-            //     if (cell.status.errors.length > 0) {
-            //         td.classList.add('error-cell');
-            //         //! add the cell validation info here
-            //         // const pc = cell.status.errors.join('<br>');
-            //         // const goodies = createCellWithPopover(
-            //         //     'error',
-            //         //     pc,
-            //         //     cellIndex,
-            //         //     cell.value
-            //         // );
-            //         // td.innerHTML = goodies;
-            //     }
-            //     if (cell.status.warnings.length > 0) {
-            //         td.classList.add('warning-cell');
-            //     }
-            //     if (cell.status.info.length > 0) {
-            //         td.classList.add('info-cell');
-            //     }
-            // }
-
             tableRow.appendChild(td);
         });
 
@@ -381,6 +361,26 @@ function addErrorsToDom(status, parentClasslist) {
 }
 
 /**
+ * Depending on the ingredient type, the validation changes
+ * @param {EventTarget} target 
+ * @returns {string} - Other, Ingredients, Nutrients
+ */
+function getIngredientTypeFromDom(target) {
+    const parentRow = target.parentNode.parentNode.parentNode;
+
+    const ingredientCell = Array.from(parentRow.cells)
+        .map((cell) => {
+            return Array.from(cell.firstChild.childNodes).find(
+                (child) => child.cell && child.cell.type === 'INGREDIENT_TYPE'
+            );
+        })
+        .filter((cell) => cell !== undefined); // Filter out undefined and null values
+
+    const ingredValue = ingredientCell[0].cell.value;
+    return ingredValue;
+}
+
+/**
  * Attaches a blur event listener to HTML table cells in a dynamically created table.
  *
  * @param {HTMLTableElement} table - The HTML table element to monitor for blur events on its cells.
@@ -398,7 +398,7 @@ function attachBlurEventToTableCells(table) {
                 // console.log({ cell });
                 // console.log(e.target);
                 e.target.innerText = e.target.innerText.trim();
-                const innerText = e.target.innerText
+                const innerText = e.target.innerText;
 
                 const parentClasslist = e.target.parentElement.classList;
                 let status = null;
@@ -426,25 +426,9 @@ function attachBlurEventToTableCells(table) {
 
                     case DV.id:
                         {
-                            // Depending on the ingredient type, the validation cahnges
-                            const parentRow =
-                                e.target.parentNode.parentNode.parentNode;
-
-                            const ingredientCell = Array.from(parentRow.cells)
-                                .map((cell) => {
-                                    return Array.from(
-                                        cell.firstChild.childNodes
-                                    ).find(
-                                        (child) =>
-                                            child.cell &&
-                                            child.cell.type ===
-                                                'INGREDIENT_TYPE'
-                                    );
-                                })
-                                .filter((cell) => cell !== undefined); // Filter out undefined and null values
-
-                            // console.log({ ingredientCell });
-                            const ingredValue = ingredientCell[0].cell.value;
+                            const ingredValue = getIngredientTypeFromDom(
+                                e.target
+                            );
 
                             status = createCell.validateDvAmount(
                                 innerText,
@@ -455,26 +439,9 @@ function attachBlurEventToTableCells(table) {
 
                     case SYMBOL.id:
                         {
-                            // Depending on the ingredient type, the validation cahnges
-                            const parentRow =
-                                e.target.parentNode.parentNode.parentNode;
-
-                            const ingredientCell = Array.from(parentRow.cells)
-                                .map((cell) => {
-                                    return Array.from(
-                                        cell.firstChild.childNodes
-                                    ).find(
-                                        (child) =>
-                                            child.cell &&
-                                            child.cell.type ===
-                                                'INGREDIENT_TYPE'
-                                    );
-                                })
-                                .filter((cell) => cell !== undefined); // Filter out undefined and null values
-
-                            // console.log({ ingredientCell });
-                            const ingredValue = ingredientCell[0].cell.value;
-
+                            const ingredValue = getIngredientTypeFromDom(
+                                e.target
+                            );
 
                             status = createCell.validateSymbol(
                                 innerText,
@@ -484,7 +451,17 @@ function attachBlurEventToTableCells(table) {
 
                         break;
                     case FOOT.id:
-                        status = createCell.validateFootnote(innerText);
+                        {
+                            // Depending on the ingredient type, the validation changes
+                            const ingredValue = getIngredientTypeFromDom(
+                                e.target
+                            );
+
+                            status = createCell.validateFootnote(
+                                innerText,
+                                ingredValue
+                            );
+                        }
 
                         break;
                     default:

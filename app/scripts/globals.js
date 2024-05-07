@@ -165,7 +165,7 @@ class Cell {
     value = '';
 
     /** @type {string | number} - fails validation */
-    badValue = '';
+    // badValue = '';
 
     /** @type {string} PARTCODE, Product ID, MERGED_INGREDIENT, */
     type;

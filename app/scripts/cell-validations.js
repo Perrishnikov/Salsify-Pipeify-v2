@@ -209,6 +209,21 @@ class Tester {
         this.tests.push(test);
         return this;
     }
+    shouldBeValidFootnote_Nutrient() {
+        let test = new Test();
+        const value = this.trimmedValue.toLowerCase();
+        const doubleDagger = '\u2021';
+        const dagger = 'U+2020';
+        const allowedValues = ['†', '‡', ''];
+
+        if (!allowedValues.includes(value)) {
+            const message = `${this.value} may not be valid Footnote`;
+            test = new Test(true, message, this.trimmedValue);
+            this.failed = true;
+        }
+        this.tests.push(test);
+        return this;
+    }
 }
 
 const createCell = {
@@ -356,7 +371,7 @@ const createCell = {
 
             const testForErrors = new Tester(cleanString)
                 .shouldBeParsedAsNumber()
-                .forEachFailure(status.addError.bind(status));
+                .forEachFailure(status.addWarning.bind(status));
         } else if (ingredType === LABEL_DATASET_INGREDIENTS_A.name) {
             const testForWarnings = new Tester(trimmedValue)
                 .shouldNotBeEmpty()
@@ -387,15 +402,13 @@ const createCell = {
         const trimmedValue = value.toString().trim();
 
         if (ingredType === LABEL_DATASET_NUTRIENT_A.name) {
-
             const testForErrors = new Tester(trimmedValue)
                 .shouldBeValidSymbol_Nutrient()
-                .forEachFailure(status.addError.bind(status));
-
+                .forEachFailure(status.addWarning.bind(status));
         } else if (ingredType === LABEL_DATASET_INGREDIENTS_A.name) {
             const testForWarnings = new Tester(trimmedValue)
                 .shouldBeValidSymbol_Ingredient()
-                .forEachFailure(status.addError.bind(status));
+                .forEachFailure(status.addWarning.bind(status));
         }
         return status;
     },
@@ -415,11 +428,22 @@ const createCell = {
         });
         return footnoteCell;
     },
-    validateFootnote: (value) => {
+    validateFootnote: (value, ingredType) => {
         // U+2020 	† 	Dagger 	0914
         // U+2021 	‡ 	Double dagger
         const status = new Status();
+        const trimmedValue = value.toString().trim();
 
+        if (ingredType === LABEL_DATASET_NUTRIENT_A.name) {
+            const testForErrors = new Tester(trimmedValue)
+                .shouldBeValidFootnote_Nutrient()
+                .forEachFailure(status.addWarning.bind(status));
+        }
+        else if (ingredType === LABEL_DATASET_INGREDIENTS_A.name) {
+            const testForWarnings = new Tester(trimmedValue)
+                .shouldBeEmpty()
+                .forEachFailure(status.addWarning.bind(status));
+        }
         return status;
     },
 };

@@ -74,6 +74,8 @@ function salsify_mergeIngredients(jsonData) {
             Object.keys(row).forEach((key) => {
                 if (key.startsWith(prefix)) {
                     // Add the value to the combinedValue with a ~ delimiter if not the first value
+                    // console.log(prefix, row[key]);
+
                     if (combinedValue) {
                         combinedValue += `~${row[key]}`;
                     } else {

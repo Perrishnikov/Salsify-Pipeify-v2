@@ -10,22 +10,58 @@ function getObjectByIngredientType(array) {
 }
 
 /**
+ * Removes items from the end of an array if the length is greater than the specified length.
+ *
+ * @param {Array} arr - The array to modify.
+ * @param {number} x - The maximum allowed length of the array.
+ */
+function removeExcessItems(arr, x) {
+    // Check if the array length is greater than the specified length
+    if (arr.length > x) {
+        // Calculate the index to start removing items
+        const startIndex = x;
+
+        // Calculate the number of items to remove
+        const itemsToRemove = arr.length - x;
+
+        // Remove the items from the array using splice()
+        arr.splice(startIndex, itemsToRemove);
+    }
+}
+
+/**
  * No validations
  * @param {string[]} pipes
  * @returns
  */
-function createNutrientCells(pipes) {
-    const order = pipes[0].trim();
-    const shortDesc = pipes[1].trim();
-    const longDesc = pipes[2].trim();
-    const qty = pipes[3].trim();
-    const uom = pipes[4].trim();
-    const dvAmt = pipes[5].trim();
-    const symbol = pipes[6].trim();
-    const foot = pipes[7].trim();
+function createNutrientCells_RowValidation(pipes, rowStatus) {
+    // Safely access each value in the pipes array using optional chaining
+    //Row validation
+    if (pipes.length < 8) {
+        // console.error('Nuts less than 8');
+        rowStatus.addWarning(
+            'Nutrient pipes are less than 8. Cell data is likely incorrect'
+        );
+    } else if (pipes.length > 8) {
+        rowStatus.addWarning(
+            'Nutrient pipes are greater than 8. Cell data is likely incorrect'
+        );
+        removeExcessItems(pipes, 8);
+    } else if (pipes.length == 8) {
+        // status.addInfo('Just right');
+    }
+
+    const order = pipes[0]?.trim() || '';
+    const shortDesc = pipes[1]?.trim() || '';
+    const longDesc = pipes[2]?.trim() || '';
+    const qty = pipes[3]?.trim() || '';
+    const uom = pipes[4]?.trim() || '';
+    const dvAmt = pipes[5]?.trim() || '';
+    const symbol = pipes[6]?.trim() || '';
+    const foot = pipes[7]?.trim() || '';
 
     // Column 1: Order
-    const orderCell = createCell.order({ value: order, isEditable: false});
+    const orderCell = createCell.order({ value: order, isEditable: false });
     // Column 2: Description
     const descCell = createCell.description({
         value: coalesce(longDesc, shortDesc),
@@ -64,24 +100,36 @@ function createNutrientCells(pipes) {
  * @param {string[]} pipes
  * @returns
  */
-function createIngredientCells(pipes) {
+function createIngredientCells_RowValidation(pipes, rowStatus) {
+    /* Row validation */
+    if (pipes.length < 9) {
+        rowStatus.addWarning(
+            'Ingredient pipes are less than 9. Cell data is likely incorrect'
+        );
+    } else if (pipes.length > 9) {
+        rowStatus.addWarning(
+            'Ingredient pipes are greater than 9. Cell data is likely incorrect'
+        );
+        removeExcessItems(pipes, 9);
+    } else if (pipes.length == 9) {
+        // status.addInfo('Just right');
+    }
     /* Ingredient validation */
-    const order = pipes[0].trim();
-    const shortDesc = pipes[1].trim();
-    const qty = pipes[2].trim();
-    const uom = pipes[3].trim();
-    const unknown4 = pipes[4].trim();
-    const dvAmt = pipes[5].trim();
-    const symbol = pipes[6].trim();
-    const foot = pipes[7].trim();
-    // const unknown8 = pipes[8].trim();
+    const order = pipes[0]?.trim() || '';
+    const shortDesc = pipes[1]?.trim() || '';
+    const qty = pipes[2]?.trim() || '';
+    const uom = pipes[3]?.trim() || '';
+    const unknown4 = pipes[4]?.trim() || '';
+    const dvAmt = pipes[5]?.trim() || '';
+    const symbol = pipes[6]?.trim() || '';
+    const foot = pipes[7]?.trim() || '';
+    const unknown8 = pipes[8].trim();
 
     // Column 1: Order
     const orderCell = createCell.order({
         value: order,
         isEditable: false,
     });
-    // console.log(`orderCell`, orderCell);
     // Column 2: Description
     const descCell = createCell.description({
         value: shortDesc,
@@ -127,7 +175,11 @@ function createOtherCells(value) {
         isEditable: false,
     });
     // Column 2: Description
-    const descCell = createCell.description({ value, isEditable: false, shouldValidate: false });
+    const descCell = createCell.description({
+        value,
+        isEditable: false,
+        shouldValidate: false,
+    });
     // Column 3: Quantity
     const qtyCell = createCell.quantity({ value: '', isEditable: false });
     // Column 4: Unit of Measure
@@ -166,13 +218,17 @@ function per_pipe_per_partcode_3(rows) {
     rows.forEach((row) => {
         // Process each cell in the row
         // console.log(`row`, row);
+        const ingredientType = row.cells.find(
+            (cell) => cell.type === INGREDIENT_TYPE.id
+        );
+        // console.log({ingredientType});
 
         row.cells.forEach((cell) => {
             // console.log(`cell`, cell);
 
             if (cell.type === MERGED_INGREDIENTS.id) {
                 const ingredientsArray = cell.value.split('|');
-                // console.log(`ingredientsArray`,cell.type, ingredientsArray);
+                // console.log(`ingredientsArray`, cell.type, ingredientsArray);
 
                 // Split the merged ingredient value by the import delimiter
                 const ingredientTypeObject = getObjectByIngredientType(
@@ -184,17 +240,18 @@ function per_pipe_per_partcode_3(rows) {
                     .filter((c) => c !== cell)
                     .map(cloneCell);
 
-                // const rowStatus = new Status();
+                const rowStatus = new Status();
 
                 // Process the type of ingredient
                 if (
                     ingredientTypeObject.value === LABEL_DATASET_NUTRIENT_A.name
                 ) {
                     // Create nutrient cells for the table
-                    const nutrientCells = createNutrientCells(
-                        ingredientsArray
-                        // rowStatus
+                    const nutrientCells = createNutrientCells_RowValidation(
+                        ingredientsArray,
+                        rowStatus
                     );
+                    // console.log(nutrientCells);
 
                     nonIngredientCells.push(...nutrientCells);
                 } else if (
@@ -202,9 +259,9 @@ function per_pipe_per_partcode_3(rows) {
                     LABEL_DATASET_INGREDIENTS_A.name
                 ) {
                     // Create ingredient cells for the table
-                    const ingredientCells = createIngredientCells(
-                        ingredientsArray
-                        // rowStatus
+                    const ingredientCells = createIngredientCells_RowValidation(
+                        ingredientsArray,
+                        rowStatus
                     );
                     nonIngredientCells.push(...ingredientCells);
                 } else if (
@@ -212,15 +269,15 @@ function per_pipe_per_partcode_3(rows) {
                     LABEL_DATASET_OTHER_INGREDS_A.name
                 ) {
                     const otherCells = createOtherCells(
-                        ingredientsArray
-                        // rowStatus
+                        ingredientsArray,
+                        rowStatus
                     );
 
                     // Add other cells to the new row
                     nonIngredientCells.push(...otherCells);
                 }
                 // Add the processed new row to the array of ingredients rows
-                const newRow = new Row(nonIngredientCells);
+                const newRow = new Row(nonIngredientCells, rowStatus);
 
                 rowsOfIngredients.push(newRow);
             }
