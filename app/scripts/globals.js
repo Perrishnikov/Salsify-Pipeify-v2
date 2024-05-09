@@ -153,9 +153,11 @@ class Row {
     /** @type {Cell[]} "row status" */
     cells;
 
+    /** @type {string} */
+    id;
     constructor(cells, status = new Status()) {
         this.cells = cells;
-
+        this.id = generateRandomString(9)
         this.status = status;
     }
 }
@@ -247,4 +249,22 @@ function coalesce(value1, value2) {
         value = null;
     }
     return value;
+}
+
+/**
+ * Generates a random string of the specified length.
+ *
+ * @param {number} length - The length of the random string to generate.
+ * @returns {string} - The randomly generated string.
+ */
+function generateRandomString(length) {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let randomString = '';
+    
+    for (let i = 0; i < length; i++) {
+        const randomIndex = Math.floor(Math.random() * characters.length);
+        randomString += characters[randomIndex];
+    }
+
+    return randomString;
 }

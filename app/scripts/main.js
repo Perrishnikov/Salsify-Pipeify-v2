@@ -257,7 +257,7 @@ function handlePopoverMenuClick(e) {
     // Get the button that was clicked
     const button = e.target.closest('.popover-menu-item');
 
-    // Determine the action based on the button's text content or another attribute
+    // // Determine the action based on the button's text content or another attribute
     if (button) {
         const [buttonId, index] = button.id.split('-');
 
@@ -272,6 +272,9 @@ function handlePopoverMenuClick(e) {
             deleteRow(index);
         }
     }
+    const tableRow = e.target.closest('tr[data-id]');
+    const id = tableRow.dataset.id
+    console.log({tableRow, id});
 }
 
 /**
@@ -303,6 +306,8 @@ function addRowAbove(index) {
         // Insert the new row before the current row at the specified index
         myTable.insertBefore(tableRow, currentRow);
 
+        // TODO: Need to update localStorage with the new row
+        // TODO: Need to use better indexing and ID's 
         console.log({ rowToCopy, index });
     } else {
         console.error('Invalid index');
@@ -398,8 +403,21 @@ function createMenuPopover(index) {
 </table>
  */
 
+/**
+ * Retrieves a table row (`<tr>`) with a specific `data-id` attribute.
+ *
+ * @param {string} id - The value of the `data-id` attribute to search for.
+ * @returns {HTMLTableRowElement | null} - The table row element with the specified `data-id` attribute, or null if not found.
+ */
+function getTableRowById(id) {
+    // Use the querySelector method to find the <tr> element with the specified data-id attribute
+    return document.querySelector(`tr[data-id="${id}"]`);
+}
+
 function createTableRow(rowData, headerCallback = null, index) {
+    console.log({ rowData });
     const tableRow = document.createElement('tr');
+    tableRow.dataset.id = rowData.id
 
     // 1st Column added here
     if (headerCallback) {
