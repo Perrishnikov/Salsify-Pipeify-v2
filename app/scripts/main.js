@@ -208,13 +208,241 @@ function processOptionWithData(mergedJsonData, parsingOption) {
 }
 
 /** MAIN ****************************************************************/
+function createPopover(type, content, index) {
+    const statusSymbol = `
+        <div id="pop-div-${(type, index)}">
+            <button class="icon" popovertarget="pop-row-${(type, index)}">
+            <span class="material-symbols-outlined" role="button" >${type}</span>
+            </button>
+            <div id="pop-row-${(type, index)}" popover anchor="pop-div-${
+        (type, index)
+    }">
+                ${content}
+            </div>
+        </div>`;
+
+    return statusSymbol;
+}
+
+/**
+ * Attaches the handlePopoverMenuClick function to each button with the class
+ * .popover-menu-item within the my-table table.
+ *
+ * @param {string} tableId - The ID of the table element (e.g., 'my-table').
+ */
+function applyHandlePopoverMenuClickToTable(tableId) {
+    // Get the table element by its ID
+    const table = document.getElementById(tableId);
+
+    // If the table is found
+    if (table) {
+        // Select all buttons with the class .popover-menu-item within the table
+        const buttons = table.querySelectorAll('.popover-menu-item');
+
+        // Attach the handlePopoverMenuClick function as a click event listener to each button
+        buttons.forEach((button) => {
+            button.addEventListener('click', handlePopoverMenuClick);
+        });
+    } else {
+        console.error(`Table with ID '${tableId}' not found.`);
+    }
+}
+
+/**
+ * Callback function to handle button clicks in the popover-menu.
+ *
+ * @param {Event} e - The click event object.
+ */
+function handlePopoverMenuClick(e) {
+    // Get the button that was clicked
+    const button = e.target.closest('.popover-menu-item');
+
+    // Determine the action based on the button's text content or another attribute
+    if (button) {
+        const [buttonId, index] = button.id.split('-');
+
+        // console.log(buttonId, index);
+
+        // Perform actions based on button text
+        if (buttonId === 'addAbove') {
+            addRowAbove(index);
+        } else if (buttonId === 'addBelow') {
+            addRowBelow(index);
+        } else if (buttonId === 'delete') {
+            deleteRow(index);
+        }
+    }
+}
+
+/**
+ * Appends a tableRow at the specified index within an HTML table.
+ *
+ * @param {number} index - The index at which to insert the new row.
+ */
+function addRowAbove(index) {
+    // Get the local storage data
+    const jsonObject = getLocalStorage();
+
+    // Process the option with the data
+    const rows = processOptionWithData(jsonObject, 'option4');
+
+    // Get the HTML table element
+    const myTable = document.getElementById('my-table');
+
+    // Check if the index is valid and within the bounds of the table
+    if (index > 0 && index <= myTable.rows.length) {
+        // Get the row data to copy
+        const rowToCopy = rows[index - 1];
+
+        // Create a new table row from the row data
+        const tableRow = createTableRow(rowToCopy, createMenuPopover, rows.length + 1);
+
+        // Get the row at the specified index
+        const currentRow = myTable.rows[index];
+
+        // Insert the new row before the current row at the specified index
+        myTable.insertBefore(tableRow, currentRow);
+
+        console.log({ rowToCopy, index });
+    } else {
+        console.error('Invalid index');
+    }
+}
+
+
+/**
+ * Function to add a row below the current row.
+ */
+function addRowBelow(index) {
+    console.log(`Adding a row below ${index}`);
+    // Add your logic to add a row below the current row
+}
+
+/**
+ * Function to delete the current row.
+ */
+function deleteRow(index) {
+    console.log(`Deleted row ${index}`);
+    // Add your logic to delete the current row
+}
+
+function createMenuPopover(index) {
+    const td = document.createElement('td');
+    td.setAttribute('data-custom', 'do-not-copy');
+    td.innerHTML = `
+    
+    <div class="cell-container" id="pop-menu-div-${index}">
+        <button class="icon" popovertarget="pop-menu-open-${index}">
+            <span class="material-symbols-outlined">menu_open</span>
+        </button>
+
+        <div class="popover-menu" id="pop-menu-open-${index}" popover anchor="pop-menu-div-${index}">
+            
+            <button class="popover-menu-item" id="addAbove-${index}" type="button">
+                <span class="material-symbols-outlined">add</span> Add Row Above ${index}
+            </button>
+            <button class="popover-menu-item" id="addBelow-${index}" type="button">
+                <span class="material-symbols-outlined">add</span> Add Row Below ${index}
+            </button>
+            <button class="popover-menu-item" id="delete-${index}" type="button">
+                <span class="material-symbols-outlined">delete</span> Delete Row ${index}
+            </button>
+        </div>
+    </div>
+    
+    `;
+
+    return td;
+}
+/* *********************************************************************/
+/**
+<table>
+    <tr>
+        <th></th>
+    </tr>
+    <tr>
+        //Menu
+        <td data-custom="do-not-copy">
+            <div id="pop-menu-div-#" class="cell-container">
+                <button class="icon" popovertarget="menu-open">
+                    <span>menu_open</span>
+                </button>
+                <div id="pop-menu-open-#">
+                    <button><span>addAbove</span></button>
+                    <button><span>addBelow</span></button>
+                    <button><span>delete</span></button>
+                </div>
+            </div>
+        </td>
+
+        //Salsify Props
+        <td>
+            <div class="cell-container">
+                <span class="cell-value">
+                    00033674069738
+                </span>
+            </div>
+        </td>
+
+        //Editable
+        <td>
+            <div class="cell-container">
+                <span class="chevron-icon">▶</span>
+                <span class="cell-value" contenteditable="true">
+                    1
+                </span>
+            </div>
+        </td>
+
+    </tr>
+</table>
+ */
+
+function createTableRow(rowData, headerCallback = null, index) {
+    const tableRow = document.createElement('tr');
+
+    // 1st Column added here
+    if (headerCallback) {
+        tableRow.appendChild(headerCallback(index));
+    }
+
+    // Data columns
+    rowData.cells.forEach((cell, cellIndex) => {
+        const td = document.createElement('td');
+        const cellContainer = document.createElement('div');
+        cellContainer.classList.add('cell-container');
+        cellContainer.cell = cell;
+        td.appendChild(cellContainer);
+
+        // use the same method as blur to apply errors
+        addErrorsToDom(cell.status, cellContainer.classList);
+
+        if (cell.isEditable) {
+            cellContainer.innerHTML = `
+                <span class="chevron-icon">▶</span>
+                <span class="cell-value" contenteditable="true">
+                    ${cell.value}
+                </span>
+            `;
+        } else {
+            cellContainer.innerHTML = `
+                <span class="cell-value">
+                    ${cell.value}
+                </span>
+            `;
+        }
+        tableRow.appendChild(td);
+    });
+
+    return tableRow;
+}
+
+/* ************************************************************** */
 function main_process(parsingOption) {
     // set in salsify_preprocess
     const jsonObject = getLocalStorage();
 
     const rows = processOptionWithData(jsonObject, parsingOption);
-
-    // const htmlTable = createHtmlTable(rowsOfData, null);
 
     // Create the table element
     const myTable = document.createElement('table');
@@ -230,105 +458,23 @@ function main_process(parsingOption) {
     }
 
     // Add the table header if rows are present and if there is any status
-    if (rows.length > 0) {
-        const headerRow = document.createElement('tr');
-        headerRow.classList.add('sticky-header');
+    const headerRow = document.createElement('tr');
 
-        // Add the status header column if there is a status
-        if (rowHasMessages) {
-            const statusHeader = document.createElement('th');
-            statusHeader.textContent = '';
-            headerRow.appendChild(statusHeader);
-        }
-        // console.log({rows});
-        // Add other headers
-        rows[0].cells.forEach((cell) => {
-            const th = document.createElement('th');
-            th.textContent = cell.header.name;
-            headerRow.appendChild(th);
-        });
-        myTable.appendChild(headerRow);
-    }
+    //* For Popover Menu
+    const menuHeader = document.createElement('th');
+    headerRow.appendChild(menuHeader);
 
-    // Add table rows
+    // Add other headers
+    rows[0].cells.forEach((cell) => {
+        const th = document.createElement('th');
+        th.textContent = cell.header.name;
+        headerRow.appendChild(th);
+    });
+    myTable.appendChild(headerRow);
+
+    //! Do it here
     rows.forEach((row, index) => {
-        const tableRow = document.createElement('tr');
-        // console.log(row);
-
-        // Add a status cell at the beginning of the row if there is a status
-        if (rowHasMessages) {
-            const statusCell = document.createElement('td');
-            let statusSymbol = '';
-            let popoverContent = '';
-
-            // Determine the appropriate icon and message for the popover
-            if (row.status.errors.length > 0) {
-                popoverContent += row.status.errors.join('<br>');
-            }
-            if (row.status.warnings.length > 0) {
-                popoverContent += row.status.warnings.join('<br>');
-            }
-            if (row.status.info.length > 0) {
-                popoverContent += row.status.info.join('<br>');
-            }
-
-            //TODO: account for multiple classes in the same row
-            if (row.status.errors.length > 0) {
-                statusSymbol = createPopover('error', popoverContent, index);
-                tableRow.classList.add('error-row');
-            } else if (row.status.warnings.length > 0) {
-                statusSymbol = createPopover('warning', popoverContent, index);
-                tableRow.classList.add('warning-row');
-            } else if (row.status.info.length > 0) {
-                statusSymbol = createPopover('info', popoverContent, index);
-                tableRow.classList.add('info-row');
-            }
-
-            statusCell.innerHTML = statusSymbol;
-
-            tableRow.appendChild(statusCell);
-        }
-
-        // Add cells to the row
-        row.cells.forEach((cell, cellIndex) => {
-            const td = document.createElement('td');
-
-            // Create a container for the cell content and chevron icon
-            const cellContainer = document.createElement('div');
-            cellContainer.classList.add('cell-container');
-
-            // Set the cell text content to the cell value
-            const cellValue = document.createElement('span');
-            cellValue.textContent = cell.value;
-            cellValue.classList.add('cell-value');
-            // Attach the object directly to the cell using a custom property
-            cellValue.cell = cell;
-
-            // Set the cell as content editable if it is editable
-            if (cell.isEditable) {
-                cellValue.setAttribute('contenteditable', 'true');
-
-                // Create a span element for the chevron icon
-                const chevron = document.createElement('span');
-                chevron.innerHTML = '▶'; // Unicode character for down chevron
-
-                // Apply a CSS class for styling the chevron
-                chevron.classList.add('chevron-icon');
-
-                // Append the chevron to the cell container
-                cellContainer.appendChild(chevron);
-            }
-
-            // Append the cell value to the cell container
-            cellContainer.appendChild(cellValue);
-
-            // Append the cell container to the table cell
-            td.appendChild(cellContainer);
-
-            tableRow.appendChild(td);
-        });
-
-        // Add the row to the table
+        const tableRow = createTableRow(row, createMenuPopover, index + 1);
         myTable.appendChild(tableRow);
     });
 
@@ -340,29 +486,32 @@ function main_process(parsingOption) {
     tableContainer.appendChild(myTable);
 
     attachBlurEventToTableCells(myTable);
+
+    applyHandlePopoverMenuClickToTable('my-table');
 }
 
+/** BLUR Validations *********************************************************/
 function addErrorsToDom(status, parentClasslist) {
     // console.log({ status });
     // console.dir(parentClasslist);
+
     if (status.hasMessages) {
         if (status.errors.length > 0) {
             parentClasslist.add('error-cell');
         }
         if (status.warnings.length > 0) {
             parentClasslist.add('warning-cell');
-            //TODO: update cell.value to valid innerText
+            //? update cell.value to valid innerText?
         }
     } else {
-        // e.target.parentElement.classList = [];
-        // e.target.parentElement.classList.add('cell-value');
         parentClasslist.remove('error-cell', 'warning-cell');
     }
 }
 
 /**
+ * Get the ingredient value from the DOM
  * Depending on the ingredient type, the validation changes
- * @param {EventTarget} target 
+ * @param {EventTarget} target
  * @returns {string} - Other, Ingredients, Nutrients
  */
 function getIngredientTypeFromDom(target) {
@@ -370,13 +519,17 @@ function getIngredientTypeFromDom(target) {
 
     const ingredientCell = Array.from(parentRow.cells)
         .map((cell) => {
-            return Array.from(cell.firstChild.childNodes).find(
-                (child) => child.cell && child.cell.type === 'INGREDIENT_TYPE'
-            );
+            if (
+                cell.firstChild.cell &&
+                cell.firstChild.cell.type === 'INGREDIENT_TYPE'
+            ) {
+                return cell;
+            }
         })
-        .filter((cell) => cell !== undefined); // Filter out undefined and null values
+        .filter((cell) => cell !== undefined);
 
-    const ingredValue = ingredientCell[0].cell.value;
+    // console.log(ingredientCell);
+    const ingredValue = ingredientCell[0].firstChild.cell.value;
     return ingredValue;
 }
 
@@ -387,92 +540,48 @@ function getIngredientTypeFromDom(target) {
  */
 function attachBlurEventToTableCells(table) {
     // console.log(`attachBlurEventToTableCells`);
-    // Add a blur event listener to the table element
-    table.addEventListener(
-        'blur',
-        (e) => {
-            if (e.target.classList.contains('cell-value')) {
-                /** @type {Cell} */
-                const cell = e.target.cell;
-                const cellType = cell.type;
-                // console.log({ cell });
-                // console.log(e.target);
-                e.target.innerText = e.target.innerText.trim();
-                const innerText = e.target.innerText;
+    // Define a named event handler function
 
-                const parentClasslist = e.target.parentElement.classList;
-                let status = null;
+    function handleBlurEvent(e) {
+        /** @type {Cell} */
+        const cell = e.target.parentElement.cell || null;
 
-                switch (cellType) {
-                    case ORDER.id:
-                        status = createCell.validateOrder(innerText);
+        if (cell) {
+            const cellType = cell.type;
 
-                        break;
+            // Clean empty cells
+            e.target.innerText = e.target.innerText.trim();
+            const innerText = e.target.innerText;
+            // console.log(e.target);
+            const ingredValue = getIngredientTypeFromDom(e.target);
+            // console.log({ ingredValue });
+            let status = null;
 
-                    case DESCRIPTION.id:
-                        status = createCell.validateDescription(innerText);
-
-                        break;
-
-                    case QUANTITY.id:
-                        status = createCell.validateQuantity(innerText);
-
-                        break;
-
-                    case UOM.id:
-                        status = createCell.validateUom(innerText);
-
-                        break;
-
-                    case DV.id:
-                        {
-                            const ingredValue = getIngredientTypeFromDom(
-                                e.target
-                            );
-
-                            status = createCell.validateDvAmount(
-                                innerText,
-                                ingredValue
-                            );
-                        }
-                        break;
-
-                    case SYMBOL.id:
-                        {
-                            const ingredValue = getIngredientTypeFromDom(
-                                e.target
-                            );
-
-                            status = createCell.validateSymbol(
-                                innerText,
-                                ingredValue
-                            );
-                        }
-
-                        break;
-                    case FOOT.id:
-                        {
-                            // Depending on the ingredient type, the validation changes
-                            const ingredValue = getIngredientTypeFromDom(
-                                e.target
-                            );
-
-                            status = createCell.validateFootnote(
-                                innerText,
-                                ingredValue
-                            );
-                        }
-
-                        break;
-                    default:
-                        break;
-                }
-
-                addErrorsToDom(status, parentClasslist);
+            if (cellType === ORDER.id) {
+                status = createCell.validateOrder(innerText);
+            } else if (cellType === DESCRIPTION.id) {
+                status = createCell.validateDescription(innerText);
+            } else if (cellType === QUANTITY.id) {
+                status = createCell.validateQuantity(innerText);
+            } else if (cellType === UOM.id) {
+                status = createCell.validateUom(innerText);
+            } else if (cellType === DV.id) {
+                status = createCell.validateDvAmount(innerText, ingredValue);
+            } else if (cellType === SYMBOL.id) {
+                status = createCell.validateSymbol(innerText, ingredValue);
+            } else if (cellType === FOOT.id) {
+                status = createCell.validateFootnote(innerText, ingredValue);
             }
-        },
-        true
-    ); // The true option makes the event listener capture the event during the capture phase
+
+            const parentClasslist = e.target.parentElement.classList;
+            addErrorsToDom(status, parentClasslist);
+        }
+    }
+
+    table.removeEventListener('blur', handleBlurEvent, true);
+
+    // Add the named event handler function to the `table` element
+    table.addEventListener('blur', handleBlurEvent, true);
 
     table.addEventListener('keydown', (event) => {
         // Check if the event target is an editable cell
@@ -482,6 +591,7 @@ function attachBlurEventToTableCells(table) {
         }
     });
 
+    //charactter limits?
     // table.addEventListener('input', (event) => {
     //     // Check if the event target is an editable cell (td element)
     //     if (event.target.cell.type === 'ORDER') {
@@ -503,37 +613,6 @@ function attachBlurEventToTableCells(table) {
     //         }
     //     }
     // });
-}
-
-function createPopover(type, content, index) {
-    const statusSymbol = `
-        <div id="pop-div-${(type, index)}">
-            <button class="icon" popovertarget="pop-row-${(type, index)}">
-            <span class="material-symbols-outlined" role="button" >${type}</span>
-            </button>
-            <div id="pop-row-${(type, index)}" popover anchor="pop-div-${
-        (type, index)
-    }">
-                ${content}
-            </div>
-        </div>`;
-
-    return statusSymbol;
-}
-
-function createCellWithPopover(type, content, index, value) {
-    const statusSymbol = `
-        <div id="pop-div-${index}">
-            <button class="icon" popovertarget="pop-row-${index}">
-                ${value}
-            </button>
-            <div id="pop-row-${index}" popover anchor="pop-div-${index}">
-                ${content}
-            </div>
-            
-        </div>`;
-
-    return statusSymbol;
 }
 
 /********************************************************************* */

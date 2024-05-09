@@ -31,6 +31,34 @@ function per_pipe_per_partcode_4b(rows) {
                         cell.isEditable = true;
                     }
                 });
+
+                // Must valdate the Cells now
+                const cellType = cell.type;
+                const value = cell.value;
+                if (cellType === ORDER.id) {
+                    cell.status = createCell.validateOrder(value);
+                } else if (cellType === DESCRIPTION.id) {
+                    cell.status = createCell.validateDescription(value);
+                } else if (cellType === QUANTITY.id) {
+                    cell.status = createCell.validateQuantity(value);
+                } else if (cellType === UOM.id) {
+                    cell.status = createCell.validateUom(value);
+                } else if (cellType === DV.id) {
+                    cell.status = createCell.validateDvAmount(
+                        value,
+                        ingredientTypeObject
+                    );
+                } else if (cellType === SYMBOL.id) {
+                    cell.status = createCell.validateSymbol(
+                        value,
+                        ingredientTypeObject
+                    );
+                } else if (cellType === FOOT.id) {
+                    cell.status = createCell.validateFootnote(
+                        value,
+                        ingredientTypeObject
+                    );
+                }
             }
 
             // Check if the ingredient type is either LABEL_DATASET_NUTRIENT_A.name, LABEL_DATASET_INGREDIENTS_A.name, or LABEL_DATASET_OTHER_INGREDS_A.name

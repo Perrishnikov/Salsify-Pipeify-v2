@@ -204,23 +204,44 @@ button {
 [popover] {
     position: absolute;
     inset: unset;
-    width: fit-content;
-    height: fit-content;
-    margin: auto;
-    border: solid;
-    padding: calc(var(--padding-margin) / 2);
-    overflow: auto;
+    /* width: fit-content; */
+    /* height: fit-content; */
+    /* margin: auto; */
+    /* border: solid; */
+    /* padding: calc(var(--padding-margin) / 2); */
+    /* overflow: auto; */
     /* margin-top: 30px; */
 }
 :popover-open {
-    background-color: #333;
+    /* background-color: #333; */
     padding: calc(var(--padding-margin) / 2);
     font-size: var(--font-size);
     /* border-radius: calc(var(--padding-margin) / 2); */
-    border: 1px solid #000;
+    border: 0px solid #000;
     cursor: pointer;
-    margin-top: calc(var(--padding-margin) / 2);
-    translate: -16px;
+    /* margin-top: calc(var(--padding-margin) / 2); */
+    /* translate: 16px; */
+    translate: 30px;
+}
+
+.popover-menu:popover-open{
+    display: flex;
+    flex-direction: column;
+    padding: calc(var(--padding-margin) / 4);
+    background-color: #000;
+    border-radius: calc(var(--padding-margin) / 2);
+    /* align-items: center; */
+    justify-content: flex-start;
+}
+button.popover-menu-item{
+    /* background-color: #007bff; */
+    display: flex;
+    margin-bottom: 4px;
+    
+    /* margin-bottom: calc(var(--padding-margin) / 2); */
+}
+.popover-menu-item:last-child {
+    margin-bottom: 0;
 }
 
 .cell-value {

@@ -62,6 +62,7 @@ function createNutrientCells_RowValidation(pipes, rowStatus) {
 
     // Column 1: Order
     const orderCell = createCell.order({ value: order, isEditable: false });
+
     // Column 2: Description
     const descCell = createCell.description({
         value: coalesce(longDesc, shortDesc),
@@ -123,8 +124,7 @@ function createIngredientCells_RowValidation(pipes, rowStatus) {
     const dvAmt = pipes[5]?.trim() || '';
     const symbol = pipes[6]?.trim() || '';
     const foot = pipes[7]?.trim() || '';
-    const unknown8 = pipes[8].trim();
-
+    const unknown8 = pipes[8]?.trim() || '';
     // Column 1: Order
     const orderCell = createCell.order({
         value: order,

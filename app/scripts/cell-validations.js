@@ -129,7 +129,23 @@ class Tester {
         this.tests.push(test);
         return this;
     }
+    shouldNotBeParsedAsNumber() {
+        // Check if the trimmed value is not a number
+        const isNotNumber = isNaN(Number(this.trimmedValue));
+        let test = new Test();
 
+        if (isNotNumber) {
+            const message = `${this.trimmedValue} is not a number`;
+            test = new Test(true, message, this.trimmedValue);
+            this.failed = true;
+        }
+
+        
+        this.tests.push(test);
+
+        
+        return this;
+    }
     shouldBeLessThanLength() {
         let test = new Test();
         const length = this.trimmedValue.length;
@@ -274,9 +290,11 @@ const createCell = {
     validateDescription: (value) => {
         const status = new Status();
         const trimmedValue = value.toString().trim();
+        // console.log({ trimmedValue });
 
         const testForWarnings = new Tester(trimmedValue)
             .shouldNotBeEmpty()
+            // .shouldNotBeParsedAsNumber()
             .forEachFailure(status.addWarning.bind(status));
 
         return status;
