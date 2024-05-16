@@ -257,24 +257,25 @@ function handlePopoverMenuClick(e) {
     // Get the button that was clicked
     const button = e.target.closest('.popover-menu-item');
 
-    // // Determine the action based on the button's text content or another attribute
+    // Determine the action based on the button's text content or another attribute
     if (button) {
+        //OLD
         const [buttonId, index] = button.id.split('-');
-
+        // NEW
+        // const dataId = document.querySelector(`tr[data-id="${id}"]`);
+        const dataId = e.target.closest(`tr[data-id]`).dataset.id;
+        // console.log(dataId);
         // console.log(buttonId, index);
 
         // Perform actions based on button text
         if (buttonId === 'addAbove') {
-            addRowAbove(index);
+            addRowAbove(dataId);
         } else if (buttonId === 'addBelow') {
-            addRowBelow(index);
+            addRowBelow(dataId);
         } else if (buttonId === 'delete') {
-            deleteRow(index);
+            deleteRow(dataId);
         }
     }
-    const tableRow = e.target.closest('tr[data-id]');
-    const id = tableRow.dataset.id
-    console.log({tableRow, id});
 }
 
 /**
@@ -282,45 +283,85 @@ function handlePopoverMenuClick(e) {
  *
  * @param {number} index - The index at which to insert the new row.
  */
-function addRowAbove(index) {
-    // Get the local storage data
-    const jsonObject = getLocalStorage();
+function addRowAbove(dataId) {
+    // Get the table element by its ID
+    const table = document.getElementById('my-table');
 
-    // Process the option with the data
-    const rows = processOptionWithData(jsonObject, 'option4');
+    // Initialize an empty array to store the table data
+    const tableData = [];
 
-    // Get the HTML table element
-    const myTable = document.getElementById('my-table');
+    // Iterate over each row in the table
+    for (let i = 1; i < table.rows.length; i++) {
+        const rowData = [];
+        const row = table.rows[i];
 
-    // Check if the index is valid and within the bounds of the table
-    if (index > 0 && index <= myTable.rows.length) {
-        // Get the row data to copy
-        const rowToCopy = rows[index - 1];
+        // Iterate over each cell in the row
+        for (let j = 0; j < row.cells.length; j++) {
+            const cell = row.cells[j];
 
-        // Create a new table row from the row data
-        const tableRow = createTableRow(rowToCopy, createMenuPopover, rows.length + 1);
-
-        // Get the row at the specified index
-        const currentRow = myTable.rows[index];
-
-        // Insert the new row before the current row at the specified index
-        myTable.insertBefore(tableRow, currentRow);
-
-        // TODO: Need to update localStorage with the new row
-        // TODO: Need to use better indexing and ID's 
-        console.log({ rowToCopy, index });
-    } else {
-        console.error('Invalid index');
+            // Extract the text content of the cell and push it to the rowData array
+            if (cell.firstChild.cell) {
+                rowData.push(cell.firstChild.cell);
+            }
+        }
+        const dataId = row.dataset.id;
+        // console.log(dataId);
+        const tempRow = {};
+        tempRow[dataId] = rowData;
+        // Push the rowData array to the tableData array
+        tableData.push(tempRow);
     }
-}
 
+    // const rowIndex = tableData.findIndex((item) => item.id === dataId);
+
+    console.log(dataId);
+    // Now, tableData contains an array of arrays, where each inner array represents a row in the table
+    console.log(tableData);
+    // console.log(tableData);
+    // Function to find an object with a matching key
+    function findObjectByKey(array, key) {
+        // Use Array.prototype.find() to search for the object
+        return array.find((obj) => {
+            if (obj[key]) {
+                return obj;
+            }
+        });
+    }
+
+    // Usage example
+    const result = findObjectByKey(tableData, dataId);
+    console.log({ result });
+    //! do it here
+    // TODO: Copy the correct cells. create new Row
+    // TODO: Inset into new table
+    // TODO: verify that listeners still work.
+    // Check if the index is valid and within the bounds of the table
+    // if (index > 0 && index <= myTable.rows.length) {
+    //     // Get the row data to copy
+    //     const rowToCopy = rows[index - 1];
+
+    //     // Create a new table row from the row data
+    //     const tableRow = createTableRow(rowToCopy, createMenuPopover, rows.length + 1);
+
+    //     // Get the row at the specified index
+    //     const currentRow = myTable.rows[index];
+
+    //     // Insert the new row before the current row at the specified index
+    //     myTable.insertBefore(tableRow, currentRow);
+
+    //     // TODO: Need to update localStorage with the new row
+    //     // TODO: Need to use better indexing and ID's
+    //     console.log({ rowToCopy, index });
+    // } else {
+    //     console.error('Invalid index');
+    // }
+}
 
 /**
  * Function to add a row below the current row.
  */
 function addRowBelow(index) {
     console.log(`Adding a row below ${index}`);
-    // Add your logic to add a row below the current row
 }
 
 /**
@@ -365,7 +406,7 @@ function createMenuPopover(index) {
     <tr>
         <th></th>
     </tr>
-    <tr>
+    <tr data-id="alkwjra">
         //Menu
         <td data-custom="do-not-copy">
             <div id="pop-menu-div-#" class="cell-container">
@@ -409,15 +450,16 @@ function createMenuPopover(index) {
  * @param {string} id - The value of the `data-id` attribute to search for.
  * @returns {HTMLTableRowElement | null} - The table row element with the specified `data-id` attribute, or null if not found.
  */
-function getTableRowById(id) {
-    // Use the querySelector method to find the <tr> element with the specified data-id attribute
-    return document.querySelector(`tr[data-id="${id}"]`);
-}
+// function getTableRowById(id) {
+//     // Use the querySelector method to find the <tr> element with the specified data-id attribute
+//     return document.querySelector(`tr[data-id="${id}"]`);
+// }
 
 function createTableRow(rowData, headerCallback = null, index) {
-    console.log({ rowData });
     const tableRow = document.createElement('tr');
-    tableRow.dataset.id = rowData.id
+    tableRow.dataset.id = rowData.id;
+    // console.log({ rowData });
+    // console.log(rowData.id);
 
     // 1st Column added here
     if (headerCallback) {
@@ -501,6 +543,7 @@ function main_process(parsingOption) {
 
     // Clear any old table
     tableContainer.innerHTML = '';
+    // Give it the new data
     tableContainer.appendChild(myTable);
 
     attachBlurEventToTableCells(myTable);
