@@ -12,12 +12,6 @@ function option_0({ rows, columnNames, substitute_headers }) {
     // create an new Entity for each row of objects()
 
     rows.forEach((row) => {
-        // const rowStatus = new Status();
-        // basically hold anonymous object {0: Entity, 1: Entity}
-        // its a Cell and not Entity because the number of Cells in unknown
-        // each object needs to be able to return a KEY and VALUE to sheetsjs
-
-        // const cells = {};
         const cells = []
 
         columnNames.forEach((name, index) => {
@@ -47,7 +41,6 @@ function option_0({ rows, columnNames, substitute_headers }) {
 
         const newRow = new Row(cells);
         rowsOfCells.push(newRow);
-        // rowsOfCells.push(cells);
     });
 
     return rowsOfCells;

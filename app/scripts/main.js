@@ -231,6 +231,9 @@ function createPopover(type, content, index) {
  * @param {string} tableId - The ID of the table element (e.g., 'my-table').
  */
 function applyHandlePopoverMenuClickToTable(tableId) {
+    // Create a WeakSet to store buttons that already have the event listener attached
+    const buttonsWithListeners = new WeakSet();
+
     // Get the table element by its ID
     const table = document.getElementById(tableId);
 
@@ -241,7 +244,12 @@ function applyHandlePopoverMenuClickToTable(tableId) {
 
         // Attach the handlePopoverMenuClick function as a click event listener to each button
         buttons.forEach((button) => {
-            button.addEventListener('click', handlePopoverMenuClick);
+            // Check if the button already has the event listener
+            if (!buttonsWithListeners.has(button)) {
+                button.addEventListener('click', handlePopoverMenuClick);
+                // Add the button to the WeakSet
+                buttonsWithListeners.add(button);
+            }
         });
     } else {
         console.error(`Table with ID '${tableId}' not found.`);
@@ -259,102 +267,84 @@ function handlePopoverMenuClick(e) {
 
     // Determine the action based on the button's text content or another attribute
     if (button) {
-        //OLD
         const [buttonId, index] = button.id.split('-');
-        // NEW
-        // const dataId = document.querySelector(`tr[data-id="${id}"]`);
-        const dataId = e.target.closest(`tr[data-id]`).dataset.id;
-        // console.log(dataId);
+
+        const rowId = e.target.closest(`tr[data-row_id]`).dataset.row_id;
+        console.log(rowId);
         // console.log(buttonId, index);
 
         // Perform actions based on button text
         if (buttonId === 'addAbove') {
-            addRowAbove(dataId);
+            addRowAbove(rowId);
         } else if (buttonId === 'addBelow') {
-            addRowBelow(dataId);
+            addRowBelow(rowId);
         } else if (buttonId === 'delete') {
-            deleteRow(dataId);
+            deleteRow(rowId);
         }
     }
+
+    const popover = e.target.closest('[popover]')
+
+    popover.togglePopover()
 }
 
-/**
- * Appends a tableRow at the specified index within an HTML table.
- *
- * @param {number} index - The index at which to insert the new row.
- */
+
 function addRowAbove(dataId) {
-    // Get the table element by its ID
+    // //! parsing creates new ID;s
     const table = document.getElementById('my-table');
 
-    // Initialize an empty array to store the table data
-    const tableData = [];
+    /**@type {Row} */
+    // let newRow;
+    let rowIndex;
 
-    // Iterate over each row in the table
+    // Copy the whole table. Iterate over each row in the table
     for (let i = 1; i < table.rows.length; i++) {
-        const rowData = [];
         const row = table.rows[i];
+        const rowId = row.dataset.row_id;
 
-        // Iterate over each cell in the row
-        for (let j = 0; j < row.cells.length; j++) {
-            const cell = row.cells[j];
+        if (rowId === dataId) {
+            rowIndex = i;
+            /** @type {Cell[]} */
+            const newCells = [];
 
-            // Extract the text content of the cell and push it to the rowData array
-            if (cell.firstChild.cell) {
-                rowData.push(cell.firstChild.cell);
+            // Iterate over each cell in the row
+            for (let j = 0; j < row.cells.length; j++) {
+                const cell = row.cells[j].firstChild.cell;
+
+                // Extract the text content of the cell and push it to the rowData array
+                if (cell && cell instanceof Cell) {
+                    // console.log(cell);
+                    const newCell = cloneCell(cell);
+
+                    if (cell.isEditable === true) {
+                        newCell.value = '';
+                        newCell.isEditable = true;
+                    }
+                    newCells.push(newCell);
+                }
             }
+
+            newRow = new Row(newCells, generateRandomString(9));
+
+            continue;
         }
-        const dataId = row.dataset.id;
-        // console.log(dataId);
-        const tempRow = {};
-        tempRow[dataId] = rowData;
-        // Push the rowData array to the tableData array
-        tableData.push(tempRow);
     }
-
-    // const rowIndex = tableData.findIndex((item) => item.id === dataId);
-
-    console.log(dataId);
-    // Now, tableData contains an array of arrays, where each inner array represents a row in the table
-    console.log(tableData);
-    // console.log(tableData);
-    // Function to find an object with a matching key
-    function findObjectByKey(array, key) {
-        // Use Array.prototype.find() to search for the object
-        return array.find((obj) => {
-            if (obj[key]) {
-                return obj;
-            }
-        });
-    }
-
-    // Usage example
-    const result = findObjectByKey(tableData, dataId);
-    console.log({ result });
     //! do it here
-    // TODO: Copy the correct cells. create new Row
-    // TODO: Inset into new table
+    //* TODO: Copy the correct cells.
+    // TODO: create new Row
+    // TODO: Inset into new table []
+    // TODO: Create HTML table or append to existing....
     // TODO: verify that listeners still work.
-    // Check if the index is valid and within the bounds of the table
-    // if (index > 0 && index <= myTable.rows.length) {
-    //     // Get the row data to copy
-    //     const rowToCopy = rows[index - 1];
+    console.log(newRow);
+    const tableRow = createTableRow(newRow, createMenuPopover, 666);
+    console.log(tableRow);
 
-    //     // Create a new table row from the row data
-    //     const tableRow = createTableRow(rowToCopy, createMenuPopover, rows.length + 1);
+    if (rowIndex !== undefined) {
+        const targetRow = table.rows[rowIndex];
+        targetRow.parentNode.insertBefore(tableRow, targetRow);
 
-    //     // Get the row at the specified index
-    //     const currentRow = myTable.rows[index];
-
-    //     // Insert the new row before the current row at the specified index
-    //     myTable.insertBefore(tableRow, currentRow);
-
-    //     // TODO: Need to update localStorage with the new row
-    //     // TODO: Need to use better indexing and ID's
-    //     console.log({ rowToCopy, index });
-    // } else {
-    //     console.error('Invalid index');
-    // }
+        applyHandlePopoverMenuClickToTable('my-table');
+    }
 }
 
 /**
@@ -444,20 +434,9 @@ function createMenuPopover(index) {
 </table>
  */
 
-/**
- * Retrieves a table row (`<tr>`) with a specific `data-id` attribute.
- *
- * @param {string} id - The value of the `data-id` attribute to search for.
- * @returns {HTMLTableRowElement | null} - The table row element with the specified `data-id` attribute, or null if not found.
- */
-// function getTableRowById(id) {
-//     // Use the querySelector method to find the <tr> element with the specified data-id attribute
-//     return document.querySelector(`tr[data-id="${id}"]`);
-// }
-
 function createTableRow(rowData, headerCallback = null, index) {
     const tableRow = document.createElement('tr');
-    tableRow.dataset.id = rowData.id;
+    tableRow.dataset.row_id = rowData.id;
     // console.log({ rowData });
     // console.log(rowData.id);
 
@@ -534,7 +513,9 @@ function main_process(parsingOption) {
 
     //! Do it here
     rows.forEach((row, index) => {
+        // console.log(row);
         const tableRow = createTableRow(row, createMenuPopover, index + 1);
+        console.log('tableRow init', tableRow);
         myTable.appendChild(tableRow);
     });
 

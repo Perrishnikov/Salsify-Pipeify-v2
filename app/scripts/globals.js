@@ -1,5 +1,3 @@
-
-
 /**
  * Represents a substitution object.
  *
@@ -155,9 +153,12 @@ class Row {
 
     /** @type {string} */
     id;
-    constructor(cells, status = new Status()) {
+
+    constructor(cells, id = '', status = new Status()) {
         this.cells = cells;
-        this.id = generateRandomString(9)
+        // this.id = generateRandomString(9)
+        this.id = id;
+
         this.status = status;
     }
 }
@@ -218,16 +219,16 @@ function cloneCell(cell) {
  *
  * @param {Object} jsonObject - The JSON object to store.
  */
-function setLocalStorage(jsonObject) {
+function setLocalStorage(jsonObject, key = 'original_merged') {
     // Convert the JSON object to a JSON string using JSON.stringify()
     const jsonString = JSON.stringify(jsonObject);
 
     // Store the JSON string in localStorage under the given key
-    localStorage.setItem('original_merged', jsonString);
+    localStorage.setItem(key, jsonString);
 }
 
-function getLocalStorage() {
-    const jsonString = localStorage.getItem('original_merged');
+function getLocalStorage(key = 'original_merged') {
+    const jsonString = localStorage.getItem(key);
     const jsonObject = JSON.parse(jsonString);
     return jsonObject;
 }
@@ -258,9 +259,10 @@ function coalesce(value1, value2) {
  * @returns {string} - The randomly generated string.
  */
 function generateRandomString(length) {
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const characters =
+        'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     let randomString = '';
-    
+
     for (let i = 0; i < length; i++) {
         const randomIndex = Math.floor(Math.random() * characters.length);
         randomString += characters[randomIndex];

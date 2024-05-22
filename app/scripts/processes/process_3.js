@@ -276,8 +276,9 @@ function per_pipe_per_partcode_3(rows) {
                     // Add other cells to the new row
                     nonIngredientCells.push(...otherCells);
                 }
+                const row_id = generateRandomString(9)
                 // Add the processed new row to the array of ingredients rows
-                const newRow = new Row(nonIngredientCells, rowStatus);
+                const newRow = new Row(nonIngredientCells, row_id, rowStatus);
 
                 rowsOfIngredients.push(newRow);
             }

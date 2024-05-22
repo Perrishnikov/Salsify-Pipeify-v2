@@ -134,6 +134,9 @@ function salsify_preprocess(jsonData, parsingOption) {
 
     /** @type {SalsifyObject[]} */
     const mergedJsonData = salsify_mergeIngredients(nonSalsifyPropsOnly);
+
+    // add the row_id here
+    // mergedJsonData.map(item => item['PIPEIFY:row_id'] = generateRandomString(9))
     // console.log('mergedJsonData', mergedJsonData);
 
     setLocalStorage(mergedJsonData);

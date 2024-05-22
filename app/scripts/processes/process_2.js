@@ -38,7 +38,9 @@ function per_ingred_per_partcode_2(rows) {
 
                     // Add the ingredient Cell to the new row
                     rowForEachIngred.push(ingredientCell);
-                    const newRow = new Row(rowForEachIngred);
+                    const newRow = new Row(
+                        rowForEachIngred
+                    );
 
                     // Add the new row to the final array of rows
                     rowsOfIngredients.push(newRow);
