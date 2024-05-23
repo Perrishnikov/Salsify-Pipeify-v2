@@ -270,7 +270,7 @@ function handlePopoverMenuClick(e) {
         const [buttonId, index] = button.id.split('-');
 
         const rowId = e.target.closest(`tr[data-row_id]`).dataset.row_id;
-        console.log(rowId);
+        // console.log(rowId);
         // console.log(buttonId, index);
 
         // Perform actions based on button text
@@ -283,21 +283,25 @@ function handlePopoverMenuClick(e) {
         }
     }
 
-    const popover = e.target.closest('[popover]')
+    const popover = e.target.closest('[popover]');
 
-    popover.togglePopover()
+    popover.togglePopover();
 }
 
-
+//! do it here
+//* TODO: Copy the correct cells.
+// TODO: create new Row
+// TODO: Inset into new table []
+// TODO: Create HTML table or append to existing....
+// TODO: verify that listeners still work.
 function addRowAbove(dataId) {
     // //! parsing creates new ID;s
     const table = document.getElementById('my-table');
 
     /**@type {Row} */
-    // let newRow;
     let rowIndex;
 
-    // Copy the whole table. Iterate over each row in the table
+    // Find Row and copy it.
     for (let i = 1; i < table.rows.length; i++) {
         const row = table.rows[i];
         const rowId = row.dataset.row_id;
@@ -326,22 +330,23 @@ function addRowAbove(dataId) {
 
             newRow = new Row(newCells, generateRandomString(9));
 
-            continue;
+            break;
         }
     }
-    //! do it here
-    //* TODO: Copy the correct cells.
-    // TODO: create new Row
-    // TODO: Inset into new table []
-    // TODO: Create HTML table or append to existing....
-    // TODO: verify that listeners still work.
-    console.log(newRow);
-    const tableRow = createTableRow(newRow, createMenuPopover, 666);
-    console.log(tableRow);
+
+    // console.log(newRow);
+    const tableRow = createTableRow(newRow, createMenuPopover);
+    // console.log(tableRow);
 
     if (rowIndex !== undefined) {
         const targetRow = table.rows[rowIndex];
+
+        
         targetRow.parentNode.insertBefore(tableRow, targetRow);
+
+        //TODO:  insertAfter()
+        //TODO: is index required, or can/should use ID
+        //TODO: Only show popover if parsing option 4
 
         applyHandlePopoverMenuClickToTable('my-table');
     }
@@ -362,26 +367,26 @@ function deleteRow(index) {
     // Add your logic to delete the current row
 }
 
-function createMenuPopover(index) {
+function createMenuPopover(rowId) {
     const td = document.createElement('td');
     td.setAttribute('data-custom', 'do-not-copy');
     td.innerHTML = `
     
-    <div class="cell-container" id="pop-menu-div-${index}">
-        <button class="icon" popovertarget="pop-menu-open-${index}">
+    <div class="cell-container" id="pop-menu-div-${rowId}">
+        <button class="icon" popovertarget="pop-menu-open-${rowId}">
             <span class="material-symbols-outlined">menu_open</span>
         </button>
 
-        <div class="popover-menu" id="pop-menu-open-${index}" popover anchor="pop-menu-div-${index}">
+        <div class="popover-menu" id="pop-menu-open-${rowId}" popover anchor="pop-menu-div-${rowId}">
             
-            <button class="popover-menu-item" id="addAbove-${index}" type="button">
-                <span class="material-symbols-outlined">add</span> Add Row Above ${index}
+            <button class="popover-menu-item" id="addAbove-${rowId}" type="button">
+                <span class="material-symbols-outlined">add</span> Add Row Above
             </button>
-            <button class="popover-menu-item" id="addBelow-${index}" type="button">
-                <span class="material-symbols-outlined">add</span> Add Row Below ${index}
+            <button class="popover-menu-item" id="addBelow-${rowId}" type="button">
+                <span class="material-symbols-outlined">add</span> Add Row Below
             </button>
-            <button class="popover-menu-item" id="delete-${index}" type="button">
-                <span class="material-symbols-outlined">delete</span> Delete Row ${index}
+            <button class="popover-menu-item" id="delete-${rowId}" type="button">
+                <span class="material-symbols-outlined">delete</span> Delete Row
             </button>
         </div>
     </div>
@@ -442,7 +447,7 @@ function createTableRow(rowData, headerCallback = null, index) {
 
     // 1st Column added here
     if (headerCallback) {
-        tableRow.appendChild(headerCallback(index));
+        tableRow.appendChild(headerCallback(rowData.id));
     }
 
     // Data columns
@@ -500,8 +505,12 @@ function main_process(parsingOption) {
     const headerRow = document.createElement('tr');
 
     //* For Popover Menu
-    const menuHeader = document.createElement('th');
-    headerRow.appendChild(menuHeader);
+    //TODO: cleanup hardcoded option4
+    if (parsingOption === 'option4') {
+        
+        const menuHeader = document.createElement('th');
+        headerRow.appendChild(menuHeader);
+    }
 
     // Add other headers
     rows[0].cells.forEach((cell) => {
@@ -511,11 +520,18 @@ function main_process(parsingOption) {
     });
     myTable.appendChild(headerRow);
 
-    //! Do it here
+    //TODO: cleanup hardcoded option4
     rows.forEach((row, index) => {
         // console.log(row);
-        const tableRow = createTableRow(row, createMenuPopover, index + 1);
-        console.log('tableRow init', tableRow);
+        let tableRow;
+        if (parsingOption === 'option4') {
+            tableRow = createTableRow(
+                row,
+                createMenuPopover
+            );
+        } else {
+            tableRow = createTableRow(row, null);
+        }
         myTable.appendChild(tableRow);
     });
 
