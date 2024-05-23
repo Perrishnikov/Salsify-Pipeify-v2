@@ -208,21 +208,6 @@ function processOptionWithData(mergedJsonData, parsingOption) {
 }
 
 /** MAIN ****************************************************************/
-function createPopover(type, content, index) {
-    const statusSymbol = `
-        <div id="pop-div-${(type, index)}">
-            <button class="icon" popovertarget="pop-row-${(type, index)}">
-            <span class="material-symbols-outlined" role="button" >${type}</span>
-            </button>
-            <div id="pop-row-${(type, index)}" popover anchor="pop-div-${
-        (type, index)
-    }">
-                ${content}
-            </div>
-        </div>`;
-
-    return statusSymbol;
-}
 
 /**
  * Attaches the handlePopoverMenuClick function to each button with the class
@@ -230,7 +215,7 @@ function createPopover(type, content, index) {
  *
  * @param {string} tableId - The ID of the table element (e.g., 'my-table').
  */
-function applyHandlePopoverMenuClickToTable(tableId) {
+function applyHandlePopoverMenuClickToTable(tableId = 'my-table') {
     // Create a WeakSet to store buttons that already have the event listener attached
     const buttonsWithListeners = new WeakSet();
 
@@ -257,7 +242,7 @@ function applyHandlePopoverMenuClickToTable(tableId) {
 }
 
 /**
- * Callback function to handle button clicks in the popover-menu.
+ * Handles the click event on popover menu items.
  *
  * @param {Event} e - The click event object.
  */
@@ -265,111 +250,150 @@ function handlePopoverMenuClick(e) {
     // Get the button that was clicked
     const button = e.target.closest('.popover-menu-item');
 
-    // Determine the action based on the button's text content or another attribute
     if (button) {
+        // Extract button ID and index from the button's ID attribute
         const [buttonId, index] = button.id.split('-');
 
-        const rowId = e.target.closest(`tr[data-row_id]`).dataset.row_id;
-        // console.log(rowId);
-        // console.log(buttonId, index);
+        // Find the row ID from the closest parent <tr> element with the data-row_id attribute
+        const targetRow = e.target.closest('tr[data-row_id]');
+        const rowIdFromDom = targetRow ? targetRow.dataset.row_id : null;
 
-        // Perform actions based on button text
-        if (buttonId === 'addAbove') {
-            addRowAbove(rowId);
-        } else if (buttonId === 'addBelow') {
-            addRowBelow(rowId);
-        } else if (buttonId === 'delete') {
-            deleteRow(rowId);
+        // Get the table element
+        const table = document.getElementById('my-table');
+        if (!rowIdFromDom || !table) {
+            //TODO: Toast this
+            console.error('Target row or table not found.');
+            return;
         }
-    }
 
-    const popover = e.target.closest('[popover]');
+        /**@type {Row} */
+        let rowIndex;
 
-    popover.togglePopover();
-}
+        if (buttonId === 'addAbove' || buttonId === 'addBelow') {
+            // Loop through table rows to find the target row by its data-row_id
+            for (let i = 1; i < table.rows.length; i++) {
+                const row = table.rows[i];
+                const rowId = row.dataset.row_id;
 
-//! do it here
-//* TODO: Copy the correct cells.
-// TODO: create new Row
-// TODO: Inset into new table []
-// TODO: Create HTML table or append to existing....
-// TODO: verify that listeners still work.
-function addRowAbove(dataId) {
-    // //! parsing creates new ID;s
-    const table = document.getElementById('my-table');
+                if (rowId === rowIdFromDom) {
+                    rowIndex = i;
+                    const newCells = [];
 
-    /**@type {Row} */
-    let rowIndex;
+                    // console.log(row);
+                    let ingredientType = Array.from(row.cells)
+                        .map((cell) => {
+                            // console.log(cell.children[0]);
+                            if (
+                                cell.children[0].cell &&
+                                cell.children[0].cell.type ===
+                                    INGREDIENT_TYPE.id
+                            ) {
+                                return cell.children[0].cell.value;
+                            }
+                        })
+                        .filter((item) => item !== undefined)[0];
+                    console.log({ cellType: ingredientType });
 
-    // Find Row and copy it.
-    for (let i = 1; i < table.rows.length; i++) {
-        const row = table.rows[i];
-        const rowId = row.dataset.row_id;
+                    // Copy cells from the target row to create a new row
+                    for (let j = 0; j < row.cells.length; j++) {
+                        const cellContainer = row.cells[j].firstChild;
+                        const cell = cellContainer ? cellContainer.cell : null;
 
-        if (rowId === dataId) {
-            rowIndex = i;
-            /** @type {Cell[]} */
-            const newCells = [];
+                        // ! Validate here
+                        if (cell && cell instanceof Cell) {
+                            // const newCell = cloneEmptyCell(cell);
+                            let newCell;
+                            // If the cell is editable, reset its value
+                            if (cell.isEditable === true) {
+                                newCell = cloneEmptyCell(cell);
+                                newCell.value = '';
+                                // console.log(cell);
+                                if (cell.type === ORDER.id) {
+                                    newCell.status =
+                                        createCell.validateOrder('');
+                                } else if (cell.type === DESCRIPTION.id) {
+                                    newCell.status =
+                                        createCell.validateDescription('');
+                                } else if (cell.type === QUANTITY.id) {
+                                    newCell.status =
+                                        createCell.validateQuantity('');
+                                } else if (cell.type === UOM.id) {
+                                    newCell.status = createCell.validateUom('');
+                                } else if (cell.type === DV.id) {
+                                    //TODO: New Ingredient DV is not validating. 
+                                    //Need to pass ingredient type to constructor
+                                    newCell.status =
+                                        createCell.validateDvAmount(
+                                            '',
+                                            ingredientType
+                                        );
+                                }
+                                //defaults to false
+                                // newCell.isEditable = true;
+                            } else {
+                                newCell = cloneCell(cell);
+                            }
 
-            // Iterate over each cell in the row
-            for (let j = 0; j < row.cells.length; j++) {
-                const cell = row.cells[j].firstChild.cell;
-
-                // Extract the text content of the cell and push it to the rowData array
-                if (cell && cell instanceof Cell) {
-                    // console.log(cell);
-                    const newCell = cloneCell(cell);
-
-                    if (cell.isEditable === true) {
-                        newCell.value = '';
-                        newCell.isEditable = true;
+                            newCells.push(newCell);
+                        }
                     }
-                    newCells.push(newCell);
+
+                    const newRow = new Row(newCells, generateRandomString(9));
+                    const tableRow = createTableRow(newRow, createMenuPopover);
+
+                    // Insert the new row above or below the target row
+                    if (buttonId === 'addAbove') {
+                        targetRow.parentNode.insertBefore(tableRow, targetRow);
+                    } else if (buttonId === 'addBelow') {
+                        if (targetRow.nextSibling) {
+                            targetRow.parentNode.insertBefore(
+                                tableRow,
+                                targetRow.nextSibling
+                            );
+                        } else {
+                            targetRow.parentNode.appendChild(tableRow);
+                        }
+                    }
+
+                    // Reapply event listeners to the table
+                    applyHandlePopoverMenuClickToTable();
+
+                    // Toggle the popover if it exists
+                    const popover = e.target.closest('[popover]');
+                    if (popover) {
+                        popover.togglePopover();
+                    }
+                    break;
+                }
+            }
+        } else if (buttonId === 'delete') {
+            // Loop through table rows to find the target row by its data-row_id and delete it
+            for (let i = 1; i < table.rows.length; i++) {
+                const row = table.rows[i];
+                const rowId = row.dataset.row_id;
+
+                if (rowId === rowIdFromDom) {
+                    rowIndex = i;
+                    break;
                 }
             }
 
-            newRow = new Row(newCells, generateRandomString(9));
-
-            break;
+            if (rowIndex !== undefined) {
+                table.deleteRow(rowIndex);
+            }
         }
     }
-
-    // console.log(newRow);
-    const tableRow = createTableRow(newRow, createMenuPopover);
-    // console.log(tableRow);
-
-    if (rowIndex !== undefined) {
-        const targetRow = table.rows[rowIndex];
-
-        
-        targetRow.parentNode.insertBefore(tableRow, targetRow);
-
-        //TODO:  insertAfter()
-        //TODO: is index required, or can/should use ID
-        //TODO: Only show popover if parsing option 4
-
-        applyHandlePopoverMenuClickToTable('my-table');
-    }
 }
 
 /**
- * Function to add a row below the current row.
+ * Creates a menu popover element for a table row with given ID.
+ *
+ * @param {string} rowId - The ID of the row for which the popover menu is created.
+ * @returns {HTMLTableCellElement} The table cell containing the popover menu.
  */
-function addRowBelow(index) {
-    console.log(`Adding a row below ${index}`);
-}
-
-/**
- * Function to delete the current row.
- */
-function deleteRow(index) {
-    console.log(`Deleted row ${index}`);
-    // Add your logic to delete the current row
-}
-
 function createMenuPopover(rowId) {
     const td = document.createElement('td');
-    td.setAttribute('data-custom', 'do-not-copy');
+    // td.setAttribute('data-custom', 'do-not-copy');
     td.innerHTML = `
     
     <div class="cell-container" id="pop-menu-div-${rowId}">
@@ -401,9 +425,9 @@ function createMenuPopover(rowId) {
     <tr>
         <th></th>
     </tr>
-    <tr data-id="alkwjra">
+    <tr data-row_id="alkwjra">
         //Menu
-        <td data-custom="do-not-copy">
+        <td>
             <div id="pop-menu-div-#" class="cell-container">
                 <button class="icon" popovertarget="menu-open">
                     <span>menu_open</span>
@@ -439,18 +463,26 @@ function createMenuPopover(rowId) {
 </table>
  */
 
+/**
+ * Creates a table row element from the provided row data.
+ *
+ * @param {Object} rowData - The data for the new row.
+ * @param {Array<Cell>} rowData.cells - Array of cell data objects.
+ * @param {string} rowData.id - The ID for the row.
+ * @param {Function} [headerCallback=null] - Optional callback function to create the header cell.
+ * @param {number} index - The index of the row.
+ * @returns {HTMLTableRowElement} The created table row element.
+ */
 function createTableRow(rowData, headerCallback = null, index) {
     const tableRow = document.createElement('tr');
     tableRow.dataset.row_id = rowData.id;
-    // console.log({ rowData });
-    // console.log(rowData.id);
 
-    // 1st Column added here
+    // Add header cell if headerCallback is provided
     if (headerCallback) {
         tableRow.appendChild(headerCallback(rowData.id));
     }
 
-    // Data columns
+    // Add data cells
     rowData.cells.forEach((cell, cellIndex) => {
         const td = document.createElement('td');
         const cellContainer = document.createElement('div');
@@ -458,9 +490,10 @@ function createTableRow(rowData, headerCallback = null, index) {
         cellContainer.cell = cell;
         td.appendChild(cellContainer);
 
-        // use the same method as blur to apply errors
+        // Apply errors to the cell container
         addErrorsToDom(cell.status, cellContainer.classList);
 
+        // Set the cell content based on its editable status
         if (cell.isEditable) {
             cellContainer.innerHTML = `
                 <span class="chevron-icon">▶</span>
@@ -475,6 +508,7 @@ function createTableRow(rowData, headerCallback = null, index) {
                 </span>
             `;
         }
+
         tableRow.appendChild(td);
     });
 
@@ -507,7 +541,6 @@ function main_process(parsingOption) {
     //* For Popover Menu
     //TODO: cleanup hardcoded option4
     if (parsingOption === 'option4') {
-        
         const menuHeader = document.createElement('th');
         headerRow.appendChild(menuHeader);
     }
@@ -521,14 +554,11 @@ function main_process(parsingOption) {
     myTable.appendChild(headerRow);
 
     //TODO: cleanup hardcoded option4
-    rows.forEach((row, index) => {
+    rows.forEach((row) => {
         // console.log(row);
         let tableRow;
         if (parsingOption === 'option4') {
-            tableRow = createTableRow(
-                row,
-                createMenuPopover
-            );
+            tableRow = createTableRow(row, createMenuPopover);
         } else {
             tableRow = createTableRow(row, null);
         }
@@ -545,7 +575,7 @@ function main_process(parsingOption) {
 
     attachBlurEventToTableCells(myTable);
 
-    applyHandlePopoverMenuClickToTable('my-table');
+    applyHandlePopoverMenuClickToTable();
 }
 
 /** BLUR Validations *********************************************************/
@@ -579,7 +609,7 @@ function getIngredientTypeFromDom(target) {
         .map((cell) => {
             if (
                 cell.firstChild.cell &&
-                cell.firstChild.cell.type === 'INGREDIENT_TYPE'
+                cell.firstChild.cell.type === INGREDIENT_TYPE.id
             ) {
                 return cell;
             }

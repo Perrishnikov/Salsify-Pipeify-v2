@@ -359,12 +359,12 @@ const createCell = {
         return status;
     },
     //DVAMT
-    dvAmount: ({ value, isEditable = true }) => {
+    dvAmount: ({ value, isEditable = true, ingredType = '' }) => {
         const dvAmtCell = new Cell({
             value: value,
             type: DV.id,
             status: isEditable
-                ? createCell.validateDvAmount(value)
+                ? createCell.validateDvAmount(value, ingredType)
                 : new Status(),
             header: new Header({
                 id: DV.id,
@@ -374,7 +374,7 @@ const createCell = {
         });
         return dvAmtCell;
     },
-    validateDvAmount: (value, ingredType = '') => {
+    validateDvAmount: (value, ingredType) => {
         const status = new Status();
         const trimmedValue = value.toString().trim();
         // const charsToRemove = ['**', '<', ','];
@@ -392,7 +392,7 @@ const createCell = {
                 .forEachFailure(status.addWarning.bind(status));
         } else if (ingredType === LABEL_DATASET_INGREDIENTS_A.name) {
             const testForWarnings = new Tester(trimmedValue)
-                .shouldNotBeEmpty()
+                // .shouldNotBeEmpty()
                 .shouldBeEmpty()
                 .forEachFailure(status.addWarning.bind(status));
         }
@@ -400,12 +400,12 @@ const createCell = {
         return status;
     },
     //SYMBOL
-    symbol: ({ value, isEditable = true }) => {
+    symbol: ({ value, isEditable = true, ingredType = '' }) => {
         const symbolCell = new Cell({
             value: value,
             type: SYMBOL.id,
             status: isEditable
-                ? createCell.validateSymbol(value)
+                ? createCell.validateSymbol(value, ingredType)
                 : new Status(),
             header: new Header({
                 id: SYMBOL.id,
@@ -415,7 +415,7 @@ const createCell = {
         });
         return symbolCell;
     },
-    validateSymbol: (value, ingredType = '') => {
+    validateSymbol: (value, ingredType) => {
         const status = new Status();
         const trimmedValue = value.toString().trim();
 
@@ -431,12 +431,12 @@ const createCell = {
         return status;
     },
     //FOOTNOTE
-    footnote: ({ value, isEditable = true }) => {
+    footnote: ({ value, isEditable = true, ingredType = '' }) => {
         const footnoteCell = new Cell({
             value: value,
             type: FOOT.id,
             status: isEditable
-                ? createCell.validateFootnote(value)
+                ? createCell.validateFootnote(value, ingredType)
                 : new Status(),
             header: new Header({
                 id: FOOT.id,
@@ -456,8 +456,7 @@ const createCell = {
             const testForErrors = new Tester(trimmedValue)
                 .shouldBeValidFootnote_Nutrient()
                 .forEachFailure(status.addWarning.bind(status));
-        }
-        else if (ingredType === LABEL_DATASET_INGREDIENTS_A.name) {
+        } else if (ingredType === LABEL_DATASET_INGREDIENTS_A.name) {
             const testForWarnings = new Tester(trimmedValue)
                 .shouldBeEmpty()
                 .forEachFailure(status.addWarning.bind(status));

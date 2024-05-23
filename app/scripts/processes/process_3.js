@@ -70,13 +70,19 @@ function createNutrientCells_RowValidation(pipes, rowStatus) {
     });
     // Column 3: Quantity
     const qtyCell = createCell.quantity({ value: qty, isEditable: false });
-    // Column 4: Unit of Measure
+    // Column 4: Unit of Measure (dont validate cells here)
     const uomCell = createCell.uom({ value: uom, isEditable: false });
-    // Column 5: Daily Value
-    const dvAmtCell = createCell.dvAmount({ value: dvAmt, isEditable: false });
-    // Column 6: Symbol
-    const symbolCell = createCell.symbol({ value: symbol, isEditable: false });
-    // Column 7: Footnote
+    // Column 5: Daily Valuem (dont validate cells here)
+    const dvAmtCell = createCell.dvAmount({
+        value: dvAmt,
+        isEditable: false,
+    });
+    // Column 6: Symbol (dont validate cells here)
+    const symbolCell = createCell.symbol({
+        value: symbol,
+        isEditable: false,
+    });
+    // Column 7: Footnote (dont validate cells here)
     const footnoteCell = createCell.footnote({
         value: foot,
         isEditable: false,

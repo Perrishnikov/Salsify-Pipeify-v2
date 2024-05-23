@@ -35,6 +35,7 @@ function per_pipe_per_partcode_4b(rows) {
                 // Must valdate the Cells now
                 const cellType = cell.type;
                 const value = cell.value;
+                
                 if (cellType === ORDER.id) {
                     cell.status = createCell.validateOrder(value);
                 } else if (cellType === DESCRIPTION.id) {
@@ -46,17 +47,17 @@ function per_pipe_per_partcode_4b(rows) {
                 } else if (cellType === DV.id) {
                     cell.status = createCell.validateDvAmount(
                         value,
-                        ingredientTypeObject
+                        ingredientTypeObject.value
                     );
                 } else if (cellType === SYMBOL.id) {
                     cell.status = createCell.validateSymbol(
                         value,
-                        ingredientTypeObject
+                        ingredientTypeObject.value
                     );
                 } else if (cellType === FOOT.id) {
                     cell.status = createCell.validateFootnote(
                         value,
-                        ingredientTypeObject
+                        ingredientTypeObject.value
                     );
                 }
             }

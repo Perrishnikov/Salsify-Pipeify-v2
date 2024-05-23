@@ -211,6 +211,19 @@ function cloneCell(cell) {
             id: cell.header.id,
             name: cell.header.name,
         }),
+        isEditable: cell.isEditable,
+    });
+}
+
+function cloneEmptyCell(cell) {
+    return new Cell({
+        value: cell.value,
+        type: cell.type,
+        header: new Header({
+            id: cell.header.id,
+            name: cell.header.name,
+        }),
+        isEditable: cell.isEditable,
     });
 }
 
