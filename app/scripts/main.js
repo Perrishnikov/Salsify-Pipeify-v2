@@ -292,7 +292,7 @@ function handlePopoverMenuClick(e) {
                             }
                         })
                         .filter((item) => item !== undefined)[0];
-                    console.log({ cellType: ingredientType });
+                    // console.log({ cellType: ingredientType });
 
                     // Copy cells from the target row to create a new row
                     for (let j = 0; j < row.cells.length; j++) {
@@ -320,7 +320,7 @@ function handlePopoverMenuClick(e) {
                                 } else if (cell.type === UOM.id) {
                                     newCell.status = createCell.validateUom('');
                                 } else if (cell.type === DV.id) {
-                                    //TODO: New Ingredient DV is not validating. 
+                                    //TODO: New Ingredient DV is not validating.
                                     //Need to pass ingredient type to constructor
                                     newCell.status =
                                         createCell.validateDvAmount(
@@ -527,13 +527,13 @@ function main_process(parsingOption) {
     myTable.setAttribute('id', 'my-table');
 
     // Check if any Row has a status
-    let rowHasMessages = false;
-    for (const row of rows) {
-        if (row.status && row.status.hasMessages) {
-            rowHasMessages = true;
-            break;
-        }
-    }
+    // let rowHasMessages = false;
+    // for (const row of rows) {
+    //     if (row.status && row.status.hasMessages) {
+    //         rowHasMessages = true;
+    //         break;
+    //     }
+    // }
 
     // Add the table header if rows are present and if there is any status
     const headerRow = document.createElement('tr');
@@ -640,11 +640,14 @@ function attachBlurEventToTableCells(table) {
             // Clean empty cells
             e.target.innerText = e.target.innerText.trim();
             const innerText = e.target.innerText;
+            //Set the cell value so it exports
+            cell.value = innerText;
             // console.log(e.target);
             const ingredValue = getIngredientTypeFromDom(e.target);
             // console.log({ ingredValue });
             let status = null;
 
+            //TODO: Verify that these are validating as expected
             if (cellType === ORDER.id) {
                 status = createCell.validateOrder(innerText);
             } else if (cellType === DESCRIPTION.id) {
@@ -707,17 +710,11 @@ function attachBlurEventToTableCells(table) {
 function preprocess_export_file(parsingOption) {
     //TODO: Unsubstitute Headers for reimport function
     // Get the table element
+    // TODO: change hard-code
     const myTable = document.getElementById('my-table');
 
     // Initialize an array to hold the data
-    const data = [];
-
-    // Get the table headers
-    const headers = Array.from(myTable.querySelectorAll('th')).map(
-        (th) => th.textContent
-    );
-    //TODO: Unsubstitute here
-    data.push(headers);
+    const tableData = [];
 
     // Get the table rows
     const rows = myTable.querySelectorAll('tr');
@@ -727,25 +724,29 @@ function preprocess_export_file(parsingOption) {
         // Skip the header row
         if (rowIndex === 0) return;
 
-        // Initialize an array to hold the row data
-        const rowData = [];
+        // console.log(row);
+        let exportObj = {};
 
-        // Get the cells in the row
-        const cells = row.querySelectorAll('.cell-value');
+        Array.from(row.cells).forEach((cell) => {
+            const cellContainer = cell.firstChild;
+            /** @type {Cell} */
+            const cellData = cellContainer ? cellContainer.cell : undefined;
+            // console.log(cellData);
+            if (cellData !== undefined) {
+                const name = cellData.header.name;
 
-        // Iterate over each cell
-        cells.forEach((cell) => {
-            // Add the cell value to the row data
-            rowData.push(cell.textContent);
+                exportObj[name] = cellData.value;
+            } else {
+                //     //TODO: Toast this?
+            }
         });
-
-        // Add the row data to the data
-        data.push(rowData);
+        tableData.push(exportObj);
     });
 
-    xlsx_exportWYSIWYG(data);
+    console.log(tableData);
+    xlsx_exportWYSIWYG(tableData);
 
-    if (parsingOption !== 'option4') {
-        showToast(`Data is not validated`, 'warning');
-    }
+    // if (parsingOption !== 'option4') {
+    //     showToast(`Data is not validated`, 'warning');
+    // }
 }

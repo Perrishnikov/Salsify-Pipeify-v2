@@ -203,8 +203,38 @@ async function xlsx_import_file(file, parsingOption) {
 
 /** EXPORT *************************************************** */
 function xlsx_exportWYSIWYG(data) {
-    const worksheet = XLSX.utils.aoa_to_sheet(data);
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    // Function to calculate the width of each column
+    const calculateAutoWidths = (data, specificWidths = {}) => {
+        const headers = Object.keys(data[0]);
+        const maxLengths = headers.map((header) => header.length);
 
+        data.forEach((row) => {
+            headers.forEach((header, colIndex) => {
+                const value = row[header];
+                const contentLength = value ? value.toString().length : 0;
+                maxLengths[colIndex] = Math.max(
+                    maxLengths[colIndex],
+                    contentLength
+                );
+            });
+        });
+
+        return headers.map((header, index) =>
+            specificWidths[header]
+                ? { wch: specificWidths[header] }
+                : { wch: maxLengths[index] + 2 }
+        );
+    };
+
+    // Set specific widths for columns by header name
+    const specificWidths = {
+        Description: 50, // Set width for the "Description" column
+        // 'Product ID': 25, // Set width for the "Product ID" column
+    };
+
+    // Set auto widths for the columns, with specific widths for certain columns
+    worksheet['!cols'] = calculateAutoWidths(data, specificWidths);
     const workbook = XLSX.utils.book_new();
 
     workbook.Props = {
@@ -216,5 +246,6 @@ function xlsx_exportWYSIWYG(data) {
 
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
 
-    XLSX.writeFile(workbook, 'Pipeify.xlsx');
+    XLSX.writeFile(workbook, 'Pipeify (customer export).xlsx');
+
 }
