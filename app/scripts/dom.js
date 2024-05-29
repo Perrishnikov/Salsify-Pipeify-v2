@@ -110,7 +110,7 @@ if (button_current_table) {
     button_current_table.addEventListener('click', (e) => {
         const parsingOption = getCheckedRadioButtonId();
 
-        preprocess_export_file(parsingOption);
+        process_wysiwyg_export(parsingOption);
     });
 }
 
@@ -120,7 +120,10 @@ const button_salsify_reimport = document.getElementById(
 );
 if (button_salsify_reimport) {
     button_salsify_reimport.addEventListener('click', (e) => {
-        console.log(`download-for-salsify-btn`);
+        // console.log(`download-for-salsify-btn`);
+        const parsingOption = getCheckedRadioButtonId();
+
+        process_reimport_salsify(parsingOption)
     });
 }
 

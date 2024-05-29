@@ -579,6 +579,12 @@ function main_process(parsingOption) {
 }
 
 /** BLUR Validations *********************************************************/
+/**
+ * Adds or removes error and warning classes to a cell's parent class list based on the status object.
+ *
+ * @param {Status} status - The status object containing error and warning information.
+ * @param {DOMTokenList} parentClasslist - The class list of the cell's parent element.
+ */
 function addErrorsToDom(status, parentClasslist) {
     // console.log({ status });
     // console.dir(parentClasslist);
@@ -627,9 +633,7 @@ function getIngredientTypeFromDom(target) {
  * @param {HTMLTableElement} table - The HTML table element to monitor for blur events on its cells.
  */
 function attachBlurEventToTableCells(table) {
-    // console.log(`attachBlurEventToTableCells`);
     // Define a named event handler function
-
     function handleBlurEvent(e) {
         /** @type {Cell} */
         const cell = e.target.parentElement.cell || null;
@@ -642,9 +646,9 @@ function attachBlurEventToTableCells(table) {
             const innerText = e.target.innerText;
             //Set the cell value so it exports
             cell.value = innerText;
-            // console.log(e.target);
+
             const ingredValue = getIngredientTypeFromDom(e.target);
-            // console.log({ ingredValue });
+            /**@type {Status} */
             let status = null;
 
             //TODO: Verify that these are validating as expected
@@ -707,8 +711,7 @@ function attachBlurEventToTableCells(table) {
 }
 
 /********************************************************************* */
-function preprocess_export_file(parsingOption) {
-    //TODO: Unsubstitute Headers for reimport function
+function process_wysiwyg_export(parsingOption) {
     // Get the table element
     // TODO: change hard-code
     const myTable = document.getElementById('my-table');
@@ -749,4 +752,280 @@ function preprocess_export_file(parsingOption) {
     // if (parsingOption !== 'option4') {
     //     showToast(`Data is not validated`, 'warning');
     // }
+}
+
+/**
+ * Process reimport of Salsify data.
+ *
+ * @param {string} parsingOption - The parsing option for reimport.
+ */
+function process_reimport_salsify(parsingOption) {
+    // TODO: Unsubstitute Headers for reimport function
+    // TODO: change hard-code
+    const myTable = document.getElementById('my-table');
+
+    // Initialize an array to hold the data
+    const tableData = [];
+
+    // Get the table rows
+    const rows = myTable.querySelectorAll('tr');
+
+    const mergedValues = [
+        ORDER.id,
+        DESCRIPTION.id,
+        QUANTITY.id,
+        UOM.id,
+        DV.id,
+        SYMBOL.id,
+        FOOT.id,
+    ];
+    //! get unique Product ID's, one per row
+    // const uniqueProductIds = new Set();
+    // // Product ID
+    // rows.forEach((row, rowIndex) => {
+    //     // Skip the header row
+    //     if (rowIndex === 0) return;
+
+    //     Array.from(row.cells).forEach((cell) => {
+    //         const cellContainer = cell.firstChild;
+    //         /** @type {Cell} */
+    //         const cellData = cellContainer ? cellContainer.cell : undefined;
+
+    //         if (cellData?.header.id === 'Product ID') {
+    //             // console.log(cellData);
+    //             uniqueProductIds.add(cellData.value);
+    //         }
+    //     });
+    // });
+
+    // const uniqueIngredTypes = new Set();
+
+    // rows.forEach((row, rowIndex) => {
+    //     // Skip the header row
+    //     if (rowIndex === 0) return;
+
+    //     Array.from(row.cells).forEach((cell) => {
+    //         const cellContainer = cell.firstChild;
+    //         /** @type {Cell} */
+    //         const cellData = cellContainer ? cellContainer.cell : undefined;
+
+    //         console.log(rowIndex, cellData);
+    //         if (cellData?.header.id === INGREDIENT_TYPE.id) {
+    //             // return cell.children[0].cell.value;
+    //             // uniqueIngredTypes.add(cell.children[0].cell.value);
+    //             uniqueIngredTypes.add(cellData.value);
+    //         }
+    //     });
+    // });
+    // console.log(uniqueIngredTypes);
+
+    //! for each row for each productId, create a column of ingredientType
+    // uniqueProductIds.forEach((productId) => {
+    let exportObj = {};
+    exportObj['Product ID'] = productId;
+
+    // console.log('product ID: ', productId);
+
+    rows.forEach((row, rowIndex) => {
+        // Skip the header row
+        if (rowIndex === 0) return;
+
+        const rowProductId = Array.from(row.cells)
+            .map((cell) => {
+                if (
+                    cell.children[0]?.cell?.type === 'Product ID' &&
+                    cell.children[0]?.cell?.value === productId
+                ) {
+                    return cell.children[0].cell.value;
+                }
+            })
+            .filter((item) => item !== undefined)[0];
+
+        if (rowProductId !== productId) {
+            return;
+        }
+
+        // Each row has ingredientType
+        const ingredientType = Array.from(row.cells)
+            .map((cell) => {
+                if (cell.children[0]?.cell?.type === INGREDIENT_TYPE.id) {
+                    return cell.children[0].cell.value;
+                }
+            })
+            .filter((item) => item !== undefined)[0];
+
+        // console.log({ ingredientType });
+
+        const otherIngreds = Array.from(row.cells)
+            .map((cell) => {
+                if (
+                    // cell.children[0].cell?.type === 'Product ID' &&
+                    ingredientType === LABEL_DATASET_OTHER_INGREDS_A.name &&
+                    cell.children[0]?.cell?.type === DESCRIPTION.id
+                ) {
+                    return cell.children[0].cell.value;
+                }
+            })
+            .filter((item) => item !== undefined)[0];
+
+        // console.log(otherIngreds);
+        const id = LABEL_DATASET_OTHER_INGREDS_A.id;
+        // console.log(cellData);
+        exportObj[id] = otherIngreds;
+        // let pipeArray = [];
+
+        // console.log(rowProductId, ingredientType);
+        // if (ingredientType === LABEL_DATASET_NUTRIENT_A.name) {
+        //     pipeArray = new Array(8).fill('');
+        // } else if (ingredientType === LABEL_DATASET_INGREDIENTS_A.name) {
+        //     pipeArray = new Array(9).fill('');
+        // }
+        // console.log(ingredientType, pipeArray);
+
+        // Array.from(row.cells).forEach((cell) => {
+        //     const cellContainer = cell.firstChild;
+        //     /** @type {Cell} */
+        //     const cellData = cellContainer ? cellContainer.cell : undefined;
+
+        //     // if (cellData?.header.id === 'Product ID') {
+        //     //     const id = cellData.header.id;
+        //     //     exportObj[id] = cellData.value;
+        //     // }
+
+        //     if (ingredientType === LABEL_DATASET_OTHER_INGREDS_A.name) {
+        //         // OTHER INGREDIENTS
+        //         if (cellData?.type === DESCRIPTION.id) {
+
+        //             const id = LABEL_DATASET_OTHER_INGREDS_A.id;
+        //             console.log(cellData);
+        //             exportObj[id] = cellData.value;
+        //         }
+        //     }
+        // });
+        // console.log('done', pipeArray);
+        tableData.push(exportObj);
+    });
+    // console.log(tableData);
+    // });
+
+    // Iterate over each row
+    // rows.forEach((row, rowIndex) => {
+    //     // Skip the header row
+    //     if (rowIndex === 0) return;
+
+    //     const ingredientType = Array.from(row.cells)
+    //         .map((cell) => {
+    //             if (
+    //                 cell.children[0].cell &&
+    //                 cell.children[0].cell.type === INGREDIENT_TYPE.id
+    //             ) {
+    //                 return cell.children[0].cell.value;
+    //             }
+    //         })
+    //         .filter((item) => item !== undefined)[0];
+
+    //     Array.from(row.cells).forEach((cell) => {
+    //         const cellContainer = cell.firstChild;
+    //         /** @type {Cell} */
+    //         const cellData = cellContainer ? cellContainer.cell : undefined;
+
+    //         if (cellData?.header.id === 'Product ID') {
+    //             console.log(cellData);
+    //             uniqueProductIds.add(cellData.value);
+    //         }
+    //     });
+
+    //     let pipeArray = [];
+
+    //     if (ingredientType === LABEL_DATASET_NUTRIENT_A.name) {
+    //         pipeArray = new Array(8).fill('');
+    //     } else if (ingredientType === LABEL_DATASET_INGREDIENTS_A.name) {
+    //         pipeArray = new Array(9).fill('');
+    //     }
+    //     // console.log(ingredientType, pipeArray);
+
+    //     let exportObj = {};
+
+    //     // Array.from(row.cells).forEach((cell) => {
+    //     //     const cellContainer = cell.firstChild;
+    //     //     /** @type {Cell} */
+    //     //     const cellData = cellContainer ? cellContainer.cell : undefined;
+
+    //     //     if (cellData?.header.id === 'Product ID') {
+    //     //         const id = cellData.header.id;
+    //     //         exportObj[id] = cellData.value;
+    //     //     }
+
+    //     //     if (ingredientType === LABEL_DATASET_OTHER_INGREDS_A.name) {
+    //     //         // OTHER INGREDIENTS
+    //     //         if (cellData) {
+    //     //             console.log(cellData);
+    //     //             const id = LABEL_DATASET_OTHER_INGREDS_A.id;
+    //     //             console.log(cellData);
+    //     //             exportObj[id] = cellData.value;
+    //     //         }
+    //     //     }
+    //     // });
+    //     // console.log('done', pipeArray);
+    //     tableData.push(exportObj);
+    // });
+    // console.log([...uniqueProductIds]);
+    // console.log(tableData);
+    // xlsx_exportWYSIWYG(tableData);
+}
+
+function ada() {
+    if (mergedValues.includes(cellData?.type)) {
+        if (ingredientType === LABEL_DATASET_NUTRIENT_A.name) {
+            // NUTRIENTS
+            switch (cellData.type) {
+                case ORDER.id:
+                    pipeArray.splice(0, -1, cellData.value); // Insert at index 0
+                    break;
+                case DESCRIPTION.id:
+                    pipeArray.splice(1, -1, cellData.value); // Insert at index 1
+                    break;
+                case QUANTITY.id:
+                    pipeArray.splice(3, -1, cellData.value); // Insert at index 3
+                    break;
+                case UOM.id:
+                    pipeArray.splice(4, -1, cellData.value); // Insert at index 4
+                    break;
+                case DV.id:
+                    pipeArray.splice(5, -1, cellData.value); // Insert at index 5
+                    break;
+                case SYMBOL.id:
+                    pipeArray.splice(6, -1, cellData.value); // Insert at index 6
+                    break;
+                case FOOT.id:
+                    pipeArray.splice(7, -1, cellData.value); // Insert at index 7
+                    break;
+            }
+        } else if (ingredientType === LABEL_DATASET_INGREDIENTS_A.name) {
+            // INGREDIENTS
+            switch (cellData.type) {
+                case ORDER.id:
+                    pipeArray.splice(0, -1, cellData.value); // Insert at index 0
+                    break;
+                case DESCRIPTION.id:
+                    pipeArray.splice(1, -1, cellData.value); // Insert at index 1
+                    break;
+                case QUANTITY.id:
+                    pipeArray.splice(2, -1, cellData.value); // Insert at index 3
+                    break;
+                case UOM.id:
+                    pipeArray.splice(3, -1, cellData.value); // Insert at index 4
+                    break;
+                case DV.id:
+                    pipeArray.splice(5, -1, cellData.value); // Insert at index 5
+                    break;
+                case SYMBOL.id:
+                    pipeArray.splice(6, -1, cellData.value); // Insert at index 6
+                    break;
+                case FOOT.id:
+                    pipeArray.splice(7, -1, cellData.value); // Insert at index 7
+                    break;
+            }
+        }
+    }
 }

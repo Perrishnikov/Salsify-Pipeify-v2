@@ -182,11 +182,13 @@ async function xlsx_import_file(file, parsingOption) {
                     // Resolve the promise with the fileType
                     resolve('PIPEIFY');
                 } else {
+                    //TODO: Toast this?
                     reject(
                         'Spreadsheet must contain Salsify props or be a Pipeify export.'
                     );
                 }
             } catch (error) {
+                //TODO: Toast this?
                 console.error('Error processing file:', error);
                 reject(error);
             }
