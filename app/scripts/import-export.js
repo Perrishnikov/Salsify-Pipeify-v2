@@ -26,8 +26,6 @@
  * @property {string} Product_ID - The product ID.
  */
 
-
-
 /**
  * Checks if any object in the array has a key named "Product ID".
  *
@@ -111,21 +109,18 @@ function salsify_mergeIngredients(jsonData) {
 function salsify_preprocess(jsonData, parsingOption) {
     console.log(jsonData);
     // Filter out parents, keeping only variants
-    const varientsOnly = [...jsonData].filter(
-        (obj) => {
-            if (obj['salsify:data_inheritance_hierarchy_level_id'] && obj['salsify:data_inheritance_hierarchy_level_id'] ===
-                    'variant') {
-                return (
-                    obj['salsify:data_inheritance_hierarchy_level_id'] ===
-                    'variant'
-                );
-            } else {
-                return obj
-            }
-            
+    const varientsOnly = [...jsonData].filter((obj) => {
+        if (
+            obj['salsify:data_inheritance_hierarchy_level_id'] &&
+            obj['salsify:data_inheritance_hierarchy_level_id'] === 'variant'
+        ) {
+            return (
+                obj['salsify:data_inheritance_hierarchy_level_id'] === 'variant'
+            );
+        } else {
+            return obj;
         }
-            
-    );
+    });
 
     console.log(varientsOnly);
     // Remove properties that start with "salsify:"
@@ -180,12 +175,6 @@ async function xlsx_import_file(file, parsingOption) {
 
                 const metadata = workbook.Props;
 
-                // Check if 'Pipeify' is in the title
-                // const isPipeify =
-                //     metadata.Title && metadata.Title.includes('Pipeify')
-                //         ? 'PIPEIFY'
-                //         : null;
-                //         console.log(metadata.Title);
                 // Validate the file type
                 if (hasProductId(jsonData)) {
                     salsify_preprocess(jsonData, parsingOption);
@@ -193,16 +182,13 @@ async function xlsx_import_file(file, parsingOption) {
                     // Resolve the promise with the fileType
                     resolve('FROM SALSIFY');
                 } else if (metadata?.Title === 'Pipeify v2 For Salsify') {
-                    // pipeify_preprocess(jsonData, parsingOption);
                     salsify_preprocess(jsonData, parsingOption);
                     // Resolve the promise with the fileType
                     resolve('FROM PIPEIFY');
                 } else if (metadata?.Title === 'Pipeify v2 Export') {
-                    // pipeify_preprocess(jsonData, parsingOption);
                     // Resolve the promise with the fileType
-                    resolve('FOR CUSTOMER');
+                    reject('FOR CUSTOMER not handled');
                 } else {
-                    //TODO: Toast this?
                     reject(
                         'Spreadsheet must contain Salsify props or be a Pipeify export.'
                     );
@@ -282,7 +268,7 @@ function xlsx_exportForSalsify(data) {
     const defaultWidth = 15;
     const colWidths = Array(numColumns).fill({ width: defaultWidth });
     worksheet['!cols'] = colWidths;
-    
+
     // Set auto widths for the columns, with specific widths for certain columns
     // worksheet['!cols'] = calculateAutoWidths(data, specificWidths);
     const workbook = XLSX.utils.book_new();

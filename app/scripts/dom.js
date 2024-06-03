@@ -61,7 +61,7 @@ async function dom_importFileHandler(file) {
 
         clearLocalStorageAndTable();
 
-        console.error('Error reading file:', error);
+        console.error('Issue handling file', error);
     }
 }
 

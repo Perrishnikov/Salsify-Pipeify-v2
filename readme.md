@@ -8,11 +8,16 @@ Export data for Salsify:
 ~~LABEL_DATASET_NUTRIENT_A~~
 ~~LABEL_DATASET_INGREDIENTS_A~~
 ~~LABEL_DATASET_OTHER_INGREDS_A~~
-[] Verify export can be imported back into Salsify
+[x] Verify export can be imported back into Salsify
+
+-- PUSH 
+
+Cleaning:
+[] check TODOS
 [] How to account for errors and warnings?
 [] Disable button. Enable only if there is a file and file has no errors. 
 [] Show number of errors and warnings?
-[] check TODOS
+
 
 Export for customers
 (Apply hidden columns)
