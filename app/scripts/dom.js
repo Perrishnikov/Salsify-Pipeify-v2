@@ -123,7 +123,7 @@ if (button_salsify_reimport) {
         // console.log(`download-for-salsify-btn`);
         const parsingOption = getCheckedRadioButtonId();
 
-        process_reimport_salsify(parsingOption)
+        process_for_salsify(parsingOption)
     });
 }
 

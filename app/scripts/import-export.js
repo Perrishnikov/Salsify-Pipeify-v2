@@ -26,12 +26,7 @@
  * @property {string} Product_ID - The product ID.
  */
 
-/**
- * TODO
- */
-function pipeify_preprocess() {
-    console.log(`TODO: pipeify_preprocess`);
-}
+
 
 /**
  * Checks if any object in the array has a key named "Product ID".
@@ -114,12 +109,25 @@ function salsify_mergeIngredients(jsonData) {
  * @param {string} parsingOption - The parsing option for processing.
  */
 function salsify_preprocess(jsonData, parsingOption) {
+    console.log(jsonData);
     // Filter out parents, keeping only variants
     const varientsOnly = [...jsonData].filter(
-        (obj) =>
-            obj['salsify:data_inheritance_hierarchy_level_id'] === 'variant'
+        (obj) => {
+            if (obj['salsify:data_inheritance_hierarchy_level_id'] && obj['salsify:data_inheritance_hierarchy_level_id'] ===
+                    'variant') {
+                return (
+                    obj['salsify:data_inheritance_hierarchy_level_id'] ===
+                    'variant'
+                );
+            } else {
+                return obj
+            }
+            
+        }
+            
     );
 
+    console.log(varientsOnly);
     // Remove properties that start with "salsify:"
     const nonSalsifyPropsOnly = varientsOnly.map((obj) => {
         Object.keys(obj).forEach((key) => {
@@ -137,12 +145,19 @@ function salsify_preprocess(jsonData, parsingOption) {
 
     // add the row_id here
     // mergedJsonData.map(item => item['PIPEIFY:row_id'] = generateRandomString(9))
-    // console.log('mergedJsonData', mergedJsonData);
+    console.log('mergedJsonData', mergedJsonData);
 
     setLocalStorage(mergedJsonData);
 
     //* Done with Salsify processing */
     main_process(parsingOption);
+}
+
+/**
+ * TODO
+ */
+function pipeify_preprocess() {
+    console.log(`TODO: pipeify_preprocess`);
 }
 
 /* XLSX Processing */
@@ -166,21 +181,26 @@ async function xlsx_import_file(file, parsingOption) {
                 const metadata = workbook.Props;
 
                 // Check if 'Pipeify' is in the title
-                const isPipeify =
-                    metadata.Title && metadata.Title.includes('Pipeify')
-                        ? 'PIPEIFY'
-                        : null;
-
+                // const isPipeify =
+                //     metadata.Title && metadata.Title.includes('Pipeify')
+                //         ? 'PIPEIFY'
+                //         : null;
+                //         console.log(metadata.Title);
                 // Validate the file type
                 if (hasProductId(jsonData)) {
                     salsify_preprocess(jsonData, parsingOption);
 
                     // Resolve the promise with the fileType
-                    resolve('SALSIFY');
-                } else if (isPipeify) {
-                    pipeify_preprocess(jsonData, parsingOption);
+                    resolve('FROM SALSIFY');
+                } else if (metadata?.Title === 'Pipeify v2 For Salsify') {
+                    // pipeify_preprocess(jsonData, parsingOption);
+                    salsify_preprocess(jsonData, parsingOption);
                     // Resolve the promise with the fileType
-                    resolve('PIPEIFY');
+                    resolve('FROM PIPEIFY');
+                } else if (metadata?.Title === 'Pipeify v2 Export') {
+                    // pipeify_preprocess(jsonData, parsingOption);
+                    // Resolve the promise with the fileType
+                    resolve('FOR CUSTOMER');
                 } else {
                     //TODO: Toast this?
                     reject(
@@ -249,5 +269,32 @@ function xlsx_exportWYSIWYG(data) {
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
 
     XLSX.writeFile(workbook, 'Pipeify (customer export).xlsx');
+}
 
+function xlsx_exportForSalsify(data) {
+    const worksheet = XLSX.utils.json_to_sheet(data);
+
+    // Get the keys of the first object to determine the number of columns
+    const keys = Object.keys(data[0]);
+    const numColumns = keys.length;
+
+    // Define column widths
+    const defaultWidth = 15;
+    const colWidths = Array(numColumns).fill({ width: defaultWidth });
+    worksheet['!cols'] = colWidths;
+    
+    // Set auto widths for the columns, with specific widths for certain columns
+    // worksheet['!cols'] = calculateAutoWidths(data, specificWidths);
+    const workbook = XLSX.utils.book_new();
+
+    workbook.Props = {
+        Title: 'Pipeify v2 For Salsify',
+        CreatedDate: new Date(),
+        Company: "Nature's Way",
+        Comments: '...',
+    };
+
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+
+    XLSX.writeFile(workbook, 'Pipeify (Salsify export).xlsx');
 }

@@ -746,7 +746,6 @@ function process_wysiwyg_export(parsingOption) {
         tableData.push(exportObj);
     });
 
-    console.log(tableData);
     xlsx_exportWYSIWYG(tableData);
 
     // if (parsingOption !== 'option4') {
@@ -759,7 +758,7 @@ function process_wysiwyg_export(parsingOption) {
  *
  * @param {string} parsingOption - The parsing option for reimport.
  */
-function process_reimport_salsify(parsingOption) {
+function process_for_salsify(parsingOption) {
     // TODO: Unsubstitute Headers for reimport function
     // TODO: change hard-code
     const myTable = document.getElementById('my-table');
@@ -770,15 +769,6 @@ function process_reimport_salsify(parsingOption) {
     // Get the table rows
     const rows = myTable.querySelectorAll('tr');
 
-    const mergedValues = [
-        ORDER.id,
-        DESCRIPTION.id,
-        QUANTITY.id,
-        UOM.id,
-        DV.id,
-        SYMBOL.id,
-        FOOT.id,
-    ];
     //! get unique Product ID's, one per row
     const uniqueProductIds = new Set();
     // Product ID
@@ -798,9 +788,7 @@ function process_reimport_salsify(parsingOption) {
         });
     });
 
-    console.log(uniqueProductIds);
-    let arrayOfProductIds = [];
-
+    // console.log(uniqueProductIds);
     // Loop through product IDs
     uniqueProductIds.forEach((productId) => {
         // Loop through the rows
@@ -951,226 +939,11 @@ function process_reimport_salsify(parsingOption) {
             rowObj[LABEL_DATASET_INGREDIENTS_A.id] = result;
         }
 
-        console.log(rowObj);
+        // console.log(rowObj);
+        tableData.push(rowObj)
     });
+
+    // console.log(tableData);
+    xlsx_exportForSalsify(tableData);
     // console.log({ arrayOfProductIds });
 }
-// function ada(ingredientType, cellData, mergedValues) {
-//     const pipeArray = [];
-
-//     if (ingredientType === LABEL_DATASET_NUTRIENT_A.name) {
-//         pipeArray = new Array(8).fill('');
-//     } else if (ingredientType === LABEL_DATASET_INGREDIENTS_A.name) {
-//         pipeArray = new Array(9).fill('');
-//     }
-
-//     if (mergedValues.includes(cellData?.type)) {
-//         if (ingredientType === LABEL_DATASET_NUTRIENT_A.name) {
-//             // NUTRIENTS
-//             switch (cellData.type) {
-//                 case ORDER.id:
-//                     pipeArray.splice(0, -1, cellData.value); // Insert at index 0
-//                     break;
-//                 case DESCRIPTION.id:
-//                     pipeArray.splice(1, -1, cellData.value); // Insert at index 1
-//                     break;
-//                 case QUANTITY.id:
-//                     pipeArray.splice(3, -1, cellData.value); // Insert at index 3
-//                     break;
-//                 case UOM.id:
-//                     pipeArray.splice(4, -1, cellData.value); // Insert at index 4
-//                     break;
-//                 case DV.id:
-//                     pipeArray.splice(5, -1, cellData.value); // Insert at index 5
-//                     break;
-//                 case SYMBOL.id:
-//                     pipeArray.splice(6, -1, cellData.value); // Insert at index 6
-//                     break;
-//                 case FOOT.id:
-//                     pipeArray.splice(7, -1, cellData.value); // Insert at index 7
-//                     break;
-//             }
-//         } else if (ingredientType === LABEL_DATASET_INGREDIENTS_A.name) {
-//             // INGREDIENTS
-//             switch (cellData.type) {
-//                 case ORDER.id:
-//                     pipeArray.splice(0, -1, cellData.value); // Insert at index 0
-//                     break;
-//                 case DESCRIPTION.id:
-//                     pipeArray.splice(1, -1, cellData.value); // Insert at index 1
-//                     break;
-//                 case QUANTITY.id:
-//                     pipeArray.splice(2, -1, cellData.value); // Insert at index 3
-//                     break;
-//                 case UOM.id:
-//                     pipeArray.splice(3, -1, cellData.value); // Insert at index 4
-//                     break;
-//                 case DV.id:
-//                     pipeArray.splice(5, -1, cellData.value); // Insert at index 5
-//                     break;
-//                 case SYMBOL.id:
-//                     pipeArray.splice(6, -1, cellData.value); // Insert at index 6
-//                     break;
-//                 case FOOT.id:
-//                     pipeArray.splice(7, -1, cellData.value); // Insert at index 7
-//                     break;
-//             }
-//         }
-//     }
-
-//     return pipeArray;
-// }
-
-//! for each row for each productId, create a column of ingredientType
-// uniqueProductIds.forEach((productId) => {
-//     let exportObj = {};
-//     exportObj['Product ID'] = productId;
-
-//     // console.log('product ID: ', productId);
-
-//     rows.forEach((row, rowIndex) => {
-//         // Skip the header row
-//         if (rowIndex === 0) return;
-
-//         // Each row has ingredientType
-//         const ingredientType = Array.from(row.cells)
-//             .map((cell) => {
-//                 if (cell.children[0]?.cell?.type === INGREDIENT_TYPE.id) {
-//                     return cell.children[0].cell.value;
-//                 }
-//             })
-//             .filter((item) => item !== undefined)[0];
-
-//         // console.log({ ingredientType });
-//         const rowProductId = Array.from(row.cells)
-//             .map((cell) => {
-//                 if (
-//                     cell.children[0]?.cell?.type === 'Product ID' &&
-//                     cell.children[0]?.cell?.value === productId
-//                 ) {
-//                     return cell.children[0].cell.value;
-//                 }
-//             })
-//             .filter((item) => item !== undefined)[0];
-
-//         if (rowProductId !== productId) {
-//             return;
-//         }
-
-//         const otherIngreds = Array.from(row.cells)
-//             .map((cell) => {
-//                 if (
-//                     // cell.children[0].cell?.type === 'Product ID' &&
-//                     ingredientType === LABEL_DATASET_OTHER_INGREDS_A.name &&
-//                     cell.children[0]?.cell?.type === DESCRIPTION.id
-//                 ) {
-//                     return cell.children[0].cell.value;
-//                 }
-//             })
-//             .filter((item) => item !== undefined)[0];
-
-//         // console.log(otherIngreds);
-//         const id = LABEL_DATASET_OTHER_INGREDS_A.id;
-//         // console.log(cellData);
-//         exportObj[id] = otherIngreds;
-//         // let pipeArray = [];
-
-//         // console.log(rowProductId, ingredientType);
-//         // if (ingredientType === LABEL_DATASET_NUTRIENT_A.name) {
-//         //     pipeArray = new Array(8).fill('');
-//         // } else if (ingredientType === LABEL_DATASET_INGREDIENTS_A.name) {
-//         //     pipeArray = new Array(9).fill('');
-//         // }
-//         // console.log(ingredientType, pipeArray);
-
-//         // Array.from(row.cells).forEach((cell) => {
-//         //     const cellContainer = cell.firstChild;
-//         //     /** @type {Cell} */
-//         //     const cellData = cellContainer ? cellContainer.cell : undefined;
-
-//         //     // if (cellData?.header.id === 'Product ID') {
-//         //     //     const id = cellData.header.id;
-//         //     //     exportObj[id] = cellData.value;
-//         //     // }
-
-//         //     if (ingredientType === LABEL_DATASET_OTHER_INGREDS_A.name) {
-//         //         // OTHER INGREDIENTS
-//         //         if (cellData?.type === DESCRIPTION.id) {
-
-//         //             const id = LABEL_DATASET_OTHER_INGREDS_A.id;
-//         //             console.log(cellData);
-//         //             exportObj[id] = cellData.value;
-//         //         }
-//         //     }
-//         // });
-//         // console.log('done', pipeArray);
-//         tableData.push(exportObj);
-//     });
-//     // console.log(tableData);
-// });
-
-// Iterate over each row
-// rows.forEach((row, rowIndex) => {
-//     // Skip the header row
-//     if (rowIndex === 0) return;
-
-//     const ingredientType = Array.from(row.cells)
-//         .map((cell) => {
-//             if (
-//                 cell.children[0].cell &&
-//                 cell.children[0].cell.type === INGREDIENT_TYPE.id
-//             ) {
-//                 return cell.children[0].cell.value;
-//             }
-//         })
-//         .filter((item) => item !== undefined)[0];
-
-//     Array.from(row.cells).forEach((cell) => {
-//         const cellContainer = cell.firstChild;
-//         /** @type {Cell} */
-//         const cellData = cellContainer ? cellContainer.cell : undefined;
-
-//         if (cellData?.header.id === 'Product ID') {
-//             console.log(cellData);
-//             uniqueProductIds.add(cellData.value);
-//         }
-//     });
-
-//     let pipeArray = [];
-
-//     if (ingredientType === LABEL_DATASET_NUTRIENT_A.name) {
-//         pipeArray = new Array(8).fill('');
-//     } else if (ingredientType === LABEL_DATASET_INGREDIENTS_A.name) {
-//         pipeArray = new Array(9).fill('');
-//     }
-//     // console.log(ingredientType, pipeArray);
-
-//     let exportObj = {};
-
-//     // Array.from(row.cells).forEach((cell) => {
-//     //     const cellContainer = cell.firstChild;
-//     //     /** @type {Cell} */
-//     //     const cellData = cellContainer ? cellContainer.cell : undefined;
-
-//     //     if (cellData?.header.id === 'Product ID') {
-//     //         const id = cellData.header.id;
-//     //         exportObj[id] = cellData.value;
-//     //     }
-
-//     //     if (ingredientType === LABEL_DATASET_OTHER_INGREDS_A.name) {
-//     //         // OTHER INGREDIENTS
-//     //         if (cellData) {
-//     //             console.log(cellData);
-//     //             const id = LABEL_DATASET_OTHER_INGREDS_A.id;
-//     //             console.log(cellData);
-//     //             exportObj[id] = cellData.value;
-//     //         }
-//     //     }
-//     // });
-//     // console.log('done', pipeArray);
-//     tableData.push(exportObj);
-// });
-// console.log([...uniqueProductIds]);
-// console.log(tableData);
-// xlsx_exportWYSIWYG(tableData);
-// }
