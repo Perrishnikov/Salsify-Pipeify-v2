@@ -261,7 +261,7 @@ function handlePopoverMenuClick(e) {
         // Get the table element
         const table = document.getElementById('my-table');
         if (!rowIdFromDom || !table) {
-            //TODO: Toast this
+            showToast(`Target row or table not found`, 'error');
             console.error('Target row or table not found.');
             return;
         }
@@ -526,6 +526,7 @@ function main_process(parsingOption) {
     const myTable = document.createElement('table');
     myTable.setAttribute('id', 'my-table');
 
+    //TODO: row validations?
     // Check if any Row has a status
     // let rowHasMessages = false;
     // for (const row of rows) {
@@ -539,7 +540,6 @@ function main_process(parsingOption) {
     const headerRow = document.createElement('tr');
 
     //* For Popover Menu
-    //TODO: cleanup hardcoded option4
     if (parsingOption === 'option4') {
         const menuHeader = document.createElement('th');
         headerRow.appendChild(menuHeader);
@@ -553,9 +553,7 @@ function main_process(parsingOption) {
     });
     myTable.appendChild(headerRow);
 
-    //TODO: cleanup hardcoded option4
     rows.forEach((row) => {
-        // console.log(row);
         let tableRow;
         if (parsingOption === 'option4') {
             tableRow = createTableRow(row, createMenuPopover);
@@ -712,8 +710,6 @@ function attachBlurEventToTableCells(table) {
 
 /********************************************************************* */
 function process_wysiwyg_export(parsingOption) {
-    // Get the table element
-    // TODO: change hard-code
     const myTable = document.getElementById('my-table');
 
     // Initialize an array to hold the data
@@ -734,13 +730,14 @@ function process_wysiwyg_export(parsingOption) {
             const cellContainer = cell.firstChild;
             /** @type {Cell} */
             const cellData = cellContainer ? cellContainer.cell : undefined;
-            // console.log(cellData);
             if (cellData !== undefined) {
                 const name = cellData.header.name;
 
+                // console.log(name, cellData);
                 exportObj[name] = cellData.value;
             } else {
-                //     //TODO: Toast this?
+                // showToast(`cellData is undefined`, 'error');
+                // console.log('cellData is undefined');
             }
         });
         tableData.push(exportObj);
@@ -759,8 +756,6 @@ function process_wysiwyg_export(parsingOption) {
  * @param {string} parsingOption - The parsing option for reimport.
  */
 function process_for_salsify(parsingOption) {
-    // TODO: Unsubstitute Headers for reimport function
-    // TODO: change hard-code
     const myTable = document.getElementById('my-table');
 
     // Initialize an array to hold the data
@@ -906,7 +901,7 @@ function process_for_salsify(parsingOption) {
                     ) {
                         if (cellData?.type === DESCRIPTION.id) {
                             rowObj[LABEL_DATASET_OTHER_INGREDS_A.id] =
-                                cellData.value[0];
+                                cellData.value;
                         }
                     }
                 }
@@ -940,7 +935,7 @@ function process_for_salsify(parsingOption) {
         }
 
         // console.log(rowObj);
-        tableData.push(rowObj)
+        tableData.push(rowObj);
     });
 
     // console.log(tableData);

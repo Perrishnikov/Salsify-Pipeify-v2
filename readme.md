@@ -14,9 +14,12 @@ Export data for Salsify:
 
 Cleaning:
 [] check TODOS
+[] check //! and // !
 [] How to account for errors and warnings?
 [] Disable button. Enable only if there is a file and file has no errors. 
 [] Show number of errors and warnings?
+[] Mouseover error and warning conditions. 
+[] do something with (parsingOption) in process_wysiwyg_export()
 
 
 Export for customers

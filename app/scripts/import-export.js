@@ -107,8 +107,7 @@ function salsify_mergeIngredients(jsonData) {
  * @param {string} parsingOption - The parsing option for processing.
  */
 function salsify_preprocess(jsonData, parsingOption) {
-    console.log(jsonData);
-    // Filter out parents, keeping only variants
+    // Filter out parents, keeping only variants. If it has them.
     const varientsOnly = [...jsonData].filter((obj) => {
         if (
             obj['salsify:data_inheritance_hierarchy_level_id'] &&
@@ -122,7 +121,6 @@ function salsify_preprocess(jsonData, parsingOption) {
         }
     });
 
-    console.log(varientsOnly);
     // Remove properties that start with "salsify:"
     const nonSalsifyPropsOnly = varientsOnly.map((obj) => {
         Object.keys(obj).forEach((key) => {
@@ -148,13 +146,6 @@ function salsify_preprocess(jsonData, parsingOption) {
     main_process(parsingOption);
 }
 
-/**
- * TODO
- */
-function pipeify_preprocess() {
-    console.log(`TODO: pipeify_preprocess`);
-}
-
 /* XLSX Processing */
 /**
  * Processes an Excel file.
@@ -175,8 +166,12 @@ async function xlsx_import_file(file, parsingOption) {
 
                 const metadata = workbook.Props;
 
+                // console.log('reader.onload');
                 // Validate the file type
-                if (hasProductId(jsonData)) {
+                if (metadata?.Title === 'Pipeify v2 For Customers') {
+                    // Resolve the promise with the fileType
+                    reject('FOR CUSTOMER not handled');
+                } else if (hasProductId(jsonData)) {
                     salsify_preprocess(jsonData, parsingOption);
 
                     // Resolve the promise with the fileType
@@ -185,17 +180,12 @@ async function xlsx_import_file(file, parsingOption) {
                     salsify_preprocess(jsonData, parsingOption);
                     // Resolve the promise with the fileType
                     resolve('FROM PIPEIFY');
-                } else if (metadata?.Title === 'Pipeify v2 Export') {
-                    // Resolve the promise with the fileType
-                    reject('FOR CUSTOMER not handled');
                 } else {
                     reject(
                         'Spreadsheet must contain Salsify props or be a Pipeify export.'
                     );
                 }
             } catch (error) {
-                //TODO: Toast this?
-                console.error('Error processing file:', error);
                 reject(error);
             }
         };
@@ -246,7 +236,7 @@ function xlsx_exportWYSIWYG(data) {
     const workbook = XLSX.utils.book_new();
 
     workbook.Props = {
-        Title: 'Pipeify v2 Export',
+        Title: 'Pipeify v2 For Customers',
         CreatedDate: new Date(),
         Company: "Nature's Way",
         Comments: '...',

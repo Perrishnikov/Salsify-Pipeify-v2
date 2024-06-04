@@ -223,7 +223,6 @@ function per_pipe_per_partcode_3(rows) {
     // Iterate through each row of data
     rows.forEach((row) => {
         // Process each cell in the row
-        // console.log(`row`, row);
         const ingredientType = row.cells.find(
             (cell) => cell.type === INGREDIENT_TYPE.id
         );
@@ -275,10 +274,9 @@ function per_pipe_per_partcode_3(rows) {
                     LABEL_DATASET_OTHER_INGREDS_A.name
                 ) {
                     const otherCells = createOtherCells(
-                        ingredientsArray,
+                        ingredientsArray[0],
                         rowStatus
                     );
-
                     // Add other cells to the new row
                     nonIngredientCells.push(...otherCells);
                 }
