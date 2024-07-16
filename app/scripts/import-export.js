@@ -117,9 +117,11 @@ function salsify_preprocess(jsonData, parsingOption) {
             return (
                 obj['salsify:data_inheritance_hierarchy_level_id'] === 'variant'
             );
-        } else {
-            return obj;
-        }
+        } 
+        // comment to allow only varients...
+        // else {
+        //     return obj;
+        // }
     });
 
     // Remove properties that start with "salsify:"
