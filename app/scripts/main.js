@@ -321,6 +321,7 @@ function handlePopoverMenuClick(e) {
                                     newCell.status = createCell.validateUom('');
                                 } else if (cell.type === DV.id) {
                                     //TODO: New Ingredient DV is not validating.
+                                    //TODO: Push to Github. See if it works there
                                     //Need to pass ingredient type to constructor
                                     newCell.status =
                                         createCell.validateDvAmount(
@@ -764,7 +765,7 @@ function process_for_salsify(parsingOption) {
     // Get the table rows
     const rows = myTable.querySelectorAll('tr');
 
-    //! get unique Product ID's, one per row
+    // get unique Product ID's, one per row
     const uniqueProductIds = new Set();
     // Product ID
     rows.forEach((row, rowIndex) => {
