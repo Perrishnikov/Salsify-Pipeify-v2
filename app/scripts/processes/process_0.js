@@ -12,6 +12,8 @@ function option_0({ rows, columnNames, substitute_headers }) {
     // create an new Entity for each row of objects()
 
     rows.forEach((row) => {
+
+        console.log(row);
         const cells = []
 
         columnNames.forEach((name, index) => {

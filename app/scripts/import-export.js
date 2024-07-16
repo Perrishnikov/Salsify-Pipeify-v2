@@ -27,13 +27,14 @@
  */
 
 /**
- * Checks if any object in the array has a key named "Product ID".
+ * Checks if any object in the array has a key named "Product ID" or "PARTCODE".
  *
  * @param {Array<Object>} data - The array of objects to check.
  * @returns {boolean} - Returns true if any object has a key named "Product ID".
  */
 function hasProductId(data) {
-    return data.some((obj) => 'Product ID' | ('PARTCODE' in obj));
+    // return data.some((obj) => 'Product ID' | ('PARTCODE' in obj));
+    return data.some((obj) => ('Product ID' in obj) | ('PARTCODE' in obj));
 }
 
 /**
@@ -131,7 +132,6 @@ function salsify_preprocess(jsonData, parsingOption) {
         });
         return obj;
     });
-    // console.dir(nonSalsifyPropsOnly);
 
     /** @type {SalsifyObject[]} */
     const mergedJsonData = salsify_mergeIngredients(nonSalsifyPropsOnly);
