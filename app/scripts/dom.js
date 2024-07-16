@@ -163,6 +163,7 @@ const helpBtn = document.getElementById('helpBtn');
 const span = document.getElementsByClassName('close')[0];
 
 // When the user clicks the button, open the modal
+
 helpBtn.onclick = function () {
     modal.style.display = 'block';
 };

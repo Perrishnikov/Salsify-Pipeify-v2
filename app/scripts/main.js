@@ -320,8 +320,6 @@ function handlePopoverMenuClick(e) {
                                 } else if (cell.type === UOM.id) {
                                     newCell.status = createCell.validateUom('');
                                 } else if (cell.type === DV.id) {
-                                    //TODO: New Ingredient DV is not validating.
-                                    //TODO: Push to Github. See if it works there
                                     //Need to pass ingredient type to constructor
                                     newCell.status =
                                         createCell.validateDvAmount(
@@ -527,7 +525,7 @@ function main_process(parsingOption) {
     const myTable = document.createElement('table');
     myTable.setAttribute('id', 'my-table');
 
-    //TODO: row validations?
+    // TODO: row validations?
     // Check if any Row has a status
     // let rowHasMessages = false;
     // for (const row of rows) {
@@ -713,6 +711,9 @@ function attachBlurEventToTableCells(table) {
 function process_wysiwyg_export(parsingOption) {
     const myTable = document.getElementById('my-table');
 
+    if (!myTable) {
+        showToast(`No Data to Export`, 'error');
+    }
     // Initialize an array to hold the data
     const tableData = [];
 
@@ -759,6 +760,9 @@ function process_wysiwyg_export(parsingOption) {
 function process_for_salsify(parsingOption) {
     const myTable = document.getElementById('my-table');
 
+    if (!myTable) {
+        showToast(`No Data to Export`, 'error');
+    }
     // Initialize an array to hold the data
     const tableData = [];
 
