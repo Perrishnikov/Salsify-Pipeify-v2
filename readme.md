@@ -23,16 +23,13 @@ Cleaning:
 ~~Accepts all columns, but only checks for errors on...~~
 Once verified, can either be exported for a client or the corrected version can be reimported back into Salsify.
 [x] Only allow Salsify Download with option 4. Validation required. 
+[x] Button for type of row to add (Nut, Ing) -> find: "// ! Validate here"
 
-[] Button for type of row to add (Nut, Ing) -> find: "// ! Validate here"
-
-
-[] Allow/ account for UPC with PARTCODE (For Customr Download)
 [] ENHANCE: Mouseover error and warning conditions. 
+[] //TODO: Add popover
 
-... Add a row
-... Delete a row
 
+[] ENHANCE: Allow/ account for UPC with PARTCODE (For Customr Download)
 [] Download for customer - how should this look? Wait and see because I don't know
 [] Enhance: Sort columns by Order on both exports
 Push to Github. See if it works there

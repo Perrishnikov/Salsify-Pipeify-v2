@@ -269,37 +269,43 @@ function handlePopoverMenuClick(e) {
         /**@type {Row} */
         let rowIndex;
 
-        if (buttonId === 'addAbove' || buttonId === 'addBelow') {
-            // Loop through table rows to find the target row by its data-row_id
-            for (let i = 1; i < table.rows.length; i++) {
-                const row = table.rows[i];
-                const rowId = row.dataset.row_id;
+        // Loop through table rows to find the target row by its data-row_id
+        for (let i = 1; i < table.rows.length; i++) {
+            const row = table.rows[i];
+            const rowId = row.dataset.row_id;
 
-                if (rowId === rowIdFromDom) {
-                    rowIndex = i;
-                    const newCells = [];
+            if (rowId === rowIdFromDom) {
+                rowIndex = i;
+                const newCells = [];
 
-                    // console.log(row);
-                    let ingredientType = Array.from(row.cells)
-                        .map((cell) => {
-                            // console.log(cell.children[0]);
-                            if (
-                                cell.children[0].cell &&
-                                cell.children[0].cell.type ===
-                                    INGREDIENT_TYPE.id
-                            ) {
-                                return cell.children[0].cell.value;
-                            }
-                        })
-                        .filter((item) => item !== undefined)[0];
-                    // console.log({ cellType: ingredientType });
+                // console.log(row);
+                let ingredientType = Array.from(row.cells)
+                    .map((cell) => {
+                        // console.log(cell.children[0]);
+                        if (
+                            cell.children[0].cell &&
+                            cell.children[0].cell.type === INGREDIENT_TYPE.id
+                        ) {
+                            return cell.children[0].cell.value;
+                        }
+                    })
+                    .filter((item) => item !== undefined)[0];
+                // console.log({ cellType: ingredientType });
 
+                //dont duplicate Other row
+                if (ingredientType === LABEL_DATASET_OTHER_INGREDS_A.name) {
+                    showToast(`Other Rows may not be added or deleted.`, 'info');
+                    return;
+                }
+
+                // ADD
+                if (buttonId === 'addAbove' || buttonId === 'addBelow') {
                     // Copy cells from the target row to create a new row
                     for (let j = 0; j < row.cells.length; j++) {
                         const cellContainer = row.cells[j].firstChild;
                         const cell = cellContainer ? cellContainer.cell : null;
 
-                        // ! Validate here
+                        
                         if (cell && cell instanceof Cell) {
                             // const newCell = cloneEmptyCell(cell);
                             let newCell;
@@ -363,24 +369,42 @@ function handlePopoverMenuClick(e) {
                         popover.togglePopover();
                     }
                     break;
-                }
-            }
-        } else if (buttonId === 'delete') {
-            // Loop through table rows to find the target row by its data-row_id and delete it
-            for (let i = 1; i < table.rows.length; i++) {
-                const row = table.rows[i];
-                const rowId = row.dataset.row_id;
 
-                if (rowId === rowIdFromDom) {
-                    rowIndex = i;
-                    break;
-                }
-            }
+                    //ADD
+                } else if (buttonId === 'delete') {
+                    // Loop through table rows to find the target row by its data-row_id and delete it
+                    for (let i = 1; i < table.rows.length; i++) {
+                        const row = table.rows[i];
+                        const rowId = row.dataset.row_id;
 
-            if (rowIndex !== undefined) {
-                table.deleteRow(rowIndex);
+                        if (rowId === rowIdFromDom) {
+                            rowIndex = i;
+                            break;
+                        }
+                    }
+
+                    if (rowIndex !== undefined) {
+                        table.deleteRow(rowIndex);
+                    }
+                }
             }
         }
+        // } else if (buttonId === 'delete') {
+        //     // Loop through table rows to find the target row by its data-row_id and delete it
+        //     for (let i = 1; i < table.rows.length; i++) {
+        //         const row = table.rows[i];
+        //         const rowId = row.dataset.row_id;
+
+        //         if (rowId === rowIdFromDom) {
+        //             rowIndex = i;
+        //             break;
+        //         }
+        //     }
+
+        //     if (rowIndex !== undefined) {
+        //         table.deleteRow(rowIndex);
+        //     }
+        // }
     }
 }
 
@@ -418,6 +442,7 @@ function createMenuPopover(rowId) {
 
     return td;
 }
+
 /* *********************************************************************/
 /**
 <table>
@@ -555,6 +580,7 @@ function main_process(parsingOption) {
     rows.forEach((row) => {
         let tableRow;
         if (parsingOption === 'option4') {
+            //! do it here
             tableRow = createTableRow(row, createMenuPopover);
         } else {
             tableRow = createTableRow(row, null);
@@ -572,6 +598,7 @@ function main_process(parsingOption) {
 
     attachBlurEventToTableCells(myTable);
 
+    //TODO: Add popover
     applyHandlePopoverMenuClickToTable();
 }
 
@@ -736,9 +763,9 @@ function process_wysiwyg_export(parsingOption) {
                 const name = cellData.header.name;
 
                 //disregard Product Id.
-                if (name === 'Product ID'){
-                    return
-                } 
+                if (name === 'Product ID') {
+                    return;
+                }
                 // console.log(name, cellData);
                 exportObj[name] = cellData.value;
             } else {
