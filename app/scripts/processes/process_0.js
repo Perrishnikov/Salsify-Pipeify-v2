@@ -13,7 +13,7 @@ function option_0({ rows, columnNames, substitute_headers }) {
 
     rows.forEach((row) => {
 
-        console.log(row);
+        // console.log(row);
         const cells = []
 
         columnNames.forEach((name, index) => {

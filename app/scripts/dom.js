@@ -5,8 +5,16 @@ if (radioButtonsDiv) {
         const selectedOption = e.target.id;
 
         // console.log(`change table columns to ${selectedOption}`);
+        const dwnbtn = document.getElementById('download-for-salsify-btn');
 
         const parsingOption = getCheckedRadioButtonId();
+
+        if (parsingOption === 'option4') {
+            dwnbtn.disabled = false;
+        } else {
+            dwnbtn.disabled = true;
+        }
+
         main_process(parsingOption);
     });
 }

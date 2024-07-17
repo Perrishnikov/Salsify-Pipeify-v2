@@ -16,29 +16,25 @@ Cleaning:
 [x] check //! and // !
 [x] Disable button. Enable only if there is a file and file has no errors.
     Allow only with 4th
-
-[] Button for type of row to add (Nut, Ing) -> find: "// ! Validate here"
-
 [x] Instructions and whats going on for future users
 ~~Takes a Salsify export, parses it, and ...~~
 ~~Export must have [PARTCODE or Product ID, Nutrients, Ingredients, Other] (TODO: create Toast ), export automatically contains Product ID, which is required for re-import~~
 ~~Removes parent record (other column remain), parses by option, leaves other columns as-is...~~
 ~~Accepts all columns, but only checks for errors on...~~
 Once verified, can either be exported for a client or the corrected version can be reimported back into Salsify.
+[x] Only allow Salsify Download with option 4. Validation required. 
 
-[] Allow/ account for UPC with PARTCODE
+[] Button for type of row to add (Nut, Ing) -> find: "// ! Validate here"
+
+
+[] Allow/ account for UPC with PARTCODE (For Customr Download)
 [] ENHANCE: Mouseover error and warning conditions. 
-Export for customers
-(Apply hidden columns)
-(By Parsing Option)
-[] How to account for errors and warnings?
-[] Should remove Product ID
-[] do something with (parsingOption) in process_wysiwyg_export()
 
 ... Add a row
 ... Delete a row
-[] Reimport a Pipeify export
 
+[] Download for customer - how should this look? Wait and see because I don't know
+[] Enhance: Sort columns by Order on both exports
 Push to Github. See if it works there
 [] Changing Option, reverts edited table data. Save to localstorage before change?
 [] Style each partcode together?

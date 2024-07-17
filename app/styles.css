@@ -67,6 +67,8 @@ input[type='radio'] {
     font-size: var(--font-size);
     color: #333;
     cursor: pointer;
+    display: inline-block;
+    min-width: 24px;
 }
 input[type='radio']:checked + .radio-label {
     color: #28a745;
@@ -201,7 +203,10 @@ button {
     border: 1px solid #000;
     cursor: pointer;
 }
-
+button:disabled {
+    cursor: default;
+}
+/* Popovers */
 [popover] {
     position: absolute;
     inset: unset;

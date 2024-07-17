@@ -735,6 +735,10 @@ function process_wysiwyg_export(parsingOption) {
             if (cellData !== undefined) {
                 const name = cellData.header.name;
 
+                //disregard Product Id.
+                if (name === 'Product ID'){
+                    return
+                } 
                 // console.log(name, cellData);
                 exportObj[name] = cellData.value;
             } else {
