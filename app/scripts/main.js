@@ -659,7 +659,6 @@ function attachBlurEventToTableCells(table) {
             /**@type {Status} */
             let status = null;
 
-            //TODO: Verify that these are validating as expected
             if (cellType === ORDER.id) {
                 status = createCell.validateOrder(innerText);
             } else if (cellType === DESCRIPTION.id) {
@@ -667,7 +666,6 @@ function attachBlurEventToTableCells(table) {
             } else if (cellType === QUANTITY.id) {
                 status = createCell.validateQuantity(innerText);
             } else if (cellType === UOM.id) {
-                //! This is not validating correctly 'undefined'
                 status = createCell.validateUom(innerText);
             } else if (cellType === DV.id) {
                 status = createCell.validateDvAmount(innerText, ingredValue);

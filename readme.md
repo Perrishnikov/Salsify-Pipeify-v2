@@ -24,11 +24,12 @@ Cleaning:
 Once verified, can either be exported for a client or the corrected version can be reimported back into Salsify.
 [x] Only allow Salsify Download with option 4. Validation required. 
 [x] Button for type of row to add (Nut, Ing) -> find: "// ! Validate here"
+[x] ENHANCE: Mouseover error and warning conditions. 
 
-[] ENHANCE: Mouseover error and warning conditions. 
-[] //TODO: Add popover
+[] Check PLM1 Pipeify to see how this will affect it. 
 
-
+---
+[] Drag n drop rows
 [] ENHANCE: Allow/ account for UPC with PARTCODE (For Customr Download)
 [] Download for customer - how should this look? Wait and see because I don't know
 [] Enhance: Sort columns by Order on both exports
@@ -38,6 +39,6 @@ Push to Github. See if it works there
 [] Style each ingredient type together?
 [] Headers checkboxes to hide columns
 [] Option to fix things like remove HTML from cell
-[] Drag n drop rows later
+
 [] Show number of errors and warnings?
 [] TODO: row validations?

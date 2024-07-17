@@ -172,11 +172,36 @@
                     </li>
                 </ul>
                 <h3>Parsing Option #4</h3>
-                
+
                 <ul>
                     <li>
-                        Checks for errors on Order, Description, Qty, UOM,
-                        DV, Sym., and Foot. columns.
+                        Checks for errors:
+                        <ul>
+                            <li><b>Order</b> - Should be number</li>
+                            <li><b>Description</b> - Should not be empty</li>
+                            <li>
+                                <b>Qty</b> - Should not be empty; Should be a number;
+                                Can use '<' and ','
+                            </li>
+                            <li>
+                                <b>UOM</b> - Valid values: 'mg', 'mcg', 'g', 'ml', 'l',
+                                'oz', 'CFU', 'mcg DFE', 'mg DFE', '', 'IU'
+                            </li>
+                            <li>
+                                <b>DV</b> - <br />For Nutrients: Should be a number;
+                                May include these characters: '**', '<', ',' <br />For
+                                Ingredients: Should not be empty
+                            </li>
+                            <li>
+                                <b>Sym</b> - <br />For Nutrients: '%', ''<br />For
+                                Ingredients: '**', ''
+                            </li>
+                            <li>
+                                <b>Foot</b> -
+                                <br>For Nutrients: ‡ , †
+                                <br>For Ingredients: Should be empty
+                            </li>
+                        </ul>
                     </li>
                     <li>Yellow indicates possible invalid value.</li>
                     <li>Red indicates invalid value.</li>

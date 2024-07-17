@@ -97,7 +97,7 @@ class Tester {
         const pattern = /\S+/;
 
         if (!pattern.test(this.trimmedValue)) {
-            const message = 'trimmedValue is Empty';
+            const message = `${this.trimmedValue} is Empty`;
             test = new Test(true, message, '');
             this.failed = true;
         }
@@ -109,7 +109,7 @@ class Tester {
         // const pattern = /\S+/;
 
         if (this.trimmedValue !== '') {
-            const message = 'trimmedValue is not Empty';
+            const message = `${this.trimmedValue} is not Empty`;
             test = new Test(true, message, '');
             this.failed = true;
         }
@@ -190,8 +190,8 @@ class Tester {
         ];
 
         if (!units.includes(value)) {
-            const message = `${this.value} may not be valid UOM`;
-            test = new Test(true, message, this.trimmedValue);
+            const message = `${value} may not be valid UOM`;
+            test = new Test(true, message, value);
             this.failed = true;
         }
         this.tests.push(test);
@@ -204,8 +204,8 @@ class Tester {
         const allowedValues = ['%', ''];
 
         if (!allowedValues.includes(value)) {
-            const message = `${this.value} may not be valid Symbol`;
-            test = new Test(true, message, this.trimmedValue);
+            const message = `${value} may not be valid Symbol`;
+            test = new Test(true, message, value);
             this.failed = true;
         }
         this.tests.push(test);
@@ -218,7 +218,7 @@ class Tester {
         const allowedValues = ['**', ''];
 
         if (!allowedValues.includes(value)) {
-            const message = `${this.value} may not be valid Symbol`;
+            const message = `${value} may not be valid Symbol`;
             test = new Test(true, message, this.trimmedValue);
             this.failed = true;
         }
@@ -233,8 +233,8 @@ class Tester {
         const allowedValues = ['†', '‡', ''];
 
         if (!allowedValues.includes(value)) {
-            const message = `${this.value} may not be valid Footnote`;
-            test = new Test(true, message, this.trimmedValue);
+            const message = `${value} may not be valid Footnote`;
+            test = new Test(true, message, value);
             this.failed = true;
         }
         this.tests.push(test);
