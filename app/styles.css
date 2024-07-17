@@ -251,6 +251,16 @@ button.popover-menu-item {
     margin-bottom: 0;
 }
 
+/* error messages - not quite popover */
+.not-popover {
+    position: absolute;
+    background-color: #fff;
+    border-radius: calc(var(--padding-margin) / 4);
+    padding: calc(var(--padding-margin) / 2);
+    box-shadow: '0 2px 5px rgba(0, 0, 0, 0.1)';
+    border: 2px dashed red;
+}
+
 .cell-value {
     flex-grow: 1;
     border: 1px solid transparent;

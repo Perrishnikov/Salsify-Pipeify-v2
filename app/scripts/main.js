@@ -294,7 +294,10 @@ function handlePopoverMenuClick(e) {
 
                 //dont duplicate Other row
                 if (ingredientType === LABEL_DATASET_OTHER_INGREDS_A.name) {
-                    showToast(`Other Rows may not be added or deleted.`, 'info');
+                    showToast(
+                        `Other Rows may not be added or deleted.`,
+                        'info'
+                    );
                     return;
                 }
 
@@ -305,7 +308,6 @@ function handlePopoverMenuClick(e) {
                         const cellContainer = row.cells[j].firstChild;
                         const cell = cellContainer ? cellContainer.cell : null;
 
-                        
                         if (cell && cell instanceof Cell) {
                             // const newCell = cloneEmptyCell(cell);
                             let newCell;
@@ -580,7 +582,6 @@ function main_process(parsingOption) {
     rows.forEach((row) => {
         let tableRow;
         if (parsingOption === 'option4') {
-            //! do it here
             tableRow = createTableRow(row, createMenuPopover);
         } else {
             tableRow = createTableRow(row, null);
@@ -598,7 +599,6 @@ function main_process(parsingOption) {
 
     attachBlurEventToTableCells(myTable);
 
-    //TODO: Add popover
     applyHandlePopoverMenuClickToTable();
 }
 
@@ -683,6 +683,7 @@ function attachBlurEventToTableCells(table) {
             } else if (cellType === QUANTITY.id) {
                 status = createCell.validateQuantity(innerText);
             } else if (cellType === UOM.id) {
+                //! This is not validating correctly 'undefined'
                 status = createCell.validateUom(innerText);
             } else if (cellType === DV.id) {
                 status = createCell.validateDvAmount(innerText, ingredValue);
@@ -691,6 +692,10 @@ function attachBlurEventToTableCells(table) {
             } else if (cellType === FOOT.id) {
                 status = createCell.validateFootnote(innerText, ingredValue);
             }
+            // console.log(status);
+
+            //must set the new status on the parent
+            cell.status = status;
 
             const parentClasslist = e.target.parentElement.classList;
             addErrorsToDom(status, parentClasslist);
@@ -709,6 +714,50 @@ function attachBlurEventToTableCells(table) {
             event.preventDefault();
         }
     });
+
+    function handleMouseOver(e) {
+        const parentClasslist = Array.from(e.target.parentElement.classList);
+        const classesToCheck = ['error-cell', 'warning-cell'];
+        const hasAnyClass = classesToCheck.some((className) =>
+            parentClasslist.includes(className)
+        );
+
+        const parentCell = e.target.parentElement; // Accessing the parent element correctly
+        const hasMessages = parentCell?.cell?.status?.hasMessages; // Use optional chaining
+
+        if (hasAnyClass && hasMessages) {
+            const messages = [
+                ...parentCell.cell.status.errors,
+                ...parentCell.cell.status.warnings,
+            ];
+
+            const popover = document.createElement('div');
+            popover.id = 'popover-message';
+            popover.classList.add('not-popover');
+
+            // popover.style.border = '2px dashed red';
+            if (parentCell.cell.status.warnings.length > 0) {
+                popover.style.borderColor = 'hsla(48, 100%, 29%, 0.8)';
+            }
+
+            popover.textContent = messages;
+            popover.style.left = `${e.pageX - 48}px`;
+            popover.style.top = `${e.pageY + 6}px`;
+
+            document.body.appendChild(popover);
+            // console.log(messages);
+        }
+    }
+
+    function handleMouseOut(e) {
+        const popover = document.querySelector('#popover-message');
+        if (popover) {
+            popover.remove();
+        }
+    }
+    // table.removeEventListener('mouseover', handleMouseOver);
+    table.addEventListener('mouseover', handleMouseOver);
+    table.addEventListener('mouseout', handleMouseOut);
 
     //charactter limits?
     // table.addEventListener('input', (event) => {
