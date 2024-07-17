@@ -26,6 +26,10 @@ Once verified, can either be exported for a client or the corrected version can 
 [x] Button for type of row to add (Nut, Ing) -> find: "// ! Validate here"
 [x] ENHANCE: Mouseover error and warning conditions. 
 
+
+[] Need to clear all columns besides Product ID for Salsify reimport
+[] Need to add any type row or change the Type... (Activated Charcoal )
+
 [] Check PLM1 Pipeify to see how this will affect it. 
 
 ---

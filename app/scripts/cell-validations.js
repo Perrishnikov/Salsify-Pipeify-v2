@@ -134,7 +134,7 @@ class Tester {
         const isNotNumber = isNaN(Number(this.trimmedValue));
         let test = new Test();
 
-        if (isNotNumber) {
+        if (!isNotNumber) {
             const message = `${this.trimmedValue} is not a number`;
             test = new Test(true, message, this.trimmedValue);
             this.failed = true;
@@ -294,7 +294,7 @@ const createCell = {
 
         const testForWarnings = new Tester(trimmedValue)
             .shouldNotBeEmpty()
-            // .shouldNotBeParsedAsNumber()
+            .shouldNotBeParsedAsNumber()
             .forEachFailure(status.addWarning.bind(status));
 
         return status;
