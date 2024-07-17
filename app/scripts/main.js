@@ -391,22 +391,6 @@ function handlePopoverMenuClick(e) {
                 }
             }
         }
-        // } else if (buttonId === 'delete') {
-        //     // Loop through table rows to find the target row by its data-row_id and delete it
-        //     for (let i = 1; i < table.rows.length; i++) {
-        //         const row = table.rows[i];
-        //         const rowId = row.dataset.row_id;
-
-        //         if (rowId === rowIdFromDom) {
-        //             rowIndex = i;
-        //             break;
-        //         }
-        //     }
-
-        //     if (rowIndex !== undefined) {
-        //         table.deleteRow(rowIndex);
-        //     }
-        // }
     }
 }
 

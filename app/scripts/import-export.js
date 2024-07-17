@@ -108,16 +108,20 @@ function salsify_mergeIngredients(jsonData) {
  * @param {string} parsingOption - The parsing option for processing.
  */
 function salsify_preprocess(jsonData, parsingOption) {
+    // console.log(jsonData);
     // Filter out parents, keeping only variants. If it has them.
     const varientsOnly = [...jsonData].filter((obj) => {
+        // console.log(obj);
+
         if (
             obj['salsify:data_inheritance_hierarchy_level_id'] &&
             obj['salsify:data_inheritance_hierarchy_level_id'] === 'variant'
         ) {
-            return (
-                obj['salsify:data_inheritance_hierarchy_level_id'] === 'variant'
-            );
-        } 
+            // return (
+            //     obj['salsify:data_inheritance_hierarchy_level_id'] === 'variant'
+            // );
+            return obj;
+        }
         // comment to allow only varients...
         // else {
         //     return obj;
@@ -138,9 +142,18 @@ function salsify_preprocess(jsonData, parsingOption) {
     /** @type {SalsifyObject[]} */
     const mergedJsonData = salsify_mergeIngredients(nonSalsifyPropsOnly);
 
-    // add the row_id here
-    // mergedJsonData.map(item => item['PIPEIFY:row_id'] = generateRandomString(9))
-    console.log('mergedJsonData', mergedJsonData);
+
+    // console.log('mergedJsonData', mergedJsonData);
+
+    setLocalStorage(mergedJsonData);
+
+    //* Done with Salsify processing */
+    main_process(parsingOption);
+}
+
+function pipeify_preprocess(jsonData, parsingOption) {
+    /** @type {SalsifyObject[]} */
+    const mergedJsonData = salsify_mergeIngredients(jsonData);
 
     setLocalStorage(mergedJsonData);
 
@@ -173,15 +186,17 @@ async function xlsx_import_file(file, parsingOption) {
                 if (metadata?.Title === 'Pipeify v2 For Customers') {
                     // Resolve the promise with the fileType
                     reject('FOR CUSTOMER not handled');
+                } else if (metadata?.Title === 'Pipeify v2 For Salsify') {
+                    showToast(`From Pipeify`, 'info');
+                    pipeify_preprocess(jsonData, parsingOption);
+                    // Resolve the promise with the fileType
+                    resolve('FROM PIPEIFY');
                 } else if (hasProductId(jsonData)) {
+                    showToast(`From Salsify`, 'info');
                     salsify_preprocess(jsonData, parsingOption);
 
                     // Resolve the promise with the fileType
                     resolve('FROM SALSIFY');
-                } else if (metadata?.Title === 'Pipeify v2 For Salsify') {
-                    salsify_preprocess(jsonData, parsingOption);
-                    // Resolve the promise with the fileType
-                    resolve('FROM PIPEIFY');
                 } else {
                     reject(
                         'Spreadsheet must contain Salsify props or be a Pipeify export.'
