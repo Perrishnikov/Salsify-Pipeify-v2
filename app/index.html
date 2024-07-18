@@ -3,6 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
         <link rel="stylesheet" href="styles.css" />
         <link
             rel="stylesheet"
@@ -13,31 +14,49 @@
     </head>
     <body>
         <div><h1>Pipeify v2</h1></div>
-        <div id="dropArea" class="margin-below">
-            Drag and drop a Salsify export (Excel) file here, or click to select
+        <div class="tab">
+            <button class="tablinks active" onclick='openTab(event, "Tab1")'>
+                Import Old Ingredients
+            </button>
+            <button class="tablinks" onclick='openTab(event, "Tab2")'>
+                Create Ingredient
+            </button>
+            <button class="tablinks" onclick='openTab(event, "Tab3")'>
+                Tab 3
+            </button>
         </div>
-        <div id="toast-container"></div>
 
-        <div>
-            <div id="radioButtons" class="margin-below">
-                <div class="subtitle">Ingredient Parsing Options:</div>
+        <!-- Tab 1 -->
+        <div id="Tab1" class="tabcontent default">
+            <div id="dropArea" class="margin-below">
+                Drag and drop a Salsify export (Excel) file here, or click to
+                select
+            </div>
+            <div id="toast-container"></div>
+            <div class="margin-below">
+                <div id="fileName" class="subtitle"></div>
+                <!-- append imported fileName here -->
+            </div>
+            <div>
+                <div id="radioButtons" class="margin-below">
+                    <div class="subtitle">Ingredient Parsing Options:</div>
 
-                <div class="option-div">
-                    <input
-                        type="radio"
-                        id="meh"
-                        name="parsingOptions"
-                        value="meh"
-                        class="radio-button"
-                    />
-                    <label for="meh" class="radio-checkbox-label">#0</label>
-                    <span class="option-context"
-                        >- (No Validation) Creates 3 columns for each of the
-                        ingredient types and 1 row per partcode.</span
-                    >
-                </div>
+                    <div class="option-div">
+                        <input
+                            type="radio"
+                            id="meh"
+                            name="parsingOptions"
+                            value="meh"
+                            class="radio-button"
+                        />
+                        <label for="meh" class="radio-checkbox-label">#0</label>
+                        <span class="option-context"
+                            >- (No Validation) Creates 3 columns for each of the
+                            ingredient types and 1 row per partcode.</span
+                        >
+                    </div>
 
-                <!-- <div class="option-div">
+                    <!-- <div class="option-div">
                     <input
                         type="radio"
                         id="option1"
@@ -54,7 +73,7 @@
                     >
                 </div> -->
 
-                <!-- <div class="option-div">
+                    <!-- <div class="option-div">
                     <input
                         type="radio"
                         id="option2"
@@ -71,7 +90,7 @@
                     >
                 </div> -->
 
-                <!-- <div class="option-div">
+                    <!-- <div class="option-div">
                     <input
                         type="radio"
                         id="option3"
@@ -87,23 +106,25 @@
                     >
                 </div> -->
 
-                <div class="option-div">
-                    <input
-                        type="radio"
-                        id="option4"
-                        name="parsingOptions"
-                        value="option4"
-                        class="radio-button"
-                        checked
-                    />
-                    <label for="option4" class="radio-checkbox-label">#4</label>
-                    <span class="option-context"
-                        >- (Cell Validation) Creates 8 ingredient related
-                        columns (1 for each pipe AND 1-3 rows per
-                        partcode)</span
-                    >
-                </div>
-                <!-- <div class="option-div">
+                    <div class="option-div">
+                        <input
+                            type="radio"
+                            id="option4"
+                            name="parsingOptions"
+                            value="option4"
+                            class="radio-button"
+                            checked
+                        />
+                        <label for="option4" class="radio-checkbox-label"
+                            >#4</label
+                        >
+                        <span class="option-context"
+                            >- (Cell Validation) Creates 8 ingredient related
+                            columns (1 for each pipe AND 1-3 rows per
+                            partcode)</span
+                        >
+                    </div>
+                    <!-- <div class="option-div">
                     <input
                         type="radio"
                         id="option5"
@@ -118,107 +139,117 @@
                         >- Error Correction for import back into Salsify</span
                     >
                 </div> -->
+                </div>
+            </div>
+
+            <div class="margin-below">
+                <button id="download-wysiwyg-btn" class="drag-drop-btn">
+                    Download For Customer
+                </button>
+
+                <button
+                    disabled
+                    id="download-for-salsify-btn"
+                    class="drag-drop-btn"
+                >
+                    Download For Salsify
+                </button>
+                <button id="clear-localstorage-btn" class="drag-drop-btn">
+                    Clear Local Storage
+                </button>
+                <button id="helpBtn" class="drag-drop-btn">Help</button>
+            </div>
+
+            <div id="table-container"></div>
+
+            <!-- The Help Modal -->
+            <div id="helpModal" class="modal">
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <h2>Pipeify Help Section</h2>
+                    <p>
+                        Pipeify takes a Salsify export, parses it, and exports
+                        it. Used for cleaning up ingredients (re-import) and to
+                        provide customers with ingredient data.
+                    </p>
+                    <ul>
+                        <li>
+                            Salsify export must have [PARTCODE or Product ID,
+                            Nutrients, Ingredients, Other]. Export automatically
+                            contains Product ID, which is required for
+                            re-import.
+                        </li>
+                        <li>
+                            Removes parent record, parses by option, and leaves
+                            other columns as-is.
+                        </li>
+                    </ul>
+                    <h3>Parsing Option #4</h3>
+
+                    <ul>
+                        <li>
+                            Checks for errors:
+                            <ul>
+                                <li><b>Order</b> - Should be number</li>
+                                <li>
+                                    <b>Description</b> - Should not be empty
+                                </li>
+                                <li>
+                                    <b>Qty</b> - Should not be empty; Should be
+                                    a number; Can use '<' and ','
+                                </li>
+                                <li>
+                                    <b>UOM</b> - Valid values: 'mg', 'mcg', 'g',
+                                    'ml', 'l', 'oz', 'CFU', 'mcg DFE', 'mg DFE',
+                                    '', 'IU'
+                                </li>
+                                <li>
+                                    <b>DV</b> - <br />For Nutrients: Should be a
+                                    number; May include these characters: '**',
+                                    '<', ',' <br />For Ingredients: Should not
+                                    be empty
+                                </li>
+                                <li>
+                                    <b>Sym</b> - <br />For Nutrients: '%', ''<br />For
+                                    Ingredients: '**', ''
+                                </li>
+                                <li>
+                                    <b>Foot</b> - <br />For Nutrients: ‡ , †
+                                    <br />For Ingredients: Should be empty
+                                </li>
+                            </ul>
+                        </li>
+                        <li>Yellow indicates possible invalid value.</li>
+                        <li>Red indicates invalid value.</li>
+                        <li>May not ADD or DELETE an Other Row</li>
+                    </ul>
+                    <h3>Download For Salsify</h3>
+                    <ul>
+                        <li>
+                            Only validated options (#4) can be exported for
+                            Salsify.
+                        </li>
+                        <li>
+                            Only exports Product ID, Nutrients, Ingredients, and
+                            Other Ingredients columns.
+                        </li>
+                    </ul>
+                    <h3>Download For Customers</h3>
+                    <ul>
+                        <li>Removes the Product ID column.</li>
+                    </ul>
+                </div>
             </div>
         </div>
-
-        <!-- <div id="headerCheckboxes" class="margin-below">
-                <div class="subtitle">Headers (To Download):</div>
-            </div> -->
-
-        <div class="margin-below">
-            <button id="download-wysiwyg-btn" class="drag-drop-btn">
-                Download For Customer
-            </button>
-
-            <button
-                disabled
-                id="download-for-salsify-btn"
-                class="drag-drop-btn"
-            >
-                Download For Salsify
-            </button>
-            <button id="clear-localstorage-btn" class="drag-drop-btn">
-                Clear Local Storage
-            </button>
-            <button id="helpBtn" class="drag-drop-btn">Help</button>
+        <!-- Tab 2 -->
+        <div id="Tab2" class="tabcontent">
+            <h3>Tab 2</h3>
+            <p>Content for Tab 2.</p>
         </div>
 
-        <div class="margin-below">
-            <div id="fileName" class="subtitle"></div>
-            <!-- append imported fileName here -->
-        </div>
-
-        <div id="table-container"></div>
-
-        <!-- The Help Modal -->
-        <div id="helpModal" class="modal">
-            <div class="modal-content">
-                <span class="close">&times;</span>
-                <h2>Pipeify Help Section</h2>
-                <p>
-                    Pipeify takes a Salsify export, parses it, and exports it.
-                    Used for cleaning up ingredients (re-import) and to provide
-                    customers with ingredient data.
-                </p>
-                <ul>
-                    <li>
-                        Salsify export must have [PARTCODE or Product ID,
-                        Nutrients, Ingredients, Other]. Export automatically
-                        contains Product ID, which is required for re-import.
-                    </li>
-                    <li>
-                        Removes parent record, parses by option, and leaves
-                        other columns as-is.
-                    </li>
-                </ul>
-                <h3>Parsing Option #4</h3>
-
-                <ul>
-                    <li>
-                        Checks for errors:
-                        <ul>
-                            <li><b>Order</b> - Should be number</li>
-                            <li><b>Description</b> - Should not be empty</li>
-                            <li>
-                                <b>Qty</b> - Should not be empty; Should be a number;
-                                Can use '<' and ','
-                            </li>
-                            <li>
-                                <b>UOM</b> - Valid values: 'mg', 'mcg', 'g', 'ml', 'l',
-                                'oz', 'CFU', 'mcg DFE', 'mg DFE', '', 'IU'
-                            </li>
-                            <li>
-                                <b>DV</b> - <br />For Nutrients: Should be a number;
-                                May include these characters: '**', '<', ',' <br />For
-                                Ingredients: Should not be empty
-                            </li>
-                            <li>
-                                <b>Sym</b> - <br />For Nutrients: '%', ''<br />For
-                                Ingredients: '**', ''
-                            </li>
-                            <li>
-                                <b>Foot</b> -
-                                <br>For Nutrients: ‡ , †
-                                <br>For Ingredients: Should be empty
-                            </li>
-                        </ul>
-                    </li>
-                    <li>Yellow indicates possible invalid value.</li>
-                    <li>Red indicates invalid value.</li>
-                    <li>May not ADD or DELETE an Other Row</li>
-                </ul>
-                <h3>Download For Salsify</h3>
-                <ul>
-                    <li>
-                        Only validated options (#4) can be exported for Salsify.
-                    </li>
-                    <li>Only exports Product ID, Nutrients, Ingredients, and Other Ingredients columns.</li>
-                </ul>
-                <h3>Download For Customers</h3>
-                <ul>
-                    <li>Removes the Product ID column.</li>
-                </ul>
-            </div>
+        <div id="Tab3" class="tabcontent">
+            <h3>Tab 3</h3>
+            <p>Content for Tab 3.</p>
         </div>
 
         <script src="scripts/toast.js"></script>
