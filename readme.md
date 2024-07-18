@@ -30,7 +30,9 @@ Once verified, can either be exported for a client or the corrected version can 
 
 [] Need to add any type row or change the Type... (Activated Charcoal )
 
-[] Check PLM1 Pipeify to see how this will affect it. 
+[] Check PLM1 Pipeify to see how this will affect it.
+    Export the PLM1 fields as above, rename columns
+[] Do we need the ability to create a new product?
 
 ---
 [] Drag n drop rows
