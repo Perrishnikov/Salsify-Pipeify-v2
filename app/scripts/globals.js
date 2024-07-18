@@ -258,9 +258,11 @@ function coalesce(value1, value2) {
 
     if (value1) {
         value = value1;
-    } else if (value2) value = value2;
+    } else if (value2) {
+        value = value2;
+    } 
     else {
-        value = null;
+        value = '';
     }
     return value;
 }

@@ -289,7 +289,7 @@ const createCell = {
     },
     validateDescription: (value) => {
         const status = new Status();
-        const trimmedValue = value.toString().trim();
+        const trimmedValue = value?.toString().trim();
         // console.log({ trimmedValue });
 
         const testForWarnings = new Tester(trimmedValue)

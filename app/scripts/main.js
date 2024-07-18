@@ -192,13 +192,14 @@ function processOptionWithData(mergedJsonData, parsingOption) {
                 const rowsOfIngredients =
                     per_ingred_per_partcode_2(rowsOfCells);
 
-                // Row validation
+                    // Row validation
                 const depipedColumns =
                     per_pipe_per_partcode_3(rowsOfIngredients);
 
                 const errorCheckedCells =
                     per_pipe_per_partcode_4b(depipedColumns);
 
+                    console.log(errorCheckedCells);
                 return errorCheckedCells;
             }
             break;
@@ -208,7 +209,64 @@ function processOptionWithData(mergedJsonData, parsingOption) {
 }
 
 /** MAIN ****************************************************************/
+function createNewTable(parsingOption, productIdValue) {
+    console.log('Hello World', parsingOption, productIdValue);
 
+    const fauxJsonObject = [
+        {
+            'Product ID': productIdValue,
+            'LABEL_DATASET_INGREDIENTS_A - en-US': '1||||||||',
+            'LABEL_DATASET_NUTRIENT_A - en-US': '1|||||||',
+            'LABEL_DATASET_OTHER_INGREDS_A': 'x',
+        },
+    ];
+
+    const rows = processOptionWithData(fauxJsonObject, parsingOption);
+    console.log(rows);
+
+    // Create the table element
+    const newTable = document.createElement('table');
+    newTable.setAttribute('id', 'new-table');
+
+    const headerRow = document.createElement('tr');
+
+    if (parsingOption === 'option4') {
+        //* For Popover Menu
+        const menuHeader = document.createElement('th');
+        headerRow.appendChild(menuHeader);
+    }
+
+    // Add other headers
+    rows[0].cells.forEach((cell) => {
+        const th = document.createElement('th');
+        th.textContent = cell.header.name;
+        headerRow.appendChild(th);
+    });
+    newTable.appendChild(headerRow);
+
+    rows.forEach((row) => {
+        let tableRow;
+        if (parsingOption === 'option4') {
+            tableRow = createTableRow(row, createMenuPopover);
+        } else {
+            tableRow = createTableRow(row, null);
+        }
+        newTable.appendChild(tableRow);
+    });
+
+    // Get container element to append the table
+    const tableContainer = document.getElementById('new-table-container');
+
+    // Clear any old table
+    tableContainer.innerHTML = '';
+
+    // Give it the new data
+    tableContainer.appendChild(newTable);
+    
+    attachBlurEventToTableCells(newTable);
+
+    applyHandlePopoverMenuClickToTable('new-table');
+}
 /**
  * Attaches the handlePopoverMenuClick function to each button with the class
  * .popover-menu-item within the my-table table.
@@ -217,6 +275,7 @@ function processOptionWithData(mergedJsonData, parsingOption) {
  */
 function applyHandlePopoverMenuClickToTable(tableId = 'my-table') {
     // Create a WeakSet to store buttons that already have the event listener attached
+    console.log(tableId);
     const buttonsWithListeners = new WeakSet();
 
     // Get the table element by its ID
@@ -231,7 +290,10 @@ function applyHandlePopoverMenuClickToTable(tableId = 'my-table') {
         buttons.forEach((button) => {
             // Check if the button already has the event listener
             if (!buttonsWithListeners.has(button)) {
-                button.addEventListener('click', handlePopoverMenuClick);
+                // button.addEventListener('click', handlePopoverMenuClick);
+                button.addEventListener('click', (event) => {
+                    handlePopoverMenuClick(event, tableId);
+                });
                 // Add the button to the WeakSet
                 buttonsWithListeners.add(button);
             }
@@ -246,7 +308,7 @@ function applyHandlePopoverMenuClickToTable(tableId = 'my-table') {
  *
  * @param {Event} e - The click event object.
  */
-function handlePopoverMenuClick(e) {
+function handlePopoverMenuClick(e, tableId) {
     // Get the button that was clicked
     const button = e.target.closest('.popover-menu-item');
 
@@ -258,8 +320,8 @@ function handlePopoverMenuClick(e) {
         const targetRow = e.target.closest('tr[data-row_id]');
         const rowIdFromDom = targetRow ? targetRow.dataset.row_id : null;
 
-        // Get the table element
-        const table = document.getElementById('my-table');
+        // Get the table element //!do it here
+        const table = document.getElementById(tableId);
         if (!rowIdFromDom || !table) {
             showToast(`Target row or table not found`, 'error');
             console.error('Target row or table not found.');
@@ -363,7 +425,7 @@ function handlePopoverMenuClick(e) {
                     }
 
                     // Reapply event listeners to the table
-                    applyHandlePopoverMenuClickToTable();
+                    applyHandlePopoverMenuClickToTable(tableId);
 
                     // Toggle the popover if it exists
                     const popover = e.target.closest('[popover]');
@@ -529,7 +591,7 @@ function createTableRow(rowData, headerCallback = null, index) {
 function main_process(parsingOption) {
     // set in salsify_preprocess
     const jsonObject = getLocalStorage();
-
+    console.log(jsonObject);
     const rows = processOptionWithData(jsonObject, parsingOption);
 
     // Create the table element
@@ -583,7 +645,7 @@ function main_process(parsingOption) {
 
     attachBlurEventToTableCells(myTable);
 
-    applyHandlePopoverMenuClickToTable();
+    applyHandlePopoverMenuClickToTable('my-table');
 }
 
 /** BLUR Validations *********************************************************/

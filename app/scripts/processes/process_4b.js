@@ -7,6 +7,7 @@
 function per_pipe_per_partcode_4b(rows) {
     rows.forEach((row) => {
         row.cells.forEach((cell) => {
+            
             // Get the object representing the ingredient type of the current row
             const ingredientTypeObject = getObjectByIngredientType(row.cells);
 

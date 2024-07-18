@@ -15,28 +15,31 @@
     <body>
         <div><h1>Pipeify v2</h1></div>
         <div class="tab">
-            <button class="tablinks active" onclick='openTab(event, "Tab1")'>
+            <button class="tablinks" onclick='openTab(event, "Tab1")'>
                 Import Old Ingredients
             </button>
-            <button class="tablinks" onclick='openTab(event, "Tab2")'>
-                Create Ingredient
+            <button class="tablinks active" onclick='openTab(event, "Tab2")'>
+                Create New
             </button>
             <button class="tablinks" onclick='openTab(event, "Tab3")'>
                 Tab 3
             </button>
         </div>
-
+        <div id="toast-container"></div>
         <!-- Tab 1 -->
-        <div id="Tab1" class="tabcontent default">
+        <div id="Tab1" class="tabcontent">
             <div id="dropArea" class="margin-below">
-                Drag and drop a Salsify export (Excel) file here, or click to
-                select
+                <h3>
+                    Drag and drop a Salsify export (Excel) file here, or click
+                    to select
+                </h3>
             </div>
-            <div id="toast-container"></div>
+
             <div class="margin-below">
                 <div id="fileName" class="subtitle"></div>
                 <!-- append imported fileName here -->
             </div>
+            <!-- TODO: Hide until there is a file -->
             <div>
                 <div id="radioButtons" class="margin-below">
                     <div class="subtitle">Ingredient Parsing Options:</div>
@@ -241,10 +244,22 @@
                 </div>
             </div>
         </div>
-        <!-- Tab 2 -->
-        <div id="Tab2" class="tabcontent">
-            <h3>Tab 2</h3>
-            <p>Content for Tab 2.</p>
+        <!-- Tab 2 default-->
+        <div id="Tab2" class="tabcontent default">
+            <h3>Create New Ingredients</h3>
+            <form action="#" method="post" id="productidform">
+                <label for="product-id">Product ID:</label>
+                <input
+                    type="text"
+                    id="product-id"
+                    name="product-id"
+                    required
+                    value="00033674069738"
+                />
+                <button type="submit">Submit</button>
+            </form>
+
+            <div id="new-table-container"></div>
         </div>
 
         <div id="Tab3" class="tabcontent">

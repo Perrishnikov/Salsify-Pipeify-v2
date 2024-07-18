@@ -14,6 +14,35 @@ function openTab(evt, tabName) {
     evt.currentTarget.className += ' active';
 }
 
+/** Validate New Ingredients Form */
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.querySelector('#productidform');
+
+    form.addEventListener('submit', function (event) {
+        const productIdInput = document.getElementById('product-id');
+        const productIdValue = productIdInput.value.trim();
+
+        event.preventDefault(); // Prevent form submission
+
+        if (productIdValue.length !== 14 || !productIdValue.startsWith('000')) {
+            showToast(
+                `Product ID must be 14 digits long and start with "000".`,
+                'error'
+            );
+            // alert('Product ID must be 14 digits long and start with "000".');
+            // event.preventDefault(); // Prevent form submission
+        } else {
+            //main.js
+            const parsingOption = getCheckedRadioButtonId();
+            createNewTable('option4', productIdValue);
+            // productIdInput.value = ''
+        }
+    });
+});
+
+
+
+
 /* ONCHAGE - RADIO BUTTON LISTENER */
 const radioButtonsDiv = document.getElementById('radioButtons');
 if (radioButtonsDiv) {

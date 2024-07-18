@@ -149,15 +149,16 @@ input[type='checkbox'] {
     z-index: 1;
 } */
 #table-container {
-    flex-basis: auto;
-    border-collapse: collapse;
+    /* flex-basis: auto; */
+    /* border-collapse: collapse; */
     /* overflow-x: auto; */
     /* overflow-y: auto; Enable vertical scrolling */
     /* height: 300px;  */
     /* height:600px; */
 }
 /* Style for the table */
-table {
+table {    flex-basis: auto;
+    border-collapse: collapse;
     border-collapse: collapse;
     border: 1px solid white;
 }
@@ -393,4 +394,42 @@ button.popover-menu-item {
     color: black;
     text-decoration: none;
     cursor: pointer;
+}
+
+form {
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--mdgray);
+    border-radius: calc(var(--padding-margin) / 2);
+    padding: var(--padding-margin);
+    background-color: white;
+}
+
+label {
+    margin-right: var(--padding-margin);
+    font-size: var(--font-size);
+}
+
+input[type='text'] {
+    flex: 1;
+    padding: calc(var(--padding-margin) / 2);
+    margin-right: var(--padding-margin);
+    border: 1px solid var(--mdgray);
+    border-radius: calc(var(--padding-margin) / 2);
+    font-size: var(--font-size);
+}
+
+button[type='submit'] {
+    padding: calc(var(--padding-margin) / 2) calc(var(--padding-margin) * 2);
+    font-size: var(--font-size);
+    border-radius: calc(var(--padding-margin) / 2);
+    border: none;
+    cursor: pointer;
+    background-color: var(--primary-color);
+    color: white;
+    transition: background-color 0.3s;
+}
+
+button[type='submit']:hover {
+    background-color: #0056b3; /* Darker shade of primary color */
 }
