@@ -58,7 +58,8 @@ if (newSalsify) {
         console.log(`download-for-salsify-btn`);
         const parsingOption = getCheckedRadioButtonId();
 
-        process_for_salsify(parsingOption);
+        const newTable = document.getElementById('new-table');
+        process_for_salsify(parsingOption, newTable);
     });
 }
 
@@ -186,7 +187,7 @@ if (button_current_table) {
     });
 }
 
-/** Export for Salsify file */
+/** Export Tab1 for Salsify file */
 const button_salsify_reimport = document.getElementById(
     'download-for-salsify-btn'
 );
@@ -195,7 +196,8 @@ if (button_salsify_reimport) {
         // console.log(`download-for-salsify-btn`);
         const parsingOption = getCheckedRadioButtonId();
 
-        process_for_salsify(parsingOption);
+        const myTable = document.getElementById('my-table');
+        process_for_salsify(parsingOption, myTable);
     });
 }
 

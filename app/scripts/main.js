@@ -882,17 +882,17 @@ function process_wysiwyg_export(parsingOption) {
  *
  * @param {string} parsingOption - The parsing option for reimport.
  */
-function process_for_salsify(parsingOption) {
-    const myTable = document.getElementById('my-table');
+function process_for_salsify(parsingOption, tableDataFromDom) {
+    // const myTable = document.getElementById('my-table');
 
-    if (!myTable) {
+    if (!tableDataFromDom) {
         showToast(`No Data to Export`, 'error');
     }
     // Initialize an array to hold the data
     const tableData = [];
 
     // Get the table rows
-    const rows = myTable.querySelectorAll('tr');
+    const rows = tableDataFromDom.querySelectorAll('tr');
 
     // get unique Product ID's, one per row
     const uniqueProductIds = new Set();
