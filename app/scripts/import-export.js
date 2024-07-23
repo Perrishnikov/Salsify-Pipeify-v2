@@ -124,8 +124,15 @@ function salsify_preprocess(jsonData, parsingOption) {
         }
         // comment to allow only varients...
         // else {
+
         //     return obj;
         // }
+        if (
+            obj['salsify:data_inheritance_hierarchy_level_id'] &&
+            obj['salsify:data_inheritance_hierarchy_level_id'] === 'standalone'
+        ) {
+            showToast(`Not a Variant`, 'error');
+        }
     });
 
     // Remove properties that start with "salsify:"
@@ -284,7 +291,7 @@ function xlsx_exportForSalsify(data) {
     let fileName = 'Pipeify (Salsify multi-item export).xlsx';
     const uniqueProductIds = [...new Set(data.map((obj) => obj['Product ID']))];
     // console.log(uniqueProductIds);
-    if(uniqueProductIds.length === 1){
+    if (uniqueProductIds.length === 1) {
         fileName = `Pipeify (Salsify ${uniqueProductIds[0]}).xlsx`;
     }
 

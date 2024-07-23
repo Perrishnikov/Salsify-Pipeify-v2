@@ -30,13 +30,12 @@ Once verified, can either be exported for a client or the corrected version can 
 
 [] Need to add any type row or change the Type... (Activated Charcoal )
 [x] Name Single ingredient by Product ID
-[] Error specific to Parent import
+[x] Error specific to Parent import
 
 [] Check PLM1 Pipeify to see how this will affect it.
     Export the PLM1 fields as above, rename columns
     Use the JS feature to parse the pipes.
     Use Pipeify to validate PLM1 as it will do NIO.
-[] Do we need the ability to create a new product?
 [] Yes - should allow for export to PLM1 and original
 [] Create helper symbols to copy and paste
 
