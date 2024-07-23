@@ -199,7 +199,7 @@ function processOptionWithData(mergedJsonData, parsingOption) {
                 const errorCheckedCells =
                     per_pipe_per_partcode_4b(depipedColumns);
 
-                    console.log(errorCheckedCells);
+                    // console.log(errorCheckedCells);
                 return errorCheckedCells;
             }
             break;

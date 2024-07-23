@@ -40,22 +40,13 @@ if (form) {
     });
 }
 
-// const newSalsify = document.querySelector('#download-new-ing-salsify-btn');
 
-// if(newSalsify){
-// console.log(newSalsify);
-//         newSalsify.addEventListener('click', (e) => {
-//             // const parsingOption = getCheckedRadioButtonId();
-//             console.log(e);
-//             // process_wysiwyg_export(parsingOption);
-//         });
-// }
-// });
 const newSalsify = document.getElementById('download-new-ing-salsify-btn');
 if (newSalsify) {
-    console.log(newSalsify);
+    
     newSalsify.addEventListener('click', (e) => {
         console.log(`download-for-salsify-btn`);
+        console.log(newSalsify.value);
         const parsingOption = getCheckedRadioButtonId();
 
         const newTable = document.getElementById('new-table');

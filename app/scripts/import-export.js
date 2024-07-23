@@ -142,7 +142,6 @@ function salsify_preprocess(jsonData, parsingOption) {
     /** @type {SalsifyObject[]} */
     const mergedJsonData = salsify_mergeIngredients(nonSalsifyPropsOnly);
 
-
     // console.log('mergedJsonData', mergedJsonData);
 
     setLocalStorage(mergedJsonData);
@@ -280,6 +279,15 @@ function xlsx_exportForSalsify(data) {
     // worksheet['!cols'] = calculateAutoWidths(data, specificWidths);
     const workbook = XLSX.utils.book_new();
 
+    //Name the export
+    //! Do it here
+    let fileName = 'Pipeify (Salsify multi-item export).xlsx';
+    const uniqueProductIds = [...new Set(data.map((obj) => obj['Product ID']))];
+    // console.log(uniqueProductIds);
+    if(uniqueProductIds.length === 1){
+        fileName = `Pipeify (Salsify ${uniqueProductIds[0]}).xlsx`;
+    }
+
     workbook.Props = {
         Title: 'Pipeify v2 For Salsify',
         CreatedDate: new Date(),
@@ -289,5 +297,5 @@ function xlsx_exportForSalsify(data) {
 
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
 
-    XLSX.writeFile(workbook, 'Pipeify (Salsify export).xlsx');
+    XLSX.writeFile(workbook, fileName);
 }

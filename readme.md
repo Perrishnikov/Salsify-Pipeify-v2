@@ -29,7 +29,7 @@ Once verified, can either be exported for a client or the corrected version can 
 
 
 [] Need to add any type row or change the Type... (Activated Charcoal )
-[] Name Single ingredient by Product ID
+[x] Name Single ingredient by Product ID
 [] Error specific to Parent import
 
 [] Check PLM1 Pipeify to see how this will affect it.
