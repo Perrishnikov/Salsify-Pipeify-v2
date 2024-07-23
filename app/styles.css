@@ -1,5 +1,6 @@
 :root {
     --primary-color: #007bff; /* Define a variable named --primary-color */
+    --primary-dk: #0056b3;
     --font-size: 16px; /* Define a variable named --font-size */
     --font-size-smaller: 14px;
     --padding-margin: 16px;
@@ -12,6 +13,9 @@
     --ltgray: #f9f9f9;
     --mdgray: #888;
     --dktranny: rgba(0, 0, 0, 0.4);
+    --ltpipe: rgb(38, 164, 16);
+    --pipe-dk: rgb(28, 124, 12); /* Darker color for hover effect */
+    --dkpipe: rgb(29, 92, 19);
     /* --dkgray: hsl(0, 0%, 40%); */
 }
 
@@ -28,6 +32,9 @@ body {
 }
 .margin-below {
     margin-bottom: calc(var(--padding-margin) * 2);
+}
+.margin-above {
+    margin-top: calc(var(--padding-margin) * 2);
 }
 .hidden {
     display: none;
@@ -64,10 +71,11 @@ body {
 }
 .tabcontent {
     display: none;
-    padding: 6px 12px;
+    padding: calc(var(--padding-margin) / 2) calc(var(--padding-margin) / 2);
     border-top: none;
     flex-direction: column;
     align-items: center;
+    width: 100%;
 }
 
 .tabcontent.default {
@@ -86,8 +94,24 @@ body {
     border-radius: calc(var(--padding-margin) / 2);
     font-size: var(--font-size);
     color: var(--primary-color);
+    
 }
-
+.button-box {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    border: 1px solid var(--mdgray);
+    border-radius: calc(var(--padding-margin) / 2);
+    padding: var(--padding-margin);
+    background-color: white;
+}
+.button-box-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+     gap: 16px;
+    /* justify-content: space-around; */
+}
 /* RADIO & CHECKBOXES */
 .option-div {
     padding-top: calc(var(--padding-margin) / 8);
@@ -148,19 +172,22 @@ input[type='checkbox'] {
     background-color: white; 
     z-index: 1;
 } */
-#table-container {
-    /* flex-basis: auto; */
-    /* border-collapse: collapse; */
-    /* overflow-x: auto; */
-    /* overflow-y: auto; Enable vertical scrolling */
-    /* height: 300px;  */
-    /* height:600px; */
+
+/* Wrapper to make table expand to full width */
+.table-wrapper {
+    display: flex;
+    width: 100%;
 }
 /* Style for the table */
-table {    flex-basis: auto;
-    border-collapse: collapse;
+table {
+    /* flex-basis: auto; */
     border-collapse: collapse;
     border: 1px solid white;
+    width: 100%;
+}
+#productidform {
+    margin-bottom: calc(var(--padding-margin) * 2);
+    /* width: 100%; */
 }
 /* Style for table header */
 th {
@@ -229,6 +256,38 @@ button {
 button:disabled {
     cursor: default;
 }
+button[type='salsify'] {
+    padding: calc(var(--padding-margin) / 2) calc(var(--padding-margin) * 2);
+    font-size: var(--font-size);
+    border-radius: calc(var(--padding-margin) / 2);
+    border: none;
+    cursor: pointer;
+    background-color: var(--ltpipe);
+    color: white;
+    transition: background-color 0.3s;
+}
+button[type='salsify']:hover {
+    background-color: var(--pipe-dk); /* Darker shade of primary color */
+}
+button:disabled {
+    cursor: default;
+    background-color: var(--ltgray);
+}
+button[type='submit'] {
+    padding: calc(var(--padding-margin) / 2) calc(var(--padding-margin) * 2);
+    font-size: var(--font-size);
+    border-radius: calc(var(--padding-margin) / 2);
+    border: none;
+    cursor: pointer;
+    background-color: var(--primary-color);
+    color: white;
+    transition: background-color 0.3s;
+}
+
+button[type='submit']:hover {
+    background-color: var(--primary-dk); /* Darker shade of primary color */
+}
+
 /* Popovers */
 [popover] {
     position: absolute;
@@ -258,7 +317,7 @@ button:disabled {
     display: flex;
     flex-direction: column;
     padding: calc(var(--padding-margin) / 4);
-    background-color: #fff;
+    background-color: var(--ltgray);
     border-radius: calc(var(--padding-margin) / 2);
     /* align-items: center; */
     justify-content: flex-start;
@@ -277,7 +336,7 @@ button.popover-menu-item {
 /* error messages - not quite popover */
 .not-popover {
     position: absolute;
-    /* background-color: #fff; */
+    background-color: #fff;
     border-radius: calc(var(--padding-margin) / 4);
     padding: calc(var(--padding-margin) / 2);
     box-shadow: '0 2px 5px rgba(0, 0, 0, 0.1)';
@@ -396,14 +455,14 @@ button.popover-menu-item {
     cursor: pointer;
 }
 
-form {
+/* form {
     display: flex;
     align-items: center;
     border: 1px solid var(--mdgray);
     border-radius: calc(var(--padding-margin) / 2);
     padding: var(--padding-margin);
     background-color: white;
-}
+} */
 
 label {
     margin-right: var(--padding-margin);
@@ -413,23 +472,8 @@ label {
 input[type='text'] {
     flex: 1;
     padding: calc(var(--padding-margin) / 2);
-    margin-right: var(--padding-margin);
+    /* margin-right: var(--padding-margin); */
     border: 1px solid var(--mdgray);
     border-radius: calc(var(--padding-margin) / 2);
     font-size: var(--font-size);
-}
-
-button[type='submit'] {
-    padding: calc(var(--padding-margin) / 2) calc(var(--padding-margin) * 2);
-    font-size: var(--font-size);
-    border-radius: calc(var(--padding-margin) / 2);
-    border: none;
-    cursor: pointer;
-    background-color: var(--primary-color);
-    color: white;
-    transition: background-color 0.3s;
-}
-
-button[type='submit']:hover {
-    background-color: #0056b3; /* Darker shade of primary color */
 }

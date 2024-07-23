@@ -799,9 +799,10 @@ function attachBlurEventToTableCells(table) {
             popover.remove();
         }
     }
-    // table.removeEventListener('mouseover', handleMouseOver);
-    table.addEventListener('mouseover', handleMouseOver);
-    table.addEventListener('mouseout', handleMouseOut);
+    table.removeEventListener('mouseover', handleMouseOver, true);
+    table.removeEventListener('mouseout', handleMouseOut, true);
+    table.addEventListener('mouseover', handleMouseOver, true);
+    table.addEventListener('mouseout', handleMouseOut, true);
 
     //charactter limits?
     // table.addEventListener('input', (event) => {

@@ -32,6 +32,8 @@ Once verified, can either be exported for a client or the corrected version can 
 
 [] Check PLM1 Pipeify to see how this will affect it.
     Export the PLM1 fields as above, rename columns
+    Use the JS feature to parse the pipes.
+    Use Pipeify to validate PLM1 as it will do NIO.
 [] Do we need the ability to create a new product?
 [] Yes - should allow for export to PLM1 and original
 [] Create helper symbols to copy and paste

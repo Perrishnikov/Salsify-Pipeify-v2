@@ -1,4 +1,4 @@
-// Tabs
+/**  Tabs */
 function openTab(evt, tabName) {
     const tabcontent = document.getElementsByClassName('tabcontent');
     for (let i = 0; i < tabcontent.length; i++) {
@@ -14,10 +14,10 @@ function openTab(evt, tabName) {
     evt.currentTarget.className += ' active';
 }
 
-/** Validate New Ingredients Form */
-document.addEventListener('DOMContentLoaded', function () {
-    const form = document.querySelector('#productidform');
-
+/** Tab 2 - Validate and Submit Product ID for New Ingredients */
+// document.addEventListener('DOMContentLoaded', function () {
+const form = document.querySelector('#productidform');
+if (form) {
     form.addEventListener('submit', function (event) {
         const productIdInput = document.getElementById('product-id');
         const productIdValue = productIdInput.value.trim();
@@ -35,18 +35,37 @@ document.addEventListener('DOMContentLoaded', function () {
             //main.js
             const parsingOption = getCheckedRadioButtonId();
             createNewTable('option4', productIdValue);
-            // productIdInput.value = ''
+            productIdInput.value = '';
         }
     });
-});
+}
 
+// const newSalsify = document.querySelector('#download-new-ing-salsify-btn');
 
+// if(newSalsify){
+// console.log(newSalsify);
+//         newSalsify.addEventListener('click', (e) => {
+//             // const parsingOption = getCheckedRadioButtonId();
+//             console.log(e);
+//             // process_wysiwyg_export(parsingOption);
+//         });
+// }
+// });
+const newSalsify = document.getElementById('download-new-ing-salsify-btn');
+if (newSalsify) {
+    console.log(newSalsify);
+    newSalsify.addEventListener('click', (e) => {
+        console.log(`download-for-salsify-btn`);
+        const parsingOption = getCheckedRadioButtonId();
 
+        process_for_salsify(parsingOption);
+    });
+}
 
-/* ONCHAGE - RADIO BUTTON LISTENER */
+/* Tab 1 - ONCHAGE - RADIO BUTTON LISTENER */
 const radioButtonsDiv = document.getElementById('radioButtons');
 if (radioButtonsDiv) {
-    radioButtonsDiv.addEventListener('change', function (e) {
+    radioButtonsDiv.addEventListener('change', (e) => {
         const selectedOption = e.target.id;
 
         // console.log(`change table columns to ${selectedOption}`);
@@ -64,7 +83,7 @@ if (radioButtonsDiv) {
     });
 }
 
-/* CHECKED - RADIO BUTTON */
+/* Tab 1 - CHECKED - RADIO BUTTON */
 /**
  * Gets the ID of the checked radio button.
  * @returns {string|null} The ID of the checked radio button, or null if none is checked.
@@ -118,7 +137,7 @@ async function dom_importFileHandler(file) {
     }
 }
 
-/* DROP BOX LISTENER */
+/* Tab1 - DROP BOX LISTENER */
 const dropArea = document.getElementById('dropArea');
 if (dropArea) {
     // Prevent default behavior (opening file in browser) when dragging over drop area
@@ -206,7 +225,7 @@ if (clearButton) {
     });
 }
 
-// Get the modal
+/* Tab1 - HELP Modal */
 const modal = document.getElementById('helpModal');
 
 // Get the button that opens the modal

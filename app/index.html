@@ -26,7 +26,8 @@
             </button>
         </div>
         <div id="toast-container"></div>
-        <!-- Tab 1 -->
+
+        <!-- *Tab 1 -->
         <div id="Tab1" class="tabcontent">
             <div id="dropArea" class="margin-below">
                 <h3>
@@ -151,6 +152,7 @@
                 </button>
 
                 <button
+                    type="salsify"
                     disabled
                     id="download-for-salsify-btn"
                     class="drag-drop-btn"
@@ -163,7 +165,7 @@
                 <button id="helpBtn" class="drag-drop-btn">Help</button>
             </div>
 
-            <div id="table-container"></div>
+            <div class="table-wrapper" id="table-container"></div>
 
             <!-- The Help Modal -->
             <div id="helpModal" class="modal">
@@ -244,24 +246,50 @@
                 </div>
             </div>
         </div>
-        <!-- Tab 2 default-->
+        <!-- *Tab 2 default-->
         <div id="Tab2" class="tabcontent default">
             <h3>Create New Ingredients</h3>
-            <form action="#" method="post" id="productidform">
-                <label for="product-id">Product ID:</label>
-                <input
-                    type="text"
-                    id="product-id"
-                    name="product-id"
-                    required
-                    value="00033674069738"
-                />
-                <button type="submit">Submit</button>
-            </form>
+            <div class="button-box">
+                <form
+                    class="button-box-row"
+                    action="#"
+                    method="post"
+                    id="productidform"
+                >
+                    <label for="product-id">Product ID:</label>
+                    <input
+                        type="text"
+                        id="product-id"
+                        name="product-id"
+                        required
+                        value="00033674069738"
+                    />
+                    <button type="submit">Submit</button>
+                </form>
 
-            <div id="new-table-container"></div>
+                <div class="button-box-row">
+                    <!-- <div class=""> -->
+
+                    <button
+                        type="salsify"
+                    
+                        id="download-new-ing-salsify-btn"
+                        class="drag-drop-btn"
+                    >
+                        Download For Salsify
+                    </button>
+                    <!-- <button id="clear-localstorage-btn" class="drag-drop-btn">
+                        Clear Local Storage
+                    </button> -->
+                    <button id="helpBtn" class="drag-drop-btn">Help</button>
+                    <!-- </div> -->
+                </div>
+            </div>
+
+            <div class="table-wrapper" id="new-table-container"></div>
         </div>
 
+        <!-- *Tab 3-->
         <div id="Tab3" class="tabcontent">
             <h3>Tab 3</h3>
             <p>Content for Tab 3.</p>
