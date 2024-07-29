@@ -131,7 +131,7 @@ function salsify_preprocess(jsonData, parsingOption) {
             obj['salsify:data_inheritance_hierarchy_level_id'] &&
             obj['salsify:data_inheritance_hierarchy_level_id'] === 'standalone'
         ) {
-            showToast(`Not a Variant`, 'error');
+            bootToast('Not a Variant', 'danger');
         }
     });
 
@@ -193,12 +193,12 @@ async function xlsx_import_file(file, parsingOption) {
                     // Resolve the promise with the fileType
                     reject('FOR CUSTOMER not handled');
                 } else if (metadata?.Title === 'Pipeify v2 For Salsify') {
-                    showToast(`From Pipeify`, 'info');
+                    bootToast('Import from Pipeify', 'success');
                     pipeify_preprocess(jsonData, parsingOption);
                     // Resolve the promise with the fileType
                     resolve('FROM PIPEIFY');
                 } else if (hasProductId(jsonData)) {
-                    showToast(`From Salsify`, 'info');
+                    bootToast(`Import from Salsify`, 'success');
                     salsify_preprocess(jsonData, parsingOption);
 
                     // Resolve the promise with the fileType
@@ -209,6 +209,8 @@ async function xlsx_import_file(file, parsingOption) {
                     );
                 }
             } catch (error) {
+                bootToast(error, 'danger');
+                //toast is in dom.js
                 reject(error);
             }
         };

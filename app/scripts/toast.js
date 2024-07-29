@@ -33,3 +33,29 @@ function showToast(message, type, duration = 4000) {
         }, 300); // Allow time for the fade-out animation
     }, duration);
 }
+
+function bootToast(message, type = 'success', title = 'Notification') {
+    // success danger warning info light dark
+
+    // Create toast element
+    const toast = document.createElement('div');
+    toast.className = `toast align-items-center text-bg-${type} border-0`;
+    toast.role = 'alert';
+    toast.ariaLive = 'assertive';
+    toast.ariaAtomic = 'true';
+    toast.innerHTML = `
+            <div class="d-flex">
+                <div class="toast-body">
+                    <strong>${title}</strong> ${message}
+                </div>
+                <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        `;
+
+    // Append toast to the container
+    document.getElementById('toast-container').appendChild(toast);
+
+    // Initialize and show the toast
+    const toastElement = new bootstrap.Toast(toast);
+    toastElement.show();
+}

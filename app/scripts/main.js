@@ -347,10 +347,10 @@ function handlePopoverMenuClick(e, tableId) {
         const targetRow = e.target.closest('tr[data-row_id]');
         const rowIdFromDom = targetRow ? targetRow.dataset.row_id : null;
 
-        // Get the table element //!do it here
+        // Get the table element
         const table = document.getElementById(tableId);
         if (!rowIdFromDom || !table) {
-            showToast(`Target row or table not found`, 'error');
+            bootToast('Target row or table not found', 'danger');
             console.error('Target row or table not found.');
             return;
         }
@@ -383,7 +383,7 @@ function handlePopoverMenuClick(e, tableId) {
 
                 //dont duplicate Other row
                 if (ingredientType === LABEL_DATASET_OTHER_INGREDS_A.name) {
-                    showToast(
+                    bootToast(
                         `Other Rows may not be added or deleted.`,
                         'info'
                     );
@@ -861,7 +861,7 @@ function process_wysiwyg_export(parsingOption) {
     const myTable = document.getElementById('my-table');
 
     if (!myTable) {
-        showToast(`No Data to Export`, 'error');
+        bootToast(`No Data to Export`, 'danger');
     }
     // Initialize an array to hold the data
     const tableData = [];
@@ -891,7 +891,7 @@ function process_wysiwyg_export(parsingOption) {
                 // console.log(name, cellData);
                 exportObj[name] = cellData.value;
             } else {
-                // showToast(`cellData is undefined`, 'error');
+
                 // console.log('cellData is undefined');
             }
         });
@@ -899,10 +899,6 @@ function process_wysiwyg_export(parsingOption) {
     });
 
     xlsx_exportWYSIWYG(tableData);
-
-    // if (parsingOption !== 'option4') {
-    //     showToast(`Data is not validated`, 'warning');
-    // }
 }
 
 /**
@@ -914,7 +910,7 @@ function process_for_salsify(parsingOption, tableDataFromDom) {
     // const myTable = document.getElementById('my-table');
 
     if (!tableDataFromDom) {
-        showToast(`No Data to Export`, 'error');
+        bootToast(`No Data to Export`, 'danger');
     }
     // Initialize an array to hold the data
     const tableData = [];

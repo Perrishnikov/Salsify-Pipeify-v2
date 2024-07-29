@@ -21,9 +21,9 @@ if (form) {
         event.preventDefault(); // Prevent form submission
 
         if (productIdValue.length !== 14 || !productIdValue.startsWith('000')) {
-            showToast(
+            bootToast(
                 `Product ID must be 14 digits long and start with "000".`,
-                'error'
+                'warning'
             );
             // alert('Product ID must be 14 digits long and start with "000".');
             // event.preventDefault(); // Prevent form submission
@@ -117,7 +117,7 @@ async function dom_importFileHandler(file) {
         // Update the DOM with the imported file name and type
         fileNameArea.textContent = `Imported File [${fileType}]: ${fileName}`;
     } catch (error) {
-        showToast(`Issue handling file: ${error}`, 'error');
+        bootToast(error, 'danger', 'Unable to Import File: ');
 
         clearLocalStorageAndTable();
 
@@ -203,7 +203,7 @@ function clearLocalStorageAndTable() {
     if (hasChildren) {
         table.innerHTML = '';
         fileName.innerHTML = '';
-        showToast(`Local Storage cleared`, 'info');
+        bootToast(`Local Storage cleared`, 'info');
     }
 }
 
