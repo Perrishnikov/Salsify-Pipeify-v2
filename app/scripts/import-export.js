@@ -193,12 +193,12 @@ async function xlsx_import_file(file, parsingOption) {
                     // Resolve the promise with the fileType
                     reject('FOR CUSTOMER not handled');
                 } else if (metadata?.Title === 'Pipeify v2 For Salsify') {
-                    bootToast('Import from Pipeify', 'success');
+                    bootToast('Import from Pipeify', 'success', 'Success');
                     pipeify_preprocess(jsonData, parsingOption);
                     // Resolve the promise with the fileType
                     resolve('FROM PIPEIFY');
                 } else if (hasProductId(jsonData)) {
-                    bootToast(`Import from Salsify`, 'success');
+                    bootToast(`Import from Salsify`, 'success', 'Success');
                     salsify_preprocess(jsonData, parsingOption);
 
                     // Resolve the promise with the fileType

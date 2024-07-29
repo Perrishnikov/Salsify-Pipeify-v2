@@ -491,7 +491,6 @@ function handlePopoverMenuClick(e, tableId) {
  */
 function createMenuPopover(rowId) {
     const td = document.createElement('td');
-    // td.setAttribute('data-custom', 'do-not-copy');
     td.innerHTML = `
     
     <div class="cell-container" id="pop-menu-div-${rowId}">
@@ -616,8 +615,28 @@ function createTableRow(rowData, headerCallback = null, index) {
 
 /* ************************************************************** */
 function main_process(parsingOption) {
+    const dwnbtn = document.getElementById('download-for-salsify-btn');
+    const custbtn = document.getElementById('download-wysiwyg-btn');
+
+    if (getLocalStorage()) {
+        custbtn.disabled = false;
+
+        if (parsingOption === 'option4') {
+            dwnbtn.disabled = false;
+        } else {
+            dwnbtn.disabled = true;
+        }
+    } else {
+        custbtn.disabled = true;
+        dwnbtn.disabled = true;
+    }
+
     // set in salsify_preprocess
     const jsonObject = getLocalStorage();
+    if (!jsonObject) {
+        return;
+    }
+
     console.log(jsonObject);
     const rows = processOptionWithData(jsonObject, parsingOption);
 
@@ -891,7 +910,6 @@ function process_wysiwyg_export(parsingOption) {
                 // console.log(name, cellData);
                 exportObj[name] = cellData.value;
             } else {
-
                 // console.log('cellData is undefined');
             }
         });

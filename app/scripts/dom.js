@@ -1,14 +1,12 @@
-
-
-    function displayFileName() {
-        const fileInput = document.getElementById('fileInput');
-        const fileNameDiv = document.getElementById('fileName');
-        if (fileInput.files.length > 0) {
-            fileNameDiv.innerText = `Selected file: ${fileInput.files[0].name}`;
-        } else {
-            fileNameDiv.innerText = '';
-        }
+function displayFileName() {
+    const fileInput = document.getElementById('fileInput');
+    const fileNameDiv = document.getElementById('fileName');
+    if (fileInput.files.length > 0) {
+        fileNameDiv.innerText = `Selected file: ${fileInput.files[0].name}`;
+    } else {
+        fileNameDiv.innerText = '';
     }
+}
 
 /** Tab 2 - Validate and Submit Product ID for New Ingredients */
 // document.addEventListener('DOMContentLoaded', function () {
@@ -36,10 +34,8 @@ if (form) {
     });
 }
 
-
 const newSalsify = document.getElementById('download-new-ing-salsify-btn');
 if (newSalsify) {
-    
     newSalsify.addEventListener('click', (e) => {
         console.log(`download-for-salsify-btn`);
         console.log(newSalsify.value);
@@ -58,12 +54,19 @@ if (radioButtonsDiv) {
 
         // console.log(`change table columns to ${selectedOption}`);
         const dwnbtn = document.getElementById('download-for-salsify-btn');
-
+        const custbtn = document.getElementById('download-wysiwyg-btn');
         const parsingOption = getCheckedRadioButtonId();
+        
+        if (getLocalStorage()) {
+            custbtn.disabled = false;
 
-        if (parsingOption === 'option4') {
-            dwnbtn.disabled = false;
+            if (parsingOption === 'option4') {
+                dwnbtn.disabled = false;
+            } else {
+                dwnbtn.disabled = true;
+            }
         } else {
+            custbtn.disabled = true;
             dwnbtn.disabled = true;
         }
 
@@ -117,7 +120,7 @@ async function dom_importFileHandler(file) {
         // Update the DOM with the imported file name and type
         fileNameArea.textContent = `Imported File [${fileType}]: ${fileName}`;
     } catch (error) {
-        bootToast(error, 'danger', 'Unable to Import File: ');
+        bootToast(error, 'danger', 'Unable to Import File');
 
         clearLocalStorageAndTable();
 
@@ -158,11 +161,12 @@ if (dropArea) {
             dom_importFileHandler(file);
         });
 
-        
         document.body.appendChild(fileInput);
         fileInput.click();
         document.body.removeChild(fileInput);
     });
+
+    //! do it here
 }
 
 /** Export WSYWIG File */
@@ -204,6 +208,12 @@ function clearLocalStorageAndTable() {
         table.innerHTML = '';
         fileName.innerHTML = '';
         bootToast(`Local Storage cleared`, 'info');
+
+        // Disable download buttons
+        const dwnbtn = document.getElementById('download-for-salsify-btn');
+        const custbtn = document.getElementById('download-wysiwyg-btn');
+        custbtn.disabled = true;
+        dwnbtn.disabled = true;
     }
 }
 
@@ -215,6 +225,7 @@ if (clearButton) {
     });
 }
 
+// TODO: Bootstrap Modal
 /* Tab1 - HELP Modal */
 const modal = document.getElementById('helpModal');
 
