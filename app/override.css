@@ -55,3 +55,53 @@ body {
 .drop-area h5 {
     margin-bottom: 0 !important;
 }
+
+/* Style for the table */
+.table-wrapper {
+    display: flex;
+    width: 100%;
+}
+table {
+    /* flex-basis: auto; */
+    border-collapse: collapse;
+    border: 1px solid white;
+    width: 100%;
+}
+#productidform {
+    margin-bottom: calc(var(--padding-margin) * 2);
+    /* width: 100%; */
+}
+/* Style for table header */
+th {
+    /* background-color: #b9b9b9; */
+    border: 1px solid var(--mdgray);
+    padding: calc(var(--padding-margin) / 2);
+}
+/* Style for table cells */
+td {
+    border: 1px solid var(--mdgray);
+    padding: calc(var(--padding-margin) / 4);
+}
+
+/* Alternate row color for better visual separation */
+tr:nth-child(even):not(.error-row):not(.warning-row):not(.info-row) {
+    background-color: var(--ltgray);
+}
+.info-row {
+    background-color: var(--info);
+}
+.error-cell {
+    background-color: var(--danger);
+}
+.warning-cell {
+    background-color: var(--warning);
+}
+.info-cell {
+    background-color: var(--info);
+}
+/* .error-row {
+    background-color: var(--danger);
+}
+.warning-row {
+    background-color: var(--warning);
+} */

@@ -253,6 +253,7 @@ function createNewTable(parsingOption, productIdValue) {
     // Create the table element
     const newTable = document.createElement('table');
     newTable.setAttribute('id', 'new-table');
+    // newTable.classList.add('table')
 
     const headerRow = document.createElement('tr');
 
@@ -623,6 +624,7 @@ function main_process(parsingOption) {
     // Create the table element
     const myTable = document.createElement('table');
     myTable.setAttribute('id', 'my-table');
+    // myTable.classList.add('table')
 
     // TODO: row validations?
     // Check if any Row has a status
