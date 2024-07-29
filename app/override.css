@@ -1,0 +1,57 @@
+:root {
+    --primary-color: #007bff; /* Define a variable named --primary-color */
+    --primary-dk: #0056b3;
+    --font-size: 16px; /* Define a variable named --font-size */
+    --font-size-smaller: 14px;
+    --padding-margin: 16px;
+    --danger: hsla(348, 86%, 43%, 0.8);
+    --warning: hsla(48, 100%, 29%, 0.8);
+    --success: hsl(141, 53%, 31%);
+    /* --info: hsl(204, 71%, 39%); */
+    --info: rgb(103, 210, 255);
+    --background-light: hsl(0, 0%, 90%);
+    --ltgray: #f9f9f9;
+    --mdgray: #888;
+    --dktranny: rgba(0, 0, 0, 0.4);
+    --ltpipe: rgb(38, 164, 16);
+    --pipe-dk: rgb(28, 124, 12); /* Darker color for hover effect */
+    --dkpipe: rgb(29, 92, 19);
+    /* --dkgray: hsl(0, 0%, 40%); */
+}
+
+body {
+    /* margin: 0; */
+    /* padding: calc(var(--padding-margin) * 2); */
+    /* height: 100%; */
+    /* display: flex; */
+    /* flex-direction: column; */
+    /* align-items: center; */
+    font-family: 'Roboto', sans-serif;
+    /* font-size: var(--font-size); */
+    /* background-color: var(--background-light); */
+}
+.drop-area {
+    border: 2px dashed #007bff;
+    background-color: #f9f9f9;
+    border-radius: 0.25rem;
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.3s, border-color 0.3s;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    /* height: 200px; Set a fixed height */
+}
+.drop-area:hover {
+    background-color: #e9ecef;
+    border-color: #0056b3;
+}
+.drop-area.dragover {
+    background-color: #e2e6ea;
+    border-color: #0056b3;
+}
+.drop-area h5 {
+    margin-bottom: 0 !important;
+}

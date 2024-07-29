@@ -1,18 +1,29 @@
 /**  Tabs */
-function openTab(evt, tabName) {
-    const tabcontent = document.getElementsByClassName('tabcontent');
-    for (let i = 0; i < tabcontent.length; i++) {
-        tabcontent[i].style.display = 'none';
-    }
+//todo: defunct
+// function openTab(evt, tabName) {
+//     const tabcontent = document.getElementsByClassName('tabcontent');
+//     for (let i = 0; i < tabcontent.length; i++) {
+//         tabcontent[i].style.display = 'none';
+//     }
 
-    const tablinks = document.getElementsByClassName('tablinks');
-    for (let i = 0; i < tablinks.length; i++) {
-        tablinks[i].className = tablinks[i].className.replace(' active', '');
-    }
+//     const tablinks = document.getElementsByClassName('tablinks');
+//     for (let i = 0; i < tablinks.length; i++) {
+//         tablinks[i].className = tablinks[i].className.replace(' active', '');
+//     }
 
-    document.getElementById(tabName).style.display = 'flex';
-    evt.currentTarget.className += ' active';
-}
+//     document.getElementById(tabName).style.display = 'flex';
+//     evt.currentTarget.className += ' active';
+// }
+
+    function displayFileName() {
+        const fileInput = document.getElementById('fileInput');
+        const fileNameDiv = document.getElementById('fileName');
+        if (fileInput.files.length > 0) {
+            fileNameDiv.innerText = `Selected file: ${fileInput.files[0].name}`;
+        } else {
+            fileNameDiv.innerText = '';
+        }
+    }
 
 /** Tab 2 - Validate and Submit Product ID for New Ingredients */
 // document.addEventListener('DOMContentLoaded', function () {
@@ -130,7 +141,7 @@ async function dom_importFileHandler(file) {
 }
 
 /* Tab1 - DROP BOX LISTENER */
-const dropArea = document.getElementById('dropArea');
+const dropArea = document.querySelector('#dropArea');
 if (dropArea) {
     // Prevent default behavior (opening file in browser) when dragging over drop area
     dropArea.addEventListener('dragover', (e) => {
@@ -162,6 +173,7 @@ if (dropArea) {
             dom_importFileHandler(file);
         });
 
+        
         document.body.appendChild(fileInput);
         fileInput.click();
         document.body.removeChild(fileInput);

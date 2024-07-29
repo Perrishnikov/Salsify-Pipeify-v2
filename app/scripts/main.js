@@ -1,3 +1,29 @@
+// import { Tooltip, Popover } from './bootstrap.bundle.min.js';
+
+const popoverTriggerList = [].slice.call(
+    document.querySelectorAll('[data-bs-toggle="popover"]')
+);
+const popoverList = popoverTriggerList.map(
+    (popoverTriggerEl) => new Popover(popoverTriggerEl)
+);
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Initialize Bootstrap components
+    const tooltipTriggerList = [].slice.call(
+        document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    );
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new Tooltip(tooltipTriggerEl);
+    });
+
+    const popoverTriggerList = [].slice.call(
+        document.querySelectorAll('[data-bs-toggle="popover"]')
+    );
+    popoverTriggerList.map(function (popoverTriggerEl) {
+        return new Popover(popoverTriggerEl);
+    });
+});
+
 // Extend the Array prototype with a new function called moveToFrontById
 Object.defineProperty(Array.prototype, 'moveToFrontById', {
     value: function (id) {
@@ -192,14 +218,14 @@ function processOptionWithData(mergedJsonData, parsingOption) {
                 const rowsOfIngredients =
                     per_ingred_per_partcode_2(rowsOfCells);
 
-                    // Row validation
+                // Row validation
                 const depipedColumns =
                     per_pipe_per_partcode_3(rowsOfIngredients);
 
                 const errorCheckedCells =
                     per_pipe_per_partcode_4b(depipedColumns);
 
-                    // console.log(errorCheckedCells);
+                // console.log(errorCheckedCells);
                 return errorCheckedCells;
             }
             break;
@@ -217,7 +243,7 @@ function createNewTable(parsingOption, productIdValue) {
             'Product ID': productIdValue,
             'LABEL_DATASET_INGREDIENTS_A - en-US': '1||||||||',
             'LABEL_DATASET_NUTRIENT_A - en-US': '1|||||||',
-            'LABEL_DATASET_OTHER_INGREDS_A': 'x',
+            LABEL_DATASET_OTHER_INGREDS_A: 'x',
         },
     ];
 
@@ -262,7 +288,7 @@ function createNewTable(parsingOption, productIdValue) {
 
     // Give it the new data
     tableContainer.appendChild(newTable);
-    
+
     attachBlurEventToTableCells(newTable);
 
     applyHandlePopoverMenuClickToTable('new-table');
