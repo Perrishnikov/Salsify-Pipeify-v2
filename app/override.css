@@ -57,16 +57,15 @@ body {
 }
 
 /* Style for the table */
-.table-wrapper {
+/* .table-wrapper {
     display: flex;
     width: 100%;
-}
+} */
 table {
-    /* flex-basis: auto; */
     border-collapse: collapse;
     border: 1px solid white;
     width: 100%;
-    table-layout: auto; /* Adjust column widths based on content */
+    /* table-layout: auto; */
 }
 #productidform {
     margin-bottom: calc(var(--padding-margin) * 2);
@@ -177,3 +176,4 @@ button.icon {
     align-items: center;
     cursor: pointer;
 }
+/*  */
