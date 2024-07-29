@@ -66,6 +66,7 @@ table {
     border-collapse: collapse;
     border: 1px solid white;
     width: 100%;
+    table-layout: auto; /* Adjust column widths based on content */
 }
 #productidform {
     margin-bottom: calc(var(--padding-margin) * 2);
@@ -113,7 +114,7 @@ tr:nth-child(even):not(.error-row):not(.warning-row):not(.info-row) {
 .cell-container {
     display: flex;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: center;
     position: relative;
 }
 
@@ -128,13 +129,6 @@ tr:nth-child(even):not(.error-row):not(.warning-row):not(.info-row) {
 [popover] {
     position: absolute;
     inset: unset;
-    /* width: fit-content; */
-    /* height: fit-content; */
-    /* margin: auto; */
-    /* border: solid; */
-    /* padding: calc(var(--padding-margin) / 2); */
-    /* overflow: auto; */
-    /* margin-top: 30px; */
 }
 :popover-open {
     /* background-color: #333; */
@@ -178,6 +172,8 @@ button.popover-menu-item {
     box-shadow: '0 2px 5px rgba(0, 0, 0, 0.1)';
     border: 2px dashed red;
 }
-button.icon{
-    background-color: white;
+button.icon {
+    all: unset; /* Remove all inherited styles */
+    align-items: center;
+    cursor: pointer;
 }

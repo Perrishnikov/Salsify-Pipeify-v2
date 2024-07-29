@@ -31,6 +31,7 @@ Once verified, can either be exported for a client or the corrected version can 
 [] Need to add any type row or change the Type... (Activated Charcoal )
 [x] Name Single ingredient by Product ID
 [x] Error specific to Parent import
+[] bootstrap modal
 
 [] Check PLM1 Pipeify to see how this will affect it.
     Export the PLM1 fields as above, rename columns

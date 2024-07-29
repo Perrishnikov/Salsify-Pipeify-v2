@@ -56,7 +56,7 @@ if (radioButtonsDiv) {
         const dwnbtn = document.getElementById('download-for-salsify-btn');
         const custbtn = document.getElementById('download-wysiwyg-btn');
         const parsingOption = getCheckedRadioButtonId();
-        
+
         if (getLocalStorage()) {
             custbtn.disabled = false;
 
@@ -166,7 +166,6 @@ if (dropArea) {
         document.body.removeChild(fileInput);
     });
 
-    //! do it here
 }
 
 /** Export WSYWIG File */

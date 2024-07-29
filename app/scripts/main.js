@@ -302,7 +302,7 @@ function createNewTable(parsingOption, productIdValue) {
  */
 function applyHandlePopoverMenuClickToTable(tableId = 'my-table') {
     // Create a WeakSet to store buttons that already have the event listener attached
-    console.log(tableId);
+    // console.log(tableId);
     const buttonsWithListeners = new WeakSet();
 
     // Get the table element by its ID
@@ -490,6 +490,7 @@ function handlePopoverMenuClick(e, tableId) {
  * @returns {HTMLTableCellElement} The table cell containing the popover menu.
  */
 function createMenuPopover(rowId) {
+    //! do it here
     const td = document.createElement('td');
     td.innerHTML = `
     
@@ -637,7 +638,7 @@ function main_process(parsingOption) {
         return;
     }
 
-    console.log(jsonObject);
+    // console.log(jsonObject);
     const rows = processOptionWithData(jsonObject, parsingOption);
 
     // Create the table element
