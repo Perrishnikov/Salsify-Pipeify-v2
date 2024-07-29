@@ -16,391 +16,207 @@
     <body>
         <div class="container mt-4">
             <h1 class="text-center mb-4">Pipeify v2</h1>
-            <ul
-                class="nav nav-tabs justify-content-center"
-                id="myTab"
-                role="tablist"
-            >
+            <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
                 <li class="nav-item" role="presentation">
-                    <a
+                    <button
                         class="nav-link active"
-                        id="home-tab"
-                        data-bs-toggle="tab"
-                        href="#tab1"
+                        id="pills-import-tab"
+                        data-bs-toggle="pill"
+                        data-bs-target="#pills-import"
+                        type="button"
                         role="tab"
-                        aria-controls="tab1"
+                        aria-controls="pills-import"
                         aria-selected="true"
-                        >Home</a
                     >
+                        Import Salsify Ingredient Set
+                    </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <a
+                    <button
                         class="nav-link"
-                        id="profile-tab"
-                        data-bs-toggle="tab"
-                        href="#tab2"
+                        id="pills-new-tab"
+                        data-bs-toggle="pill"
+                        data-bs-target="#pills-new"
+                        type="button"
                         role="tab"
-                        aria-controls="tab2"
+                        aria-controls="pills-new"
                         aria-selected="false"
-                        >Profile</a
                     >
+                        Create New Original Ingredient Set
+                    </button>
                 </li>
+
                 <li class="nav-item" role="presentation">
-                    <a
+                    <button
                         class="nav-link"
-                        id="contact-tab"
-                        data-bs-toggle="tab"
-                        href="#tab3"
+                        id="pills-plm1-tab"
+                        data-bs-toggle="pill"
+                        data-bs-target="#pills-plm1"
+                        type="button"
                         role="tab"
-                        aria-controls="tab3"
+                        aria-controls="pills-plm1"
                         aria-selected="false"
-                        >Contact</a
                     >
+                        PLM1 Validate
+                    </button>
                 </li>
             </ul>
-            <div class="container mt-4">
-                <h5>Home Content</h5>
+            <div class="tab-content" id="pills-tabContent">
+                <!--* Tab1 -->
                 <div
-                    id="dropArea"
-                    class="drop-area"
-                    
+                    class="tab-pane fade show active"
+                    id="pills-import"
+                    role="tabpanel"
+                    aria-labelledby="pills-import-tab"
+                    tabindex="0"
                 >
-                <!-- onclick="document.getElementById('fileInput').click()" -->
-                    <h5 class="mb-4">
-                        Drag and drop a file here or click to select
-                    </h5>
-                    <input
-                        type="file"
-                        id="fileInput"
-                        style="display: none"
-                        onchange="displayFileName()"
-                    />
-                </div>
-                <div id="fileName" class="mt-4"></div>
-                <div class="mt-4">
-                    <div class="form-check">
-                        <input
-                            class="form-check-input"
-                            type="radio"
-                            name="options"
-                            id="option1"
-                            value="option1"
-                        />
-                        <label class="form-check-label" for="option1">
-                            Option 1
-                        </label>
+                    <div class="container mt-4">
+                        <div id="dropArea" class="drop-area">
+                            <h5 class="mb-4">
+                                Drag and drop a file here or click to select
+                            </h5>
+                            <input
+                                type="file"
+                                id="fileInput"
+                                style="display: none"
+                                onchange="displayFileName()"
+                            />
+                        </div>
+                        <div id="fileName" class="mt-4"></div>
+                        <div class="mt-4">
+                            <h5>Parsing Options:</h5>
+                            <div class="form-check">
+                                <input
+                                    class="form-check-input"
+                                    type="radio"
+                                    name="parsingOptions"
+                                    id="meh"
+                                    value="meh"
+                                />
+                                <label class="form-check-label" for="meh">
+                                    0 - (No Validation) Creates 3 columns for
+                                    each of the ingredient types and 1 row per
+                                    partcode.
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input
+                                    class="form-check-input"
+                                    type="radio"
+                                    name="parsingOptions"
+                                    id="option4"
+                                    value="option4"
+                                    checked
+                                />
+                                <label class="form-check-label" for="option4">
+                                    4 - (Cell Validation) Creates 8 ingredient
+                                    related columns (1 for each pipe AND 1-3
+                                    rows per partcode)
+                                </label>
+                            </div>
+                        </div>
+                        <div class="button-box-row mt-4">
+                            <button
+                                id="download-wysiwyg-btn"
+                                class="btn btn-secondary me-2"
+                            >
+                                Download For Customer
+                            </button>
+                            <button
+                                type="salsify"
+                                disabled
+                                id="download-for-salsify-btn"
+                                class="btn btn-secondary me-2"
+                            >
+                                Download For Salsify
+                            </button>
+                            <button
+                                id="clear-localstorage-btn"
+                                class="btn btn-secondary"
+                            >
+                                Clear Local Storage
+                            </button>
+                            <button id="helpBtn" class="drag-drop-btn">
+                                Help
+                            </button>
+                        </div>
                     </div>
-                    <div class="form-check">
-                        <input
-                            class="form-check-input"
-                            type="radio"
-                            name="options"
-                            id="option2"
-                            value="option2"
-                        />
-                        <label class="form-check-label" for="option2">
-                            Option 2
-                        </label>
-                    </div>
+                    <div class="table-wrapper" id="table-container"></div>
                 </div>
-                <div class="button-box-row mt-4">
-                    <button class="btn btn-secondary me-2">Button 1</button>
-                    <button class="btn btn-secondary me-2">Button 2</button>
-                    <button class="btn btn-secondary">Button 3</button>
+                <!--* Tab2 -->
+                <div
+                    class="tab-pane fade"
+                    id="pills-new"
+                    role="tabpanel"
+                    aria-labelledby="pills-new-tab"
+                    tabindex="0"
+                >
+                    <!-- <div id="Tab2" class="tabcontent default"> -->
+                    <div class="container mt-4">
+                        <h3>Create New Ingredients</h3>
+                        <div class="button-box">
+                            <form
+                                class="button-box-row"
+                                action="#"
+                                method="post"
+                                id="productidform"
+                            >
+                                <label for="product-id">Product ID:</label>
+                                <input
+                                    type="text"
+                                    id="product-id"
+                                    name="product-id"
+                                    required
+                                    value=""
+                                />
+                                <button type="submit">Submit</button>
+                            </form>
+
+                            <div class="button-box-row">
+                                <!-- <div class=""> -->
+
+                                <button
+                                    type="salsify"
+                                    id="download-new-ing-salsify-btn"
+                                    class="drag-drop-btn"
+                                >
+                                    Download For Salsify
+                                </button>
+
+                                <button id="helpBtn" class="drag-drop-btn">
+                                    Help
+                                </button>
+                                <!-- </div> -->
+                            </div>
+                        </div>
+
+                        <div
+                            class="table-wrapper"
+                            id="new-table-container"
+                        ></div>
+                    </div>
+                    <!-- </div> -->
+                </div>
+                <!-- *Tab 3-->
+                <div
+                    class="tab-pane fade"
+                    id="pills-plm1"
+                    role="tabpanel"
+                    aria-labelledby="pills-plm1-tab"
+                    tabindex="0"
+                >
+                    <div class="container mt-4">
+                        <h3>PLM Validate or CA Ing</h3>
+                        <p>
+                            I don't think we need to create a new IngSet, just
+                            error check one.
+                        </p>
+                    </div>
                 </div>
             </div>
-        </div>
-
-        <!-- addffsdfanflsdflsajflsdjfkldssdj  -->
-        <div><h1>Pipeify v2</h1></div>
-        <div class="tab">
-            <button class="tablinks" onclick='openTab(event, "Tab1")'>
-                Import Salsify Ingredient Set
-            </button>
-            <button class="tablinks active" onclick='openTab(event, "Tab2")'>
-                Create New Original Ingredient Set
-            </button>
-            <button class="tablinks" onclick='openTab(event, "Tab3")'>
-                PLM1 or CA
-            </button>
         </div>
         <div id="toast-container"></div>
 
-        <!-- *Tab 1 -->
-        <div id="Tab1" class="tabcontent">
-            <!-- <div id="dropArea" class="margin-below">
-                <h3>
-                    Drag and drop a Salsify export (Excel) file here, or click
-                    to select
-                </h3>
-            </div> -->
-
-            <div class="margin-below">
-                <div id="fileName" class="subtitle"></div>
-                <!-- append imported fileName here -->
-            </div>
-            <!-- TODO: Hide until there is a file -->
-            <div>
-                <div id="radioButtons" class="margin-below">
-                    <div class="subtitle">Ingredient Parsing Options:</div>
-
-                    <div class="option-div">
-                        <input
-                            type="radio"
-                            id="meh"
-                            name="parsingOptions"
-                            value="meh"
-                            class="radio-button"
-                        />
-                        <label for="meh" class="radio-checkbox-label">#0</label>
-                        <span class="option-context"
-                            >- (No Validation) Creates 3 columns for each of the
-                            ingredient types and 1 row per partcode.</span
-                        >
-                    </div>
-
-                    <!-- <div class="option-div">
-                    <input
-                        type="radio"
-                        id="option1"
-                        name="parsingOptions"
-                        value="option1"
-                        class="radio-button"
-                    />
-                    <label for="option1" class="radio-checkbox-label"
-                        >1st</label
-                    >
-                    <span class="option-context"
-                        >- [1t,xp] (As is) Creates 1 column for all ingredients and up
-                        to 3 rows per partcode.</span
-                    >
-                </div> -->
-
-                    <!-- <div class="option-div">
-                    <input
-                        type="radio"
-                        id="option2"
-                        name="parsingOptions"
-                        value="option2"
-                        class="radio-button"
-                    />
-                    <label for="option2" class="radio-checkbox-label"
-                        >2nd</label
-                    >
-                    <span class="option-context"
-                        >- [1t,xp] (No Validation) Creates 1 column for all ingredients and x
-                        rows per ingredient per partcode.</span
-                    >
-                </div> -->
-
-                    <!-- <div class="option-div">
-                    <input
-                        type="radio"
-                        id="option3"
-                        name="parsingOptions"
-                        value="option3"
-                        class="radio-button"
-                    />
-                    <label for="option3" class="radio-checkbox-label"
-                        >3rd</label
-                    >
-                    <span class="option-context"
-                        >- [8,x] (No Validation) Creates 8 columns, 1 for each pipe and x rows per ~ per partcode.</span
-                    >
-                </div> -->
-
-                    <div class="option-div">
-                        <input
-                            type="radio"
-                            id="option4"
-                            name="parsingOptions"
-                            value="option4"
-                            class="radio-button"
-                            checked
-                        />
-                        <label for="option4" class="radio-checkbox-label"
-                            >#4</label
-                        >
-                        <span class="option-context"
-                            >- (Cell Validation) Creates 8 ingredient related
-                            columns (1 for each pipe AND 1-3 rows per
-                            partcode)</span
-                        >
-                    </div>
-                    <!-- <div class="option-div">
-                    <input
-                        type="radio"
-                        id="option5"
-                        name="parsingOptions"
-                        value="option5"
-                        class="radio-button"
-                    />
-                    <label for="option5" class="radio-checkbox-label"
-                        >5th
-                    </label>
-                    <span class="option-context"
-                        >- Error Correction for import back into Salsify</span
-                    >
-                </div> -->
-                </div>
-            </div>
-
-            <div class="margin-below">
-                <button id="download-wysiwyg-btn" class="drag-drop-btn">
-                    Download For Customer
-                </button>
-
-                <button
-                    type="salsify"
-                    disabled
-                    id="download-for-salsify-btn"
-                    class="drag-drop-btn"
-                >
-                    Download For Salsify
-                </button>
-                <button id="clear-localstorage-btn" class="drag-drop-btn">
-                    Clear Local Storage
-                </button>
-                <button id="helpBtn" class="drag-drop-btn">Help</button>
-            </div>
-
-            <div class="table-wrapper" id="table-container"></div>
-
-            <!-- The Help Modal -->
-            <div id="helpModal" class="modal">
-                <div class="modal-content">
-                    <span class="close">&times;</span>
-                    <h2>Pipeify Help Section</h2>
-                    <p>
-                        Pipeify takes a Salsify export, parses it, and exports
-                        it. Used for cleaning up ingredients (re-import) and to
-                        provide customers with ingredient data.
-                    </p>
-                    <ul>
-                        <li>
-                            Salsify export must have [PARTCODE or Product ID,
-                            Nutrients, Ingredients, Other]. Export automatically
-                            contains Product ID, which is required for
-                            re-import.
-                        </li>
-                        <li>
-                            Removes parent record, parses by option, and leaves
-                            other columns as-is.
-                        </li>
-                    </ul>
-                    <h3>Parsing Option #4</h3>
-
-                    <ul>
-                        <li>
-                            Checks for errors:
-                            <ul>
-                                <li><b>Order</b> - Should be number</li>
-                                <li>
-                                    <b>Description</b> - Should not be empty
-                                </li>
-                                <li>
-                                    <b>Qty</b> - Should not be empty; Should be
-                                    a number; Can use '<' and ','
-                                </li>
-                                <li>
-                                    <b>UOM</b> - Valid values: 'mg', 'mcg', 'g',
-                                    'ml', 'l', 'oz', 'CFU', 'mcg DFE', 'mg DFE',
-                                    '', 'IU'
-                                </li>
-                                <li>
-                                    <b>DV</b> - <br />For Nutrients: Should be a
-                                    number; May include these characters: '**',
-                                    '<', ',' <br />For Ingredients: Should not
-                                    be empty
-                                </li>
-                                <li>
-                                    <b>Sym</b> - <br />For Nutrients: '%', ''<br />For
-                                    Ingredients: '**', ''
-                                </li>
-                                <li>
-                                    <b>Foot</b> - <br />For Nutrients: ‡ , †
-                                    <br />For Ingredients: Should be empty
-                                </li>
-                            </ul>
-                        </li>
-                        <li>Yellow indicates possible invalid value.</li>
-                        <li>Red indicates invalid value.</li>
-                        <li>May not ADD or DELETE an Other Row</li>
-                    </ul>
-                    <h3>Download For Salsify</h3>
-                    <ul>
-                        <li>
-                            Only validated options (#4) can be exported for
-                            Salsify.
-                        </li>
-                        <li>
-                            Only exports Product ID, Nutrients, Ingredients, and
-                            Other Ingredients columns.
-                        </li>
-                    </ul>
-                    <h3>Download For Customers</h3>
-                    <ul>
-                        <li>Removes the Product ID column.</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-        <!-- *Tab 2 default-->
-        <div id="Tab2" class="tabcontent default">
-            <h3>Create New Ingredients</h3>
-            <div class="button-box">
-                <form
-                    class="button-box-row"
-                    action="#"
-                    method="post"
-                    id="productidform"
-                >
-                    <label for="product-id">Product ID:</label>
-                    <input
-                        type="text"
-                        id="product-id"
-                        name="product-id"
-                        required
-                        value=""
-                    />
-                    <button type="submit">Submit</button>
-                </form>
-
-                <div class="button-box-row">
-                    <!-- <div class=""> -->
-
-                    <button
-                        type="salsify"
-                        id="download-new-ing-salsify-btn"
-                        class="drag-drop-btn"
-                    >
-                        Download For Salsify
-                    </button>
-                    <!-- <button id="clear-localstorage-btn" class="drag-drop-btn">
-                        Clear Local Storage
-                    </button> -->
-                    <button id="helpBtn" class="drag-drop-btn">Help</button>
-                    <!-- </div> -->
-                </div>
-            </div>
-
-            <div class="table-wrapper" id="new-table-container"></div>
-        </div>
-
-        <!-- *Tab 3-->
-        <div id="Tab3" class="tabcontent">
-            <h3>PLM Validate or CA Ing</h3>
-            <p>
-                I don't think we need to create a new IngSet, just error check
-                one.
-            </p>
-        </div>
-
-        <!-- <script
-            src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-            crossorigin="anonymous"
-        ></script> -->
         <script src="scripts/bootstrap.bundle.min.js"></script>
 
         <script src="scripts/toast.js"></script>
@@ -411,8 +227,7 @@
         <script src="scripts/processes/process_2.js"></script>
         <script src="scripts/processes/process_3.js"></script>
         <script src="scripts/processes/process_4b.js"></script>
-        <!-- <script src="scripts/main.js"></script> -->
-        <script type="module" src="scripts/main.js"></script>
+        <script src="scripts/main.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
         <script src="scripts/import-export.js"></script>
         <script src="scripts/dom.js"></script>
