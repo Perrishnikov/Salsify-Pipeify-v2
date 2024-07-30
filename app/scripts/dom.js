@@ -18,57 +18,27 @@ if (form) {
 
         event.preventDefault(); // Prevent form submission
         const feedbackDiv = document.querySelector('#newIngredFeedbackDiv');
-        
-        if (productIdValue.length !== 14 || !productIdValue.startsWith('000')) {
-            // bootToast(
-            //     `Product ID must be 14 digits long and start with "000".`,
-            //     'warning'
-            // );
-            // alert('Product ID must be 14 digits long and start with "000".');
-            // event.preventDefault(); // Prevent form submission
-            // const input = this.querySelector('#product-id');
 
+        if (productIdValue.length !== 14 || !productIdValue.startsWith('000')) {
             feedbackDiv.classList.remove('d-none');
-            // input.classList.add('is-invalid');
         } else {
             //main.js
-
-            const parsingOption = getCheckedRadioButtonId();
+            // const parsingOption = getCheckedRadioButtonId();
             createNewTable('option4', productIdValue);
             productIdInput.value = '';
             feedbackDiv.classList.add('d-none');
+
+            //enable download button
+            document
+                .querySelector('#download-new-ing-salsify-btn')
+                .removeAttribute('disabled');
+            //disable create set button
+            document
+                .querySelector('#newIngredSubmit')
+                .setAttribute('disabled', true);
         }
     });
 }
-// document
-//     .querySelector('form.needs-validation')
-//     .addEventListener('submit', function (event) {
-//         const input = this.querySelector('#product-id');
-//         const feedbackDiv = this.querySelector('#newIngredFeedbackDiv');
-
-//         const productIdInput = document.getElementById('product-id');
-//         const productIdValue = productIdInput.value.trim();
-//         event.preventDefault();
-//         event.stopPropagation();
-
-//         // if (!this.checkValidity()) {
-//         if (productIdValue.length !== 14 || !productIdValue.startsWith('000')) {
-//             // Show feedback and mark input as invalid
-//             feedbackDiv.classList.remove('d-none');
-//             input.classList.add('is-invalid');
-//         } else {
-//             // Hide feedback and remove invalid class
-//             feedbackDiv.classList.add('d-none');
-//             input.classList.remove('is-invalid');
-
-//             const parsingOption = getCheckedRadioButtonId();
-//             createNewTable('option4', productIdValue);
-//             productIdInput.value = '';
-//         }
-//             feedbackDiv.classList.add('d-none');
-//             input.classList.remove('is-invalid');
-//         this.classList.add('was-validated');
-//     });
 
 const newSalsify = document.getElementById('download-new-ing-salsify-btn');
 if (newSalsify) {
@@ -79,6 +49,26 @@ if (newSalsify) {
 
         const newTable = document.getElementById('new-table');
         process_for_salsify(parsingOption, newTable);
+    });
+}
+
+const newClearSalsify = document.getElementById('clear-product-id-btn');
+if (newClearSalsify) {
+    newClearSalsify.addEventListener('click', (e) => {
+        console.log(`clear!`);
+        // console.log(newSalsify.value);
+        // const parsingOption = getCheckedRadioButtonId();
+
+        const newTable = document.getElementById('new-table-container');
+        newTable.innerHTML = '';
+        // process_for_salsify(parsingOption, newTable);
+        document.querySelector('#newIngredSubmit').removeAttribute('disabled');
+
+        document
+            .querySelector('#download-new-ing-salsify-btn')
+            .setAttribute('disabled', true);
+
+        document.querySelector('#newIngredFeedbackDiv').classList.add('d-none');
     });
 }
 

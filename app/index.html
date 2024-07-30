@@ -20,7 +20,7 @@
         <div class="container mt-4">
             <h1 class="text-center mb-4">Pipeify v2</h1>
             <ul
-                class="nav nav-tabs mb-3 nav-fill"
+                class="nav nav-tabs mb-3 nav-fill fs-5"
                 id="pills-tab"
                 role="tablist"
             >
@@ -167,30 +167,7 @@
                 aria-labelledby="pills-new-tab"
                 tabindex="0"
             >
-                <!-- <div id="Tab2" class="tabcontent default"> -->
                 <div class="container mt-4">
-                    <!-- <h3>Create New Ingredients</h3> -->
-                    <!-- <div class="button-box">
-                        <form
-                            class="button-box-row"
-                            action="#"
-                            method="post"
-                            id="productidform"
-                        >
-                            <label for="product-id">Product ID:</label>
-                            <input
-                                type="text"
-                                id="product-id"
-                                name="product-id"
-                                required
-                                value=""
-                            />
-                            <button type="submit">Submit</button>
-                        </form>
-
-                        
-                    </div> -->
-                    <!--  -->
                     <form
                         class="row gx-3 align-items-center pipeify-create needs-validation"
                         novalidate
@@ -228,16 +205,32 @@
                             "000".
                         </div>
                     </form>
-                    <div class="button-box-row">
-                        <button
-                            type="salsify"
-                            id="download-new-ing-salsify-btn"
-                            class="drag-drop-btn"
-                        >
-                            Download For Salsify
-                        </button>
-
-                        <button id="helpBtn" class="drag-drop-btn">Help</button>
+                    <!-- Butts -->
+                    <div
+                        class="button-box-row mt-4"
+                        style="display: flex; justify-content: space-between"
+                    >
+                        <div id="grow">
+                            <button
+                                type="salsify"
+                                id="download-new-ing-salsify-btn"
+                                class="btn btn-primary me-2"
+                                disabled
+                            >
+                                Download For Salsify
+                            </button>
+                            <button
+                                id="clear-product-id-btn"
+                                class="btn btn-secondary"
+                            >
+                                Clear
+                            </button>
+                        </div>
+                        <div>
+                            <button id="helpBtn" class="btn btn-info">
+                                Help
+                            </button>
+                        </div>
                     </div>
                 </div>
                 <div
