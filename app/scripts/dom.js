@@ -10,29 +10,65 @@ function displayFileName() {
 
 /** Tab 2 - Validate and Submit Product ID for New Ingredients */
 // document.addEventListener('DOMContentLoaded', function () {
-const form = document.querySelector('#productidform');
+const form = document.querySelector('#newIngredSubmit');
 if (form) {
-    form.addEventListener('submit', function (event) {
+    form.addEventListener('click', function (event) {
         const productIdInput = document.getElementById('product-id');
         const productIdValue = productIdInput.value.trim();
 
         event.preventDefault(); // Prevent form submission
-
+        const feedbackDiv = document.querySelector('#newIngredFeedbackDiv');
+        
         if (productIdValue.length !== 14 || !productIdValue.startsWith('000')) {
-            bootToast(
-                `Product ID must be 14 digits long and start with "000".`,
-                'warning'
-            );
+            // bootToast(
+            //     `Product ID must be 14 digits long and start with "000".`,
+            //     'warning'
+            // );
             // alert('Product ID must be 14 digits long and start with "000".');
             // event.preventDefault(); // Prevent form submission
+            // const input = this.querySelector('#product-id');
+
+            feedbackDiv.classList.remove('d-none');
+            // input.classList.add('is-invalid');
         } else {
             //main.js
+
             const parsingOption = getCheckedRadioButtonId();
             createNewTable('option4', productIdValue);
             productIdInput.value = '';
+            feedbackDiv.classList.add('d-none');
         }
     });
 }
+// document
+//     .querySelector('form.needs-validation')
+//     .addEventListener('submit', function (event) {
+//         const input = this.querySelector('#product-id');
+//         const feedbackDiv = this.querySelector('#newIngredFeedbackDiv');
+
+//         const productIdInput = document.getElementById('product-id');
+//         const productIdValue = productIdInput.value.trim();
+//         event.preventDefault();
+//         event.stopPropagation();
+
+//         // if (!this.checkValidity()) {
+//         if (productIdValue.length !== 14 || !productIdValue.startsWith('000')) {
+//             // Show feedback and mark input as invalid
+//             feedbackDiv.classList.remove('d-none');
+//             input.classList.add('is-invalid');
+//         } else {
+//             // Hide feedback and remove invalid class
+//             feedbackDiv.classList.add('d-none');
+//             input.classList.remove('is-invalid');
+
+//             const parsingOption = getCheckedRadioButtonId();
+//             createNewTable('option4', productIdValue);
+//             productIdInput.value = '';
+//         }
+//             feedbackDiv.classList.add('d-none');
+//             input.classList.remove('is-invalid');
+//         this.classList.add('was-validated');
+//     });
 
 const newSalsify = document.getElementById('download-new-ing-salsify-btn');
 if (newSalsify) {
@@ -165,7 +201,6 @@ if (dropArea) {
         fileInput.click();
         document.body.removeChild(fileInput);
     });
-
 }
 
 /** Export WSYWIG File */
@@ -246,8 +281,8 @@ span.onclick = function () {
 };
 
 // When the user clicks anywhere outside of the modal, close it
-window.onclick = function (event) {
-    if (event.target == modal) {
-        modal.style.display = 'none';
-    }
-};
+// window.onclick = function (event) {
+//     if (event.target == modal) {
+//         modal.style.display = 'none';
+//     }
+// }

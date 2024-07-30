@@ -26,7 +26,7 @@
             >
                 <li class="nav-item" role="presentation">
                     <button
-                        class="nav-link active"
+                        class="nav-link"
                         id="pills-import-tab"
                         data-bs-toggle="pill"
                         data-bs-target="#pills-import"
@@ -40,7 +40,7 @@
                 </li>
                 <li class="nav-item" role="presentation">
                     <button
-                        class="nav-link"
+                        class="nav-link active"
                         id="pills-new-tab"
                         data-bs-toggle="pill"
                         data-bs-target="#pills-new"
@@ -73,7 +73,7 @@
         <div class="tab-content" id="pills-tabContent">
             <!--* Tab1 -->
             <div
-                class="tab-pane fade show active"
+                class="tab-pane fade"
                 id="pills-import"
                 role="tabpanel"
                 aria-labelledby="pills-import-tab"
@@ -93,8 +93,8 @@
                     </div>
                     <div id="fileName" class="mt-4"></div>
                     <div id="radioButtons" class="mt-4">
-                        <h5>Parsing Options:</h5>
-                        <div class="form-check">
+                        <h5 class="mb-3">Parsing Options:</h5>
+                        <div class="form-check mb-3">
                             <input
                                 class="form-check-input"
                                 type="radio"
@@ -161,7 +161,7 @@
             </div>
             <!--* Tab2 -->
             <div
-                class="tab-pane fade"
+                class="tab-pane fade show active"
                 id="pills-new"
                 role="tabpanel"
                 aria-labelledby="pills-new-tab"
@@ -170,7 +170,7 @@
                 <!-- <div id="Tab2" class="tabcontent default"> -->
                 <div class="container mt-4">
                     <!-- <h3>Create New Ingredients</h3> -->
-                    <div class="button-box">
+                    <!-- <div class="button-box">
                         <form
                             class="button-box-row"
                             action="#"
@@ -188,29 +188,62 @@
                             <button type="submit">Submit</button>
                         </form>
 
-                        <div class="button-box-row">
-                            <!-- <div class=""> -->
-
-                            <button
-                                type="salsify"
-                                id="download-new-ing-salsify-btn"
-                                class="drag-drop-btn"
-                            >
-                                Download For Salsify
-                            </button>
-
-                            <button id="helpBtn" class="drag-drop-btn">
-                                Help
-                            </button>
-                            <!-- </div> -->
+                        
+                    </div> -->
+                    <!--  -->
+                    <form
+                        class="row gx-3 align-items-center pipeify-create needs-validation"
+                        novalidate
+                    >
+                        <div class="col-auto">
+                            <label for="product-id" class="col-form-label">
+                                <h5>Enter Product ID</h5>
+                            </label>
                         </div>
-                    </div>
+                        <div class="col-auto">
+                            <input
+                                type="text"
+                                id="product-id"
+                                class="form-control"
+                                aria-describedby="product-id"
+                                required
+                                pattern="000\d{11}"
+                            />
+                            <div class="invalid-feedback">
+                                Product ID must be 14 digits long and start with
+                                "000".
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <button
+                                type="submit"
+                                class="btn btn-primary"
+                                id="newIngredSubmit"
+                            >
+                                Create Set
+                            </button>
+                        </div>
+                        <div class="col-auto d-none" id="newIngredFeedbackDiv">
+                            Product ID must be 14 digits long and start with
+                            "000".
+                        </div>
+                    </form>
+                    <div class="button-box-row">
+                        <button
+                            type="salsify"
+                            id="download-new-ing-salsify-btn"
+                            class="drag-drop-btn"
+                        >
+                            Download For Salsify
+                        </button>
 
-                    <div
-                        class="table-wrapper mt-4"
-                        id="new-table-container"
-                    ></div>
+                        <button id="helpBtn" class="drag-drop-btn">Help</button>
+                    </div>
                 </div>
+                <div
+                    class="table-wrapper mt-4 mb-4"
+                    id="new-table-container"
+                ></div>
                 <!-- </div> -->
             </div>
             <!-- *Tab 3-->

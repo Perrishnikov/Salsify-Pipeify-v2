@@ -1,6 +1,6 @@
 :root {
     --font-size: 1rem; /* Define a variable named --font-size */
-    --font-size-smaller: .9rem;
+    --font-size-smaller: 0.9rem;
     --padding-margin: 16px;
 }
 
@@ -53,7 +53,7 @@ body {
 }
 
 /* TABLE */
-.table-wrapper{
+.table-wrapper {
     margin-left: 2rem;
     margin-right: 2rem;
 }
@@ -62,8 +62,9 @@ table {
     width: 100%;
     /* table-layout: auto; */
 }
-#productidform {
-    margin-bottom: calc(var(--padding-margin) * 2);
+h5 {
+    margin-bottom: 0 !important;
+    /* margin-bottom: calc(var(--padding-margin) * 2); */
     /* width: 100%; */
 }
 th {
@@ -75,7 +76,7 @@ td {
     border: 1px solid var(--bs-secondary-color);
     padding: calc(var(--padding-margin) / 4);
 }
-tr{
+tr {
     background-color: rgba(var(--bs-body-color-rgb), 0.1);
 }
 /* Alternate row color for better visual separation */
@@ -169,7 +170,16 @@ button.icon {
     align-items: center;
     cursor: pointer;
 }
-button.nav-link.active{
+button.nav-link.active {
     font-weight: bold !important;
 }
 /*  */
+.pipeify-create {
+    border: 2px solid var(--bs-secondary);
+    border-radius: 0.25rem;
+    background-color: var(--bs-light);
+    padding: 2rem;
+}
+#newIngredFeedbackDiv {
+    color: var(--bs-form-invalid-color);
+}
