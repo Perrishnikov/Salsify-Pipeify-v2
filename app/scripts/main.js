@@ -499,15 +499,15 @@ function createMenuPopover(rowId) {
             <span class="material-symbols-outlined">menu_open</span>
         </button>
 
-        <div class="popover-menu" id="pop-menu-open-${rowId}" popover anchor="pop-menu-div-${rowId}">
+        <div class="popover-menu bs-secondary" id="pop-menu-open-${rowId}" popover anchor="pop-menu-div-${rowId}">
             
-            <button class="popover-menu-item" id="addAbove-${rowId}" type="button">
+            <button class="btn btn-light popover-menu-item" id="addAbove-${rowId}" type="button">
                 <span class="material-symbols-outlined">add</span> Add Row Above
             </button>
-            <button class="popover-menu-item" id="addBelow-${rowId}" type="button">
+            <button class="btn btn-light popover-menu-item" id="addBelow-${rowId}" type="button">
                 <span class="material-symbols-outlined">add</span> Add Row Below
             </button>
-            <button class="popover-menu-item" id="delete-${rowId}" type="button">
+            <button class="btn btn-light popover-menu-item" id="delete-${rowId}" type="button">
                 <span class="material-symbols-outlined">delete</span> Delete Row
             </button>
         </div>
@@ -827,9 +827,11 @@ function attachBlurEventToTableCells(table) {
             popover.id = 'popover-message';
             popover.classList.add('not-popover');
 
-            // popover.style.border = '2px dashed red';
             if (parentCell.cell.status.warnings.length > 0) {
-                popover.style.borderColor = 'hsla(48, 100%, 29%, 0.8)';
+                popover.classList.add('warning-border');
+            }
+            if (parentCell.cell.status.errors.length > 0) {
+                popover.classList.add('danger-border');
             }
 
             popover.textContent = messages;
