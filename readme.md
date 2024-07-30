@@ -27,8 +27,9 @@ Once verified, can either be exported for a client or the corrected version can 
 [x] ENHANCE: Mouseover error and warning conditions. 
 [x] Need to clear all columns besides Product ID for Salsify reimport
 
-[] Table shrink and grow
+[x] Table shrink and grow
 [] Need to add any type row or change the Type... (Activated Charcoal )
+[] Create New needs to style and work
 [x] Name Single ingredient by Product ID
 [x] Error specific to Parent import
 [] bootstrap modal
