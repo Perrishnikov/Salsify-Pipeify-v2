@@ -26,15 +26,13 @@ Once verified, can either be exported for a client or the corrected version can 
 [x] Button for type of row to add (Nut, Ing) -> find: "// ! Validate here"
 [x] ENHANCE: Mouseover error and warning conditions. 
 [x] Need to clear all columns besides Product ID for Salsify reimport
-
 [x] Table shrink and grow
-[] Need to add any type row or change the Type... (Activated Charcoal )
 [x] Create New needs to style and work
 [x] Name Single ingredient by Product ID
 [x] Error specific to Parent import
 [x] bootstrap modal
 [x] bootstrap popover - NO
-[] add row col per ingred type
+[x] add row col per ingred type
 
 [] Check PLM1 Pipeify to see how this will affect it.
     Export the PLM1 fields as above, rename columns
@@ -42,6 +40,7 @@ Once verified, can either be exported for a client or the corrected version can 
     Use Pipeify to validate PLM1 as it will do NIO.
 [] Yes - should allow for export to PLM1 and original
 [] Create helper symbols to copy and paste
+[] Need to add any type row or change the Type... (Activated Charcoal )
 
 ---
 [] Drag n drop rows
