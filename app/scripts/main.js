@@ -236,7 +236,7 @@ function processOptionWithData(mergedJsonData, parsingOption) {
 
 /** MAIN ****************************************************************/
 function createNewTable(parsingOption, productIdValue) {
-    console.log('Hello World', parsingOption, productIdValue);
+    // console.log('Hello World', parsingOption, productIdValue);
 
     const fauxJsonObject = [
         {
@@ -248,7 +248,7 @@ function createNewTable(parsingOption, productIdValue) {
     ];
 
     const rows = processOptionWithData(fauxJsonObject, parsingOption);
-    console.log(rows);
+    // console.log(rows);
 
     // Create the table element
     const newTable = document.createElement('table');
@@ -592,11 +592,9 @@ function createTableRow(rowData, headerCallback = null, index) {
         // Apply errors to the cell container
         addErrorsToDom(cell.status, cellContainer.classList);
 
-        
         // Add classes to rows for type id
         if (cell.type === INGREDIENT_TYPE.id) {
-            
-            tableRow.dataset.type = cell.value
+            tableRow.dataset.type = cell.value;
         }
 
         if (cell.isEditable) {
@@ -767,9 +765,13 @@ function attachBlurEventToTableCells(table) {
             const cellType = cell.type;
 
             // Clean empty cells
-            e.target.innerText = e.target.innerText.trim();
-            let innerText = e.target.innerText;
-            innerText = innerText.replace(/[\r\n]/g, '');
+            
+            let innerText = e.target.innerText.trim();
+            // Remove <br> elements
+            innerText = innerText.replace(/<br\s*\/?>/gi, '');
+
+            // Remove carriage returns and newlines
+            innerText = innerText.replace(/[\r\n]+/g, '');
 
             //Set the cell value so it exports
             cell.value = innerText;
