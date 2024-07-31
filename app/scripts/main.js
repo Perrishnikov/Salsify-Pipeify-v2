@@ -294,6 +294,10 @@ function createNewTable(parsingOption, productIdValue) {
 
     applyHandlePopoverMenuClickToTable('new-table');
 }
+
+// TODO: move this into a scope. Presently needs to be outside because it's adding listerers from three places (461, )
+const buttonsWithListeners = new WeakSet();
+
 /**
  * Attaches the handlePopoverMenuClick function to each button with the class
  * .popover-menu-item within the my-table table.
@@ -303,7 +307,7 @@ function createNewTable(parsingOption, productIdValue) {
 function applyHandlePopoverMenuClickToTable(tableId = 'my-table') {
     // Create a WeakSet to store buttons that already have the event listener attached
     // console.log(tableId);
-    const buttonsWithListeners = new WeakSet();
+    // const buttonsWithListeners = new WeakSet();
 
     // Get the table element by its ID
     const table = document.getElementById(tableId);
@@ -338,7 +342,7 @@ function applyHandlePopoverMenuClickToTable(tableId = 'my-table') {
 function handlePopoverMenuClick(e, tableId) {
     // Get the button that was clicked
     const button = e.target.closest('.popover-menu-item');
-
+    // console.log(button.id);
     if (button) {
         // Extract button ID and index from the button's ID attribute
         const [buttonId, index] = button.id.split('-');
@@ -391,6 +395,10 @@ function handlePopoverMenuClick(e, tableId) {
                             `Other Rows may not be added or deleted.`,
                             'info'
                         );
+                        const popover = e.target.closest('[popover]');
+                        if (popover) {
+                            popover.togglePopover();
+                        }
                         return;
                     }
 
@@ -453,7 +461,6 @@ function handlePopoverMenuClick(e, tableId) {
                         }
                     }
 
-                    // Reapply event listeners to the table
                     applyHandlePopoverMenuClickToTable(tableId);
 
                     // Toggle the popover if it exists
@@ -466,29 +473,50 @@ function handlePopoverMenuClick(e, tableId) {
                     //ADD
                 } else if (buttonId === 'delete') {
                     // Confirm dialog
-                    // const modal = new bootstrap.Modal(
-                    //     document.getElementById('confirmationModal')
-                    // );
-                    // modal.show();
+                    const modal = new bootstrap.Modal(
+                        document.getElementById('confirmationModal')
+                    );
+                    modal.show();
 
-                    //get delete button
-                    // document
-                    //     .getElementById('confirmDelete')
-                    //     .addEventListener('click', () => {
-                    //         const modal = bootstrap.Modal.getInstance(
-                    //             document.getElementById('confirmationModal')
-                    //         );
+                    // get delete button
+                    document
+                        .getElementById('confirmDelete')
+                        .addEventListener('click', () => {
+                            const modal = bootstrap.Modal.getInstance(
+                                document.getElementById('confirmationModal')
+                            );
 
-                    //         deleteRow(e, tableId);
+                            deleteRow(e, tableId);
 
-                    //         modal.hide();
-                    //     });
+                            modal.hide();
+                        });
                 }
             }
         }
+        updateDividerCss(table);
     }
 }
 
+/**
+ * Adds or removes the 'divider' class from table rows based on product ID differences.
+ *
+ * @param {HTMLTableElement} table - The table to update.
+ */
+function updateDividerCss(table) {
+    Array.from(table.rows).forEach((row, index) => {
+        const thisProductId = row.dataset.productId;
+        const thatProductId = Array.from(table.rows)[index - 1];
+        // console.log(thatProductId?.dataset.productId);
+        // console.log(thisProductId, index);
+
+        // console.log(thisProductId !== thatProductId?.dataset.productId);
+        if (thisProductId !== thatProductId?.dataset.productId) {
+            row.classList.add('divider');
+        } else {
+            row.classList.remove('divider');
+        }
+    });
+}
 
 /**
  * Remove from scope
@@ -525,7 +553,6 @@ function deleteRow(e, tableId) {
  * @returns {HTMLTableCellElement} The table cell containing the popover menu.
  */
 function createMenuPopover(rowId) {
-    //! do it here
     const td = document.createElement('td');
     td.innerHTML = `
     
@@ -728,20 +755,7 @@ function main_process(parsingOption) {
         myTable.appendChild(tableRow);
     });
 
-    //!do it here - iterate table adding class for different product id
-    Array.from(myTable.rows).forEach((row, index) => {
-        const thisProductId = row.dataset.productId;
-        const thatProductId = Array.from(myTable.rows)[index - 1];
-        // console.log(thatProductId?.dataset.productId);
-        // console.log(thisProductId, index);
-
-        // console.log(thisProductId !== thatProductId?.dataset.productId);
-        if (thisProductId !== thatProductId?.dataset.productId) {
-            row.classList.add('divider');
-        } else {
-            row.classList.remove('divider');
-        }
-    });
+    updateDividerCss(myTable);
 
     // Get container element to append the table
     const tableContainer = document.getElementById('table-container');
@@ -919,29 +933,6 @@ function attachBlurEventToTableCells(table) {
     table.removeEventListener('mouseout', handleMouseOut, true);
     table.addEventListener('mouseover', handleMouseOver, true);
     table.addEventListener('mouseout', handleMouseOut, true);
-
-    //charactter limits?
-    // table.addEventListener('input', (event) => {
-    //     // Check if the event target is an editable cell (td element)
-    //     if (event.target.cell.type === 'ORDER') {
-    //         const cellContent = event.target.textContent;
-    //         console.log({ cellContent });
-    //         const charLimit = 3;
-    //         // If the content length exceeds the character limit
-    //         if (cellContent.length > charLimit) {
-    //             // Truncate the cell content to the character limit
-    //             event.target.textContent = cellContent.slice(0, charLimit);
-
-    //             // Optionally, place the cursor at the end of the truncated text
-    //             const range = document.createRange();
-    //             range.setStart(event.target.childNodes[0], charLimit);
-    //             range.collapse(true);
-    //             const selection = window.getSelection();
-    //             selection.removeAllRanges();
-    //             selection.addRange(range);
-    //         }
-    //     }
-    // });
 }
 
 /********************************************************************* */
