@@ -26,7 +26,7 @@
             >
                 <li class="nav-item" role="presentation">
                     <button
-                        class="nav-link"
+                        class="nav-link active"
                         id="pills-import-tab"
                         data-bs-toggle="pill"
                         data-bs-target="#pills-import"
@@ -40,7 +40,7 @@
                 </li>
                 <li class="nav-item" role="presentation">
                     <button
-                        class="nav-link active"
+                        class="nav-link"
                         id="pills-new-tab"
                         data-bs-toggle="pill"
                         data-bs-target="#pills-new"
@@ -73,7 +73,7 @@
         <div class="tab-content" id="pills-tabContent">
             <!--* Tab1 -->
             <div
-                class="tab-pane fade"
+                class="tab-pane fade show active"
                 id="pills-import"
                 role="tabpanel"
                 aria-labelledby="pills-import-tab"
@@ -252,6 +252,10 @@
                                         </ul>
                                     </li>
                                     <li>
+                                        All new line characters are remove -
+                                        should have 1 line per row.
+                                    </li>
+                                    <li>
                                         <span class="text-warning">Yellow</span>
                                         indicates possible invalid value.
                                     </li>
@@ -281,8 +285,6 @@
                                 <ul>
                                     <li>Removes the Product ID column.</li>
                                 </ul>
-                                <!-- </div> -->
-                                <!-- </div> -->
                             </div>
                         </div>
                     </div>
@@ -291,7 +293,7 @@
             </div>
             <!--* Tab2 -->
             <div
-                class="tab-pane fade show active"
+                class="tab-pane fade"
                 id="pills-new"
                 role="tabpanel"
                 aria-labelledby="pills-new-tab"

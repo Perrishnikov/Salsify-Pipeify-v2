@@ -181,7 +181,7 @@ button.icon {
     align-items: center;
     cursor: pointer;
 }
-/*  */
+/* Enter Product ID box */
 .pipeify-create {
     border: 2px solid var(--bs-secondary);
     border-radius: 0.25rem;
@@ -191,6 +191,7 @@ button.icon {
 #newIngredFeedbackDiv {
     color: var(--bs-form-invalid-color);
 }
+/* bs override */
 @media (min-width: 576px) {
   .modal-dialog {
     max-width: 750px;

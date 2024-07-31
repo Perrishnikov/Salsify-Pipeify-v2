@@ -32,8 +32,9 @@ Once verified, can either be exported for a client or the corrected version can 
 [x] Create New needs to style and work
 [x] Name Single ingredient by Product ID
 [x] Error specific to Parent import
-[] bootstrap modal
-[] bootstrap popover
+[x] bootstrap modal
+[x] bootstrap popover - NO
+[] add row col per ingred type
 
 [] Check PLM1 Pipeify to see how this will affect it.
     Export the PLM1 fields as above, rename columns

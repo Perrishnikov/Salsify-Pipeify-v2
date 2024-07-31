@@ -761,7 +761,9 @@ function attachBlurEventToTableCells(table) {
 
             // Clean empty cells
             e.target.innerText = e.target.innerText.trim();
-            const innerText = e.target.innerText;
+            let innerText = e.target.innerText;
+            innerText = innerText.replace(/[\r\n]/g, '');
+
             //Set the cell value so it exports
             cell.value = innerText;
 
