@@ -275,8 +275,15 @@ function xlsx_exportWYSIWYG(data) {
 function xlsx_exportForSalsify(data) {
     const worksheet = XLSX.utils.json_to_sheet(data);
 
+    // Return and error if there is no table data
+    if (data.length < 1) {
+        bootToast(`No Table Data to Export`, 'danger');
+        return;
+    }
+
     // Get the keys of the first object to determine the number of columns
     const keys = Object.keys(data[0]);
+
     const numColumns = keys.length;
 
     // Define column widths

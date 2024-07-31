@@ -368,30 +368,32 @@ function handlePopoverMenuClick(e, tableId) {
                 const newCells = [];
 
                 // console.log(row);
-                let ingredientType = Array.from(row.cells)
-                    .map((cell) => {
-                        // console.log(cell.children[0]);
-                        if (
-                            cell.children[0].cell &&
-                            cell.children[0].cell.type === INGREDIENT_TYPE.id
-                        ) {
-                            return cell.children[0].cell.value;
-                        }
-                    })
-                    .filter((item) => item !== undefined)[0];
-                // console.log({ cellType: ingredientType });
-
-                //dont duplicate Other row
-                if (ingredientType === LABEL_DATASET_OTHER_INGREDS_A.name) {
-                    bootToast(
-                        `Other Rows may not be added or deleted.`,
-                        'info'
-                    );
-                    return;
-                }
 
                 // ADD
                 if (buttonId === 'addAbove' || buttonId === 'addBelow') {
+                    let ingredientType = Array.from(row.cells)
+                        .map((cell) => {
+                            // console.log(cell.children[0]);
+                            if (
+                                cell.children[0].cell &&
+                                cell.children[0].cell.type ===
+                                    INGREDIENT_TYPE.id
+                            ) {
+                                return cell.children[0].cell.value;
+                            }
+                        })
+                        .filter((item) => item !== undefined)[0];
+
+                    // console.log({ cellType: ingredientType });
+                    //dont duplicate Other row
+                    if (ingredientType === LABEL_DATASET_OTHER_INGREDS_A.name) {
+                        bootToast(
+                            `Other Rows may not be added or deleted.`,
+                            'info'
+                        );
+                        return;
+                    }
+
                     // Copy cells from the target row to create a new row
                     for (let j = 0; j < row.cells.length; j++) {
                         const cellContainer = row.cells[j].firstChild;
@@ -463,26 +465,58 @@ function handlePopoverMenuClick(e, tableId) {
 
                     //ADD
                 } else if (buttonId === 'delete') {
-                    // Loop through table rows to find the target row by its data-row_id and delete it
-                    for (let i = 1; i < table.rows.length; i++) {
-                        const row = table.rows[i];
-                        const rowId = row.dataset.row_id;
+                    // Confirm dialog
+                    const modal = new bootstrap.Modal(
+                        document.getElementById('confirmationModal')
+                    );
+                    modal.show();
 
-                        if (rowId === rowIdFromDom) {
-                            rowIndex = i;
-                            break;
-                        }
-                    }
+                    //get delete button
+                    document
+                        .getElementById('confirmDelete')
+                        .addEventListener('click', () => {
+                            // Hide the modal
+                            const modal = bootstrap.Modal.getInstance(
+                                document.getElementById('confirmationModal')
+                            );
+                            deleteRow(e, tableId);
 
-                    if (rowIndex !== undefined) {
-                        table.deleteRow(rowIndex);
-                    }
+                            modal.hide();
+                        });
                 }
             }
         }
     }
 }
 
+/**
+ * Remove from scope
+ * @param {Event} e
+ * @param {string} tableId
+ */
+
+function deleteRow(e, tableId) {
+    const targetRow = e.target.closest('tr[data-row_id]');
+    const rowIdFromDom = targetRow ? targetRow.dataset.row_id : null;
+
+    const table = document.getElementById(tableId);
+
+    let rowIndex;
+    // Loop through table rows to find the target row by its data-row_id and delete it
+    for (let i = 1; i < table.rows.length; i++) {
+        const row = table.rows[i];
+        const rowId = row.dataset.row_id;
+
+        if (rowId === rowIdFromDom) {
+            rowIndex = i;
+            break;
+            // const newCells = [];
+        }
+    }
+    if (rowIndex !== undefined) {
+        table.deleteRow(rowIndex);
+    }
+}
 /**
  * Creates a menu popover element for a table row with given ID.
  *
@@ -765,7 +799,7 @@ function attachBlurEventToTableCells(table) {
             const cellType = cell.type;
 
             // Clean empty cells
-            
+
             let innerText = e.target.innerText.trim();
             // Remove <br> elements
             innerText = innerText.replace(/<br\s*\/?>/gi, '');
