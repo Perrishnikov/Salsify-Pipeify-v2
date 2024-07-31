@@ -466,28 +466,29 @@ function handlePopoverMenuClick(e, tableId) {
                     //ADD
                 } else if (buttonId === 'delete') {
                     // Confirm dialog
-                    const modal = new bootstrap.Modal(
-                        document.getElementById('confirmationModal')
-                    );
-                    modal.show();
+                    // const modal = new bootstrap.Modal(
+                    //     document.getElementById('confirmationModal')
+                    // );
+                    // modal.show();
 
                     //get delete button
-                    document
-                        .getElementById('confirmDelete')
-                        .addEventListener('click', () => {
-                            // Hide the modal
-                            const modal = bootstrap.Modal.getInstance(
-                                document.getElementById('confirmationModal')
-                            );
-                            deleteRow(e, tableId);
+                    // document
+                    //     .getElementById('confirmDelete')
+                    //     .addEventListener('click', () => {
+                    //         const modal = bootstrap.Modal.getInstance(
+                    //             document.getElementById('confirmationModal')
+                    //         );
 
-                            modal.hide();
-                        });
+                    //         deleteRow(e, tableId);
+
+                    //         modal.hide();
+                    //     });
                 }
             }
         }
     }
 }
+
 
 /**
  * Remove from scope
@@ -631,6 +632,11 @@ function createTableRow(rowData, headerCallback = null, index) {
             tableRow.dataset.type = cell.value;
         }
 
+        //add the product id for a css divider
+        if (cell.type === 'Product ID') {
+            tableRow.dataset.productId = cell.value;
+        }
+
         if (cell.isEditable) {
             // Set the cell content based on its editable status
             cellContainer.innerHTML = `
@@ -720,6 +726,21 @@ function main_process(parsingOption) {
             tableRow = createTableRow(row, null);
         }
         myTable.appendChild(tableRow);
+    });
+
+    //!do it here - iterate table adding class for different product id
+    Array.from(myTable.rows).forEach((row, index) => {
+        const thisProductId = row.dataset.productId;
+        const thatProductId = Array.from(myTable.rows)[index - 1];
+        // console.log(thatProductId?.dataset.productId);
+        // console.log(thisProductId, index);
+
+        // console.log(thisProductId !== thatProductId?.dataset.productId);
+        if (thisProductId !== thatProductId?.dataset.productId) {
+            row.classList.add('divider');
+        } else {
+            row.classList.remove('divider');
+        }
     });
 
     // Get container element to append the table

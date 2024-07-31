@@ -109,6 +109,9 @@ tr[data-type="Other"] {
     /* Your styles here */
     background-color: var(--color-other) !important;
 }
+.divider{
+    border-top: 4px solid var(--bs-secondary);
+}
 .error-cell {
     background-color: var(--bs-danger) !important;
     color: var(--bs-light) !important;

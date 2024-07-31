@@ -34,6 +34,7 @@ Once verified, can either be exported for a client or the corrected version can 
 [x] bootstrap popover - NO
 [x] add row col per ingred type
 [] need to delete Other row for new ingreds
+[] broken - popover needs to close after click
 
 [] Check PLM1 Pipeify to see how this will affect it.
     Export the PLM1 fields as above, rename columns
