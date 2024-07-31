@@ -592,8 +592,15 @@ function createTableRow(rowData, headerCallback = null, index) {
         // Apply errors to the cell container
         addErrorsToDom(cell.status, cellContainer.classList);
 
-        // Set the cell content based on its editable status
+        
+        // Add classes to rows for type id
+        if (cell.type === INGREDIENT_TYPE.id) {
+            
+            tableRow.dataset.type = cell.value
+        }
+
         if (cell.isEditable) {
+            // Set the cell content based on its editable status
             cellContainer.innerHTML = `
                 <span class="chevron-icon">▶</span>
                 <span class="cell-value" contenteditable="true">

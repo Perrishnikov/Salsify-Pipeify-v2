@@ -2,6 +2,9 @@
     --font-size: 1rem; /* Define a variable named --font-size */
     --font-size-smaller: 0.9rem;
     --padding-margin: 16px;
+    --color-nut: rgba(173, 216, 230, 0.2);
+    --color-ing: rgba(144, 238, 144, 0.2);
+    --color-other: rgba(240, 128, 128, 0.2);
 }
 
 .bs-secondary {
@@ -94,7 +97,18 @@ tr {
 tr:nth-child(even):not(.error-row):not(.warning-row):not(.info-row) {
     background-color: rgba(var(--bs-body-color-rgb), 0.03);
 }
-
+tr[data-type="Nutrients"] {
+    /* Your styles here */
+    background-color: var(--color-nut) !important;
+}
+tr[data-type="Ingredients"] {
+    /* Your styles here */
+    background-color: var(--color-ing) !important;
+}
+tr[data-type="Other"] {
+    /* Your styles here */
+    background-color: var(--color-other) !important;
+}
 .error-cell {
     background-color: var(--bs-danger) !important;
     color: var(--bs-light) !important;
