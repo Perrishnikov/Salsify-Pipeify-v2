@@ -696,8 +696,8 @@ function createTableRow(rowData, headerCallback = null, index) {
  */
 function main_process(parsingOption, tableId) {
     //TODO: update buttons 
-    const dwnbtn = document.getElementById('download-for-salsify-btn');
-    const custbtn = document.getElementById('download-wysiwyg-btn');
+    const dwnbtn = document.getElementById('download-validate-salsify-btn');
+    const custbtn = document.getElementById('download-validate-customer-btn');
 
     if (getLocalStorage()) {
         custbtn.disabled = false;
@@ -944,8 +944,8 @@ function attachBlurEventToTableCells(table) {
 }
 
 /********************************************************************* */
-function process_wysiwyg_export(parsingOption) {
-    const myTable = document.getElementById('my-table');
+function process_wysiwyg_export() {
+    const myTable = document.getElementById('table-validate');
 
     if (!myTable) {
         bootToast(`No Data to Export`, 'danger');

@@ -1,18 +1,42 @@
-// function displayFileName() {
-//     const fileInputValidate = document.getElementById('fileInputValidate');
-//     const fileNameDiv = document.getElementById('fileName');
-//     if (fileInputValidate.files.length > 0) {
-//         fileInputValidate.innerText = `Selected file: ${fileInputValidate.files[0].name}`;
-//     } else {
-//         fileNameDiv.innerText = '';
-//     }
-// }
+
+const duplicateProductIdForm = document.querySelector(
+    '#download-duplicate-salsify-btn'
+);
+if (duplicateProductIdForm) {
+
+    duplicateProductIdForm.addEventListener('click', function (event) {
+        const productIdInput = document.getElementById('product-id');
+        const productIdValue = productIdInput.value.trim();
+
+        event.preventDefault(); // Prevent form submission
+        const feedbackDiv = document.querySelector('#newIngredFeedbackDiv');
+
+        if (productIdValue.length !== 14 || !productIdValue.startsWith('000')) {
+            feedbackDiv.classList.remove('d-none');
+        } else {
+            //main.js
+            // const parsingOption = getCheckedRadioButtonId();
+            createNewTable('option4', productIdValue);
+            productIdInput.value = '';
+            feedbackDiv.classList.add('d-none');
+
+            //enable download button
+            document
+                .querySelector('#download-new-ing-salsify-btn')
+                .removeAttribute('disabled');
+            //disable create set button
+            document
+                .querySelector('#newIngredSubmit')
+                .setAttribute('disabled', true);
+        }
+    });
+}
 
 /** Tab 2 - Validate and Submit Product ID for New Ingredients */
 // document.addEventListener('DOMContentLoaded', function () {
-const form = document.querySelector('#newIngredSubmit');
-if (form) {
-    form.addEventListener('click', function (event) {
+const newProductIdForm = document.querySelector('#newIngredSubmit');
+if (newProductIdForm) {
+    newProductIdForm.addEventListener('click', function (event) {
         const productIdInput = document.getElementById('product-id');
         const productIdValue = productIdInput.value.trim();
 
@@ -44,12 +68,12 @@ if (form) {
 const newSalsify = document.getElementById('download-new-ing-salsify-btn');
 if (newSalsify) {
     newSalsify.addEventListener('click', (e) => {
-        console.log(`download-for-salsify-btn`);
-        console.log(newSalsify.value);
+        
+
         const parsingOption = getCheckedRadioButtonId();
 
         //
-        const newTable = document.getElementById('table-validate');
+        const newTable = document.getElementById('table-new');
         process_for_salsify(parsingOption, newTable);
     });
 }
@@ -81,8 +105,8 @@ if (radioButtonsDiv) {
         const selectedOption = e.target.id;
 
         // console.log(`change table columns to ${selectedOption}`);
-        const dwnbtn = document.getElementById('download-for-salsify-btn');
-        const custbtn = document.getElementById('download-wysiwyg-btn');
+        const dwnbtn = document.getElementById('download-validate-salsify-btn');
+        const custbtn = document.getElementById('download-validate-customer-btn');
         const parsingOption = getCheckedRadioButtonId();
 
         if (getLocalStorage()) {
@@ -209,7 +233,7 @@ const dropAreas = document.querySelectorAll('.drop-area').forEach((element) => {
 });
 
 /** Export WSYWIG File */
-const button_current_table = document.getElementById('download-wysiwyg-btn');
+const button_current_table = document.getElementById('download-validate-customer-btn');
 if (button_current_table) {
     button_current_table.addEventListener('click', (e) => {
         const parsingOption = getCheckedRadioButtonId();
@@ -220,11 +244,10 @@ if (button_current_table) {
 
 /** Export Tab1 for Salsify file */
 const button_salsify_reimport = document.getElementById(
-    'download-for-salsify-btn'
+    'download-validate-salsify-btn'
 );
 if (button_salsify_reimport) {
     button_salsify_reimport.addEventListener('click', (e) => {
-        // console.log(`download-for-salsify-btn`);
         const parsingOption = getCheckedRadioButtonId();
 
         const myTable = document.getElementById('table-validate');
@@ -233,6 +256,7 @@ if (button_salsify_reimport) {
 }
 
 //TODO: clear all tables and filenames .forEach()
+//TODO: Create new is handling itself. This needs to clear local storage for both tables
 function clearLocalStorageAndTable() {
     localStorage.clear();
 
@@ -251,7 +275,7 @@ function clearLocalStorageAndTable() {
 
         // Disable download buttons
         const dwnbtn = document.getElementById('download-for-salsify-btn');
-        const custbtn = document.getElementById('download-wysiwyg-btn');
+        const custbtn = document.getElementById('download-validate-customer-btn');
         custbtn.disabled = true;
         dwnbtn.disabled = true;
     }

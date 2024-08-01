@@ -37,6 +37,7 @@ Once verified, can either be exported for a client or the corrected version can 
 [x] broken - popover needs to close after click
 [] allow duplicate (change product id) of complicated ingredient set like Alive Multi. CA - US is getting PLM soon
 [x] move this into a scope. ...new WeakSet();
+[] verify clear is clearing scope
 
 [] Check PLM1 Pipeify to see how this will affect it.
     Export the PLM1 fields as above, rename columns

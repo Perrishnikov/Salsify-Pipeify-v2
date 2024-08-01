@@ -144,13 +144,13 @@
                             <button
                                 type="salsify"
                                 disabled
-                                id="download-for-salsify-btn"
+                                id="download-validate-salsify-btn"
                                 class="btn btn-primary me-2"
                             >
                                 Download For Salsify
                             </button>
                             <button
-                                id="download-wysiwyg-btn"
+                                id="download-validate-customer-btn"
                                 class="btn btn-secondary me-2"
                                 disabled
                             >
@@ -462,9 +462,10 @@
                             <button
                                 type="submit"
                                 class="btn btn-primary"
-                                id="replaceIngredSubmit"
+                                id="duplicateIngredSubmit"
+                                disabled
                             >
-                                Create Set
+                                Replace
                             </button>
                         </div>
                         <div class="col-auto d-none" id="dupeIngredFeedbackDiv">
@@ -480,12 +481,12 @@
                             <button
                                 type="salsify"
                                 disabled
-                                id="download-for-salsify-btn"
+                                id="download-duplicate-salsify-btn"
                                 class="btn btn-primary me-2"
                             >
                                 Download For Salsify
                             </button>
-                            <button id="" class="btn btn-secondary">
+                            <button id="clear-localstorage-btn" class="btn btn-secondary">
                                 Clear
                             </button>
                         </div>
@@ -496,6 +497,7 @@
                                 class="btn btn-info"
                                 data-bs-toggle="modal"
                                 data-bs-target="#help-import-modal"
+                                disabled
                             >
                                 Help
                             </button>
