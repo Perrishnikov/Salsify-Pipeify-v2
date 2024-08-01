@@ -1,0 +1,7 @@
+{
+  "liveServer.settings.ignoreFiles": [
+    "/*",            // Ignore all files in the root directory
+    "!/app/**"       // Do not ignore files in the app subdirectory
+  ],
+  "liveServer.settings.root": "/app"
+}

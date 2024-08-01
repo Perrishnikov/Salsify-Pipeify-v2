@@ -54,7 +54,7 @@ body {
 .drop-area h5 {
     margin-bottom: 0 !important;
 }
-input#product-id {
+input#product-id, input#replace-product-id {
     border: 1px solid var(--bs-secondary);
     border-radius: 0.25rem;
 }
@@ -205,7 +205,7 @@ button.icon {
     background-color: var(--bs-light);
     padding: 2rem;
 }
-#newIngredFeedbackDiv {
+#newIngredFeedbackDiv, #dupeIngredFeedbackDiv{
     color: var(--bs-form-invalid-color);
 }
 /* bs override */

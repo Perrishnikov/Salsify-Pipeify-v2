@@ -35,7 +35,8 @@ Once verified, can either be exported for a client or the corrected version can 
 [x] add row col per ingred type
 [x] need to delete Other row for new ingreds
 [x] broken - popover needs to close after click
-[] move this into a scope. ...new WeakSet();
+[] allow duplicate (change product id) of complicated ingredient set like Alive Multi. CA - US is getting PLM soon
+[x] move this into a scope. ...new WeakSet();
 
 [] Check PLM1 Pipeify to see how this will affect it.
     Export the PLM1 fields as above, rename columns

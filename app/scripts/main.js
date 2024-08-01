@@ -758,7 +758,7 @@ function main_process(parsingOption) {
     updateDividerCss(myTable);
 
     // Get container element to append the table
-    const tableContainer = document.getElementById('table-container');
+    const tableContainer = document.getElementById('validate-table-container');
 
     // Clear any old table
     tableContainer.innerHTML = '';

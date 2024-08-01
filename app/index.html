@@ -26,7 +26,7 @@
             >
                 <li class="nav-item" role="presentation">
                     <button
-                        class="nav-link active"
+                        class="nav-link"
                         id="pills-import-tab"
                         data-bs-toggle="pill"
                         data-bs-target="#pills-import"
@@ -35,7 +35,7 @@
                         aria-controls="pills-import"
                         aria-selected="true"
                     >
-                        Import Salsify Ingredient Set
+                        Validate Salsify Ingredient Sets
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
@@ -50,6 +50,20 @@
                         aria-selected="false"
                     >
                         Create New Salsify Ingredient Set
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button
+                        class="nav-link active"
+                        id="pills-duplicate-tab"
+                        data-bs-toggle="pill"
+                        data-bs-target="#pills-duplicate"
+                        type="button"
+                        role="tab"
+                        aria-controls="pills-duplicate"
+                        aria-selected="false"
+                    >
+                        Duplicate Salsify Ingredient Set
                     </button>
                 </li>
 
@@ -73,22 +87,22 @@
         <div class="tab-content" id="pills-tabContent">
             <!--* Tab1 -->
             <div
-                class="tab-pane fade show active"
+                class="tab-pane fade"
                 id="pills-import"
                 role="tabpanel"
                 aria-labelledby="pills-import-tab"
                 tabindex="0"
             >
                 <div class="container mt-4">
-                    <div id="dropArea" class="drop-area">
+                    <div id="validateDropArea" class="drop-area">
                         <h5 class="mb-4">
                             Drag and drop a file here or click to select
                         </h5>
                         <input
                             type="file"
-                            id="fileInput"
+                            id="fileInputValidate"
                             style="display: none"
-                            onchange="displayFileName()"
+
                         />
                     </div>
                     <div id="fileName" class="mt-4"></div>
@@ -289,7 +303,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="table-wrapper mt-4 mb-4" id="table-container"></div>
+                <div class="table-wrapper mt-4 mb-4" id="validate-table-container"></div>
             </div>
             <!--* Tab2 -->
             <div
@@ -301,7 +315,7 @@
             >
                 <div class="container mt-4">
                     <form
-                        class="row gx-3 align-items-center pipeify-create needs-validation"
+                        class="row gx-4 align-items-center pipeify-create needs-validation"
                         novalidate
                     >
                         <div class="col-auto">
@@ -316,10 +330,6 @@
                                 class="form-control"
                                 aria-describedby="product-id"
                             />
-                            <div class="invalid-feedback">
-                                Product ID must be 14 digits long and start with
-                                "000".
-                            </div>
                         </div>
                         <div class="col-auto">
                             <button
@@ -404,7 +414,97 @@
                 ></div>
                 <!-- </div> -->
             </div>
-            <!-- *Tab 3-->
+            <!-- *Tab 3 Duplicate-->
+            <div
+                class="tab-pane fade show active"
+                id="pills-duplicate"
+                role="tabpanel"
+                aria-labelledby="pills-duplicate-tab"
+                tabindex="0"
+            >
+                <div class="container mt-4">
+                    <div id="duplicateDropArea" class="drop-area">
+                        <h5 class="mb-4">
+                            Drag and drop a file here or click to select
+                        </h5>
+                        <input
+                            type="file"
+                            id="fileInputDuplicate"
+                            style="display: none"
+                            onchange=""
+                        />
+                    </div>
+                    <form
+                        class="row mt-4 gx-4 mx-1 align-items-center pipeify-create needs-validation"
+                        novalidate
+                    >
+                        <div class="col-auto">
+                            <label for="product-id" class="col-form-label">
+                                <h5>Product ID Replacement</h5>
+                            </label>
+                        </div>
+                        <div class="col-auto">
+                            <input
+                                type="text"
+                                id="replace-product-id"
+                                class="form-control"
+                                aria-describedby="replace-product-id"
+                            />
+                            <!-- <div class="invalid-feedback">
+                                Product ID must be 14 digits long and start with
+                                "000".
+                            </div> -->
+                        </div>
+                        <div class="col-auto">
+                            <button
+                                type="submit"
+                                class="btn btn-primary"
+                                id="replaceIngredSubmit"
+                            >
+                                Create Set
+                            </button>
+                        </div>
+                        <div class="col-auto d-none" id="dupeIngredFeedbackDiv">
+                            Product ID must be 14 digits long and start with
+                            "000".
+                        </div>
+                    </form>
+                    <div
+                        class="button-box-row mt-4"
+                        style="display: flex; justify-content: space-between"
+                    >
+                        <div id="grow">
+                            <button
+                                type="salsify"
+                                disabled
+                                id="download-for-salsify-btn"
+                                class="btn btn-primary me-2"
+                            >
+                                Download For Salsify
+                            </button>
+                            <button id="" class="btn btn-secondary">
+                                Clear
+                            </button>
+                        </div>
+                        <div class="">
+                            <!-- Button trigger modal -->
+                            <button
+                                type="button"
+                                class="btn btn-info"
+                                data-bs-toggle="modal"
+                                data-bs-target="#help-import-modal"
+                            >
+                                Help
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                                <div
+                    class="table-wrapper mt-4 mb-4"
+                    id="duplicate-table-container"
+                ></div>
+            </div>
+            <!--* Tab4 PLM1-->
             <div
                 class="tab-pane fade"
                 id="pills-plm1"
@@ -424,7 +524,7 @@
         </div>
         <!-- TOAST -->
         <div id="toast-container"></div>
-        
+
         <!-- Confirm Modal Structure -->
         <div
             class="modal fade"
@@ -447,7 +547,8 @@
                         ></button>
                     </div>
                     <div class="modal-body">
-                        Are you sure you want to delete this row. Can't be undone.
+                        Are you sure you want to delete this row. Can't be
+                        undone.
                     </div>
                     <div class="modal-footer">
                         <button
@@ -457,7 +558,11 @@
                         >
                             Cancel
                         </button>
-                        <button type="button" id="confirmDelete" class="btn btn-primary">
+                        <button
+                            type="button"
+                            id="confirmDelete"
+                            class="btn btn-primary"
+                        >
                             Confirm
                         </button>
                     </div>

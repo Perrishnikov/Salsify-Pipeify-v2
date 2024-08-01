@@ -1,12 +1,12 @@
-function displayFileName() {
-    const fileInput = document.getElementById('fileInput');
-    const fileNameDiv = document.getElementById('fileName');
-    if (fileInput.files.length > 0) {
-        fileNameDiv.innerText = `Selected file: ${fileInput.files[0].name}`;
-    } else {
-        fileNameDiv.innerText = '';
-    }
-}
+// function displayFileName() {
+//     const fileInputValidate = document.getElementById('fileInputValidate');
+//     const fileNameDiv = document.getElementById('fileName');
+//     if (fileInputValidate.files.length > 0) {
+//         fileInputValidate.innerText = `Selected file: ${fileInputValidate.files[0].name}`;
+//     } else {
+//         fileNameDiv.innerText = '';
+//     }
+// }
 
 /** Tab 2 - Validate and Submit Product ID for New Ingredients */
 // document.addEventListener('DOMContentLoaded', function () {
@@ -128,7 +128,7 @@ function getCheckedRadioButtonId() {
  *
  * @param {File} file - The file to be imported.
  */
-async function dom_importFileHandler(file) {
+async function dom_importFileHandler(file, parsingOption) {
     const fileName = file.name;
 
     // Append file name to DOM
@@ -136,7 +136,7 @@ async function dom_importFileHandler(file) {
     // fileNameArea.textContent = `Imported File: ${fileName}`;
 
     // Get the parsing option from the DOM
-    const parsingOption = getCheckedRadioButtonId();
+    // const parsingOption = getCheckedRadioButtonId();
 
     // Try to import the file and handle errors
     try {
@@ -155,28 +155,29 @@ async function dom_importFileHandler(file) {
 }
 
 /* Tab1 - DROP BOX LISTENER */
-const dropArea = document.querySelector('#dropArea');
-if (dropArea) {
+const validateDropArea = document.querySelector('#validateDropArea');
+if (validateDropArea) {
+    const parsingOption = getCheckedRadioButtonId();
     // Prevent default behavior (opening file in browser) when dragging over drop area
-    dropArea.addEventListener('dragover', (e) => {
+    validateDropArea.addEventListener('dragover', (e) => {
         e.preventDefault();
     });
 
     // Handle dropped files
-    dropArea.addEventListener('drop', (e) => {
+    validateDropArea.addEventListener('drop', (e) => {
         e.preventDefault();
 
         // Check if files were dropped
         if (e.dataTransfer) {
             const file = e.dataTransfer.files[0];
-            dom_importFileHandler(file);
+            dom_importFileHandler(file, parsingOption);
         } else {
             console.log('No files were dropped.');
         }
     });
 
     // Handle file input change
-    dropArea.addEventListener('click', () => {
+    validateDropArea.addEventListener('click', () => {
         let fileInput = document.createElement('input');
         fileInput.type = 'file';
         fileInput.accept = '.xls, .xlsx';
@@ -184,7 +185,48 @@ if (dropArea) {
 
         fileInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
-            dom_importFileHandler(file);
+            dom_importFileHandler(file, parsingOption);
+        });
+
+        document.body.appendChild(fileInput);
+        fileInput.click();
+        document.body.removeChild(fileInput);
+    });
+}
+
+/* Tab3 - Duplicate */
+//! do it here
+const duplicateDropArea = document.querySelector('#duplicateDropArea');
+if (duplicateDropArea) {
+    const parsingOption = getCheckedRadioButtonId();
+    // Prevent default behavior (opening file in browser) when dragging over drop area
+    duplicateDropArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+    });
+
+    // Handle dropped files
+    duplicateDropArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+
+        // Check if files were dropped
+        if (e.dataTransfer) {
+            const file = e.dataTransfer.files[0];
+            dom_importFileHandler(file, 'option4');
+        } else {
+            console.log('No files were dropped.');
+        }
+    });
+
+    // Handle file input change
+    duplicateDropArea.addEventListener('click', () => {
+        let fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = '.xls, .xlsx';
+        fileInput.style.display = 'none';
+
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            dom_importFileHandler(file, 'option4');
         });
 
         document.body.appendChild(fileInput);
@@ -222,7 +264,7 @@ function clearLocalStorageAndTable() {
 
     // console.log('localStorage cleared');
 
-    const table = document.getElementById('table-container');
+    const table = document.getElementById('validate-table-container');
     const fileName = document.getElementById('fileName');
 
     const hasChildren = table.childNodes.length > 0;
