@@ -106,8 +106,9 @@ function salsify_mergeIngredients(jsonData) {
  * Sets the localStorage
  * @param {Object[]} jsonData - The raw JSON data from Salsify.
  * @param {string} parsingOption - The parsing option for processing.
+ * @param {string} tableId - validate | duplicate
  */
-function salsify_preprocess(jsonData, parsingOption) {
+function salsify_preprocess(jsonData, parsingOption, tableId) {
     // console.log(jsonData);
     // Filter out parents, keeping only variants. If it has them.
     const varientsOnly = [...jsonData].filter((obj) => {
@@ -154,17 +155,17 @@ function salsify_preprocess(jsonData, parsingOption) {
     setLocalStorage(mergedJsonData);
 
     //* Done with Salsify processing */
-    main_process(parsingOption);
+    main_process(parsingOption, tableId);
 }
 
-function pipeify_preprocess(jsonData, parsingOption) {
+function pipeify_preprocess(jsonData, parsingOption, tableId) {
     /** @type {SalsifyObject[]} */
     const mergedJsonData = salsify_mergeIngredients(jsonData);
 
     setLocalStorage(mergedJsonData);
 
     //* Done with Salsify processing */
-    main_process(parsingOption);
+    main_process(parsingOption, tableId);
 }
 
 /* XLSX Processing */
@@ -174,7 +175,7 @@ function pipeify_preprocess(jsonData, parsingOption) {
  * @param {string} parsingOption - The parsing option to use.
  * @returns {Promise<string>} - A promise that resolves with the file type.
  */
-async function xlsx_import_file(file, parsingOption) {
+async function xlsx_import_file(file, parsingOption, tableId) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
 
@@ -194,12 +195,12 @@ async function xlsx_import_file(file, parsingOption) {
                     reject('FOR CUSTOMER not handled');
                 } else if (metadata?.Title === 'Pipeify v2 For Salsify') {
                     bootToast('Import from Pipeify', 'success', 'Success');
-                    pipeify_preprocess(jsonData, parsingOption);
+                    pipeify_preprocess(jsonData, parsingOption, tableId);
                     // Resolve the promise with the fileType
                     resolve('FROM PIPEIFY');
                 } else if (hasProductId(jsonData)) {
                     bootToast(`Import from Salsify`, 'success', 'Success');
-                    salsify_preprocess(jsonData, parsingOption);
+                    salsify_preprocess(jsonData, parsingOption, tableId);
 
                     // Resolve the promise with the fileType
                     resolve('FROM SALSIFY');
@@ -296,7 +297,6 @@ function xlsx_exportForSalsify(data) {
     const workbook = XLSX.utils.book_new();
 
     //Name the export
-    //! Do it here
     let fileName = 'Pipeify (Salsify multi-item export).xlsx';
     const uniqueProductIds = [...new Set(data.map((obj) => obj['Product ID']))];
     // console.log(uniqueProductIds);

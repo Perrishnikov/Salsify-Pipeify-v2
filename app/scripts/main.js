@@ -252,7 +252,7 @@ function createNewTable(parsingOption, productIdValue) {
 
     // Create the table element
     const newTable = document.createElement('table');
-    newTable.setAttribute('id', 'new-table');
+    newTable.setAttribute('id', 'table-new');
     // newTable.classList.add('table')
 
     const headerRow = document.createElement('tr');
@@ -292,7 +292,8 @@ function createNewTable(parsingOption, productIdValue) {
 
     attachBlurEventToTableCells(newTable);
 
-    applyHandlePopoverMenuClickToTable('new-table');
+//! TODO: update ID
+    applyHandlePopoverMenuClickToTable('table-new');
 }
 
 // TODO: move this into a scope. Presently needs to be outside because it's adding listerers from three places (461, )
@@ -687,7 +688,14 @@ function createTableRow(rowData, headerCallback = null, index) {
 }
 
 /* ************************************************************** */
-function main_process(parsingOption) {
+/**
+ * 
+ * @param {*} parsingOption - option4
+ * @param {string} tableId - validate | duplicate
+ * @returns 
+ */
+function main_process(parsingOption, tableId) {
+    //TODO: update buttons 
     const dwnbtn = document.getElementById('download-for-salsify-btn');
     const custbtn = document.getElementById('download-wysiwyg-btn');
 
@@ -715,8 +723,8 @@ function main_process(parsingOption) {
 
     // Create the table element
     const myTable = document.createElement('table');
-    myTable.setAttribute('id', 'my-table');
-    // myTable.classList.add('table')
+    myTable.setAttribute('id', `table-${tableId}`);
+
 
     // TODO: row validations?
     // Check if any Row has a status
@@ -758,7 +766,7 @@ function main_process(parsingOption) {
     updateDividerCss(myTable);
 
     // Get container element to append the table
-    const tableContainer = document.getElementById('validate-table-container');
+    const tableContainer = document.getElementById(`${tableId}-table-container`);
 
     // Clear any old table
     tableContainer.innerHTML = '';
@@ -767,7 +775,7 @@ function main_process(parsingOption) {
 
     attachBlurEventToTableCells(myTable);
 
-    applyHandlePopoverMenuClickToTable('my-table');
+    applyHandlePopoverMenuClickToTable(`table-${tableId}`);
 }
 
 /** BLUR Validations *********************************************************/

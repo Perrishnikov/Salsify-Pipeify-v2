@@ -40,6 +40,7 @@ if (form) {
     });
 }
 
+// NEW
 const newSalsify = document.getElementById('download-new-ing-salsify-btn');
 if (newSalsify) {
     newSalsify.addEventListener('click', (e) => {
@@ -47,11 +48,12 @@ if (newSalsify) {
         console.log(newSalsify.value);
         const parsingOption = getCheckedRadioButtonId();
 
-        const newTable = document.getElementById('new-table');
+        //
+        const newTable = document.getElementById('table-validate');
         process_for_salsify(parsingOption, newTable);
     });
 }
-
+//NEW
 const newClearSalsify = document.getElementById('clear-product-id-btn');
 if (newClearSalsify) {
     newClearSalsify.addEventListener('click', (e) => {
@@ -128,20 +130,25 @@ function getCheckedRadioButtonId() {
  *
  * @param {File} file - The file to be imported.
  */
-async function dom_importFileHandler(file, parsingOption) {
-    const fileName = file.name;
-
-    // Append file name to DOM
-    const fileNameArea = document.getElementById('fileName');
-    // fileNameArea.textContent = `Imported File: ${fileName}`;
-
+async function dom_importFileHandler(file, tableId) {
     // Get the parsing option from the DOM
-    // const parsingOption = getCheckedRadioButtonId();
+    let parsingOption;
+    if (tableId === 'validate') {
+        parsingOption = getCheckedRadioButtonId();
+    } else if (tableId === 'duplicate') {
+        parsingOption = 'option4';
+    } else {
+        console.error('tableId not found');
+    }
 
     // Try to import the file and handle errors
     try {
+        const fileName = file.name;
+
+        // Append file name to DOM
+        const fileNameArea = document.getElementById(`${tableId}-fileName`);
         // Use await to wait for the promise to resolve and retrieve the file type
-        const fileType = await xlsx_import_file(file, parsingOption);
+        const fileType = await xlsx_import_file(file, parsingOption, tableId);
 
         // Update the DOM with the imported file name and type
         fileNameArea.textContent = `Imported File [${fileType}]: ${fileName}`;
@@ -154,86 +161,52 @@ async function dom_importFileHandler(file, parsingOption) {
     }
 }
 
-/* Tab1 - DROP BOX LISTENER */
-const validateDropArea = document.querySelector('#validateDropArea');
-if (validateDropArea) {
-    const parsingOption = getCheckedRadioButtonId();
-    // Prevent default behavior (opening file in browser) when dragging over drop area
-    validateDropArea.addEventListener('dragover', (e) => {
-        e.preventDefault();
+//! Do it here
+/* DROP BOX LISTENERS */
+const dropAreas = document.querySelectorAll('.drop-area').forEach((element) => {
+    element.addEventListener('dragover', (e) => {
+        e.preventDefault(); // Necessary for the drop event to be triggered
     });
 
-    // Handle dropped files
-    validateDropArea.addEventListener('drop', (e) => {
-        e.preventDefault();
+    element.addEventListener('drop', (e) => {
+        e.preventDefault(); // Necessary for the drop event to be triggered
 
-        // Check if files were dropped
-        if (e.dataTransfer) {
-            const file = e.dataTransfer.files[0];
-            dom_importFileHandler(file, parsingOption);
-        } else {
-            console.log('No files were dropped.');
+        const closestDropArea = e.target.closest('.drop-area').id;
+        if (closestDropArea) {
+
+            const tableId = closestDropArea.split('-')[0];
+            // Check if files were dropped
+            if (e.dataTransfer) {
+                const file = e.dataTransfer.files[0];
+                dom_importFileHandler(file, tableId);
+            } else {
+                console.log('No files were dropped.');
+            }
         }
     });
 
     // Handle file input change
-    validateDropArea.addEventListener('click', () => {
-        let fileInput = document.createElement('input');
-        fileInput.type = 'file';
-        fileInput.accept = '.xls, .xlsx';
-        fileInput.style.display = 'none';
+    element.addEventListener('click', (e) => {
+        const closestDropArea = e.target.closest('.drop-area').id;
+        if (closestDropArea) {
+            const tableId = closestDropArea.split('-')[0];
 
-        fileInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            dom_importFileHandler(file, parsingOption);
-        });
+            let fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.accept = '.xls, .xlsx';
+            fileInput.style.display = 'none';
 
-        document.body.appendChild(fileInput);
-        fileInput.click();
-        document.body.removeChild(fileInput);
-    });
-}
+            fileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                dom_importFileHandler(file, tableId);
+            });
 
-/* Tab3 - Duplicate */
-//! do it here
-const duplicateDropArea = document.querySelector('#duplicateDropArea');
-if (duplicateDropArea) {
-    const parsingOption = getCheckedRadioButtonId();
-    // Prevent default behavior (opening file in browser) when dragging over drop area
-    duplicateDropArea.addEventListener('dragover', (e) => {
-        e.preventDefault();
-    });
-
-    // Handle dropped files
-    duplicateDropArea.addEventListener('drop', (e) => {
-        e.preventDefault();
-
-        // Check if files were dropped
-        if (e.dataTransfer) {
-            const file = e.dataTransfer.files[0];
-            dom_importFileHandler(file, 'option4');
-        } else {
-            console.log('No files were dropped.');
+            document.body.appendChild(fileInput);
+            fileInput.click();
+            document.body.removeChild(fileInput);
         }
     });
-
-    // Handle file input change
-    duplicateDropArea.addEventListener('click', () => {
-        let fileInput = document.createElement('input');
-        fileInput.type = 'file';
-        fileInput.accept = '.xls, .xlsx';
-        fileInput.style.display = 'none';
-
-        fileInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            dom_importFileHandler(file, 'option4');
-        });
-
-        document.body.appendChild(fileInput);
-        fileInput.click();
-        document.body.removeChild(fileInput);
-    });
-}
+});
 
 /** Export WSYWIG File */
 const button_current_table = document.getElementById('download-wysiwyg-btn');
@@ -254,11 +227,12 @@ if (button_salsify_reimport) {
         // console.log(`download-for-salsify-btn`);
         const parsingOption = getCheckedRadioButtonId();
 
-        const myTable = document.getElementById('my-table');
+        const myTable = document.getElementById('table-validate');
         process_for_salsify(parsingOption, myTable);
     });
 }
 
+//TODO: clear all tables and filenames .forEach()
 function clearLocalStorageAndTable() {
     localStorage.clear();
 

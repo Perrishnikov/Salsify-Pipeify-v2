@@ -94,7 +94,7 @@
                 tabindex="0"
             >
                 <div class="container mt-4">
-                    <div id="validateDropArea" class="drop-area">
+                    <div id="validate-DropArea" class="drop-area">
                         <h5 class="mb-4">
                             Drag and drop a file here or click to select
                         </h5>
@@ -102,10 +102,9 @@
                             type="file"
                             id="fileInputValidate"
                             style="display: none"
-
                         />
                     </div>
-                    <div id="fileName" class="mt-4"></div>
+                    <div id="validate-fileName" class="mt-4"></div>
                     <div id="radioButtons" class="mt-4">
                         <h5 class="mb-3">Parsing Options:</h5>
                         <div class="form-check mb-3">
@@ -303,7 +302,12 @@
                         </div>
                     </div>
                 </div>
-                <div class="table-wrapper mt-4 mb-4" id="validate-table-container"></div>
+                <div
+                    class="table-wrapper mt-4 mb-4"
+                    id="validate-table-container"
+                >
+                    <!-- table-validate -->
+                </div>
             </div>
             <!--* Tab2 -->
             <div
@@ -408,11 +412,9 @@
                     </div>
                 </div>
 
-                <div
-                    class="table-wrapper mt-4 mb-4"
-                    id="new-table-container"
-                ></div>
-                <!-- </div> -->
+                <div class="table-wrapper mt-4 mb-4" id="new-table-container">
+                    <!-- table-new -->
+                </div>
             </div>
             <!-- *Tab 3 Duplicate-->
             <div
@@ -423,7 +425,7 @@
                 tabindex="0"
             >
                 <div class="container mt-4">
-                    <div id="duplicateDropArea" class="drop-area">
+                    <div id="duplicate-DropArea" class="drop-area">
                         <h5 class="mb-4">
                             Drag and drop a file here or click to select
                         </h5>
@@ -434,6 +436,7 @@
                             onchange=""
                         />
                     </div>
+                    <div id="duplicate-fileName" class="mt-4"></div>
                     <form
                         class="row mt-4 gx-4 mx-1 align-items-center pipeify-create needs-validation"
                         novalidate
@@ -499,10 +502,12 @@
                         </div>
                     </div>
                 </div>
-                                <div
+                <div
                     class="table-wrapper mt-4 mb-4"
                     id="duplicate-table-container"
-                ></div>
+                >
+                    <!-- table-duplicate -->
+                </div>
             </div>
             <!--* Tab4 PLM1-->
             <div
