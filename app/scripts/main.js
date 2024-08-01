@@ -252,7 +252,7 @@ function createNewTable(parsingOption, productIdValue) {
 
     // Create the table element
     const newTable = document.createElement('table');
-    newTable.setAttribute('id', 'table-new');
+    newTable.setAttribute('id', 'table-newIng');
     // newTable.classList.add('table')
 
     const headerRow = document.createElement('tr');
@@ -282,7 +282,7 @@ function createNewTable(parsingOption, productIdValue) {
     });
 
     // Get container element to append the table
-    const tableContainer = document.getElementById('new-table-container');
+    const tableContainer = document.getElementById('newIng-table-container');
 
     // Clear any old table
     tableContainer.innerHTML = '';
@@ -292,8 +292,7 @@ function createNewTable(parsingOption, productIdValue) {
 
     attachBlurEventToTableCells(newTable);
 
-    //! TODO: update ID
-    applyHandlePopoverMenuClickToTable('table-new');
+    applyHandlePopoverMenuClickToTable('table-newIng');
 }
 
 // TODO: move this into a scope. Presently needs to be outside because it's adding listerers from three places (461, )
@@ -687,6 +686,9 @@ function createTableRow(rowData, headerCallback = null, index) {
     return tableRow;
 }
 
+function replaceProductId(){
+    console.log('replaceProductId');
+}
 /* ************************************************************** */
 /**
  *
@@ -695,26 +697,32 @@ function createTableRow(rowData, headerCallback = null, index) {
  * @returns
  */
 function main_process(parsingOption, tableId) {
-    console.log({ tableId });
+    console.log({ tableId }, 'do it here DUPLICATE');
 
+    //! do it here
+    // review how this processes
+    // main_process is only called on validate and duplicate
     if (tableId === 'validate') {
-    } else if (tableId === 'duplicate') {
-    }
-    //TODO: update buttons
-    const dwnbtn = document.getElementById('download-validate-salsify-btn');
-    const custbtn = document.getElementById('download-validate-customer-btn');
+        const dwnbtn = document.getElementById('download-validate-salsify-btn');
+        const custbtn = document.getElementById(
+            'download-validate-customer-btn'
+        );
+        if (getLocalStorage(tableId)) {
+            custbtn.disabled = false;
 
-    if (getLocalStorage(tableId)) {
-        custbtn.disabled = false;
-
-        if (parsingOption === 'option4') {
-            dwnbtn.disabled = false;
+            if (parsingOption === 'option4') {
+                dwnbtn.disabled = false;
+            } else {
+                dwnbtn.disabled = true;
+            }
         } else {
+            custbtn.disabled = true;
             dwnbtn.disabled = true;
         }
-    } else {
-        custbtn.disabled = true;
-        dwnbtn.disabled = true;
+    } else if (tableId === 'duplicate') {
+        //TODO: update buttons
+        const duplicateBtn = document.getElementById('duplicate-submit-btn');
+        duplicateBtn.disabled = false;
     }
 
     // set in salsify_preprocess
@@ -774,7 +782,7 @@ function main_process(parsingOption, tableId) {
         `${tableId}-table-container`
     );
 
-    if(tableContainer){
+    if (tableContainer) {
         // Clear any old table
         tableContainer.innerHTML = '';
         // Give it the new data
@@ -784,7 +792,6 @@ function main_process(parsingOption, tableId) {
 
         applyHandlePopoverMenuClickToTable(`table-${tableId}`);
     }
-
 }
 
 /** BLUR Validations *********************************************************/

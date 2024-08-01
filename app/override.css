@@ -205,7 +205,7 @@ button.icon {
     background-color: var(--bs-light);
     padding: 2rem;
 }
-#newIngredFeedbackDiv, #dupeIngredFeedbackDiv{
+.feedback{
     color: var(--bs-form-invalid-color);
 }
 /* bs override */
