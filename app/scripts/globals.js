@@ -232,7 +232,7 @@ function cloneEmptyCell(cell) {
  *
  * @param {Object} jsonObject - The JSON object to store.
  */
-function setLocalStorage(jsonObject, key = 'original_merged') {
+function setLocalStorage(jsonObject, key) {
     // Convert the JSON object to a JSON string using JSON.stringify()
     const jsonString = JSON.stringify(jsonObject);
 
@@ -240,7 +240,7 @@ function setLocalStorage(jsonObject, key = 'original_merged') {
     localStorage.setItem(key, jsonString);
 }
 
-function getLocalStorage(key = 'original_merged') {
+function getLocalStorage(key) {
     const jsonString = localStorage.getItem(key);
     const jsonObject = JSON.parse(jsonString);
     return jsonObject;

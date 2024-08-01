@@ -292,7 +292,7 @@ function createNewTable(parsingOption, productIdValue) {
 
     attachBlurEventToTableCells(newTable);
 
-//! TODO: update ID
+    //! TODO: update ID
     applyHandlePopoverMenuClickToTable('table-new');
 }
 
@@ -689,17 +689,22 @@ function createTableRow(rowData, headerCallback = null, index) {
 
 /* ************************************************************** */
 /**
- * 
+ *
  * @param {*} parsingOption - option4
  * @param {string} tableId - validate | duplicate
- * @returns 
+ * @returns
  */
 function main_process(parsingOption, tableId) {
-    //TODO: update buttons 
+    console.log({ tableId });
+
+    if (tableId === 'validate') {
+    } else if (tableId === 'duplicate') {
+    }
+    //TODO: update buttons
     const dwnbtn = document.getElementById('download-validate-salsify-btn');
     const custbtn = document.getElementById('download-validate-customer-btn');
 
-    if (getLocalStorage()) {
+    if (getLocalStorage(tableId)) {
         custbtn.disabled = false;
 
         if (parsingOption === 'option4') {
@@ -713,7 +718,7 @@ function main_process(parsingOption, tableId) {
     }
 
     // set in salsify_preprocess
-    const jsonObject = getLocalStorage();
+    const jsonObject = getLocalStorage(tableId);
     if (!jsonObject) {
         return;
     }
@@ -724,7 +729,6 @@ function main_process(parsingOption, tableId) {
     // Create the table element
     const myTable = document.createElement('table');
     myTable.setAttribute('id', `table-${tableId}`);
-
 
     // TODO: row validations?
     // Check if any Row has a status
@@ -766,16 +770,21 @@ function main_process(parsingOption, tableId) {
     updateDividerCss(myTable);
 
     // Get container element to append the table
-    const tableContainer = document.getElementById(`${tableId}-table-container`);
+    const tableContainer = document.getElementById(
+        `${tableId}-table-container`
+    );
 
-    // Clear any old table
-    tableContainer.innerHTML = '';
-    // Give it the new data
-    tableContainer.appendChild(myTable);
+    if(tableContainer){
+        // Clear any old table
+        tableContainer.innerHTML = '';
+        // Give it the new data
+        tableContainer.appendChild(myTable);
 
-    attachBlurEventToTableCells(myTable);
+        attachBlurEventToTableCells(myTable);
 
-    applyHandlePopoverMenuClickToTable(`table-${tableId}`);
+        applyHandlePopoverMenuClickToTable(`table-${tableId}`);
+    }
+
 }
 
 /** BLUR Validations *********************************************************/

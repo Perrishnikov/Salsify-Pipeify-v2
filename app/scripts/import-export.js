@@ -152,7 +152,7 @@ function salsify_preprocess(jsonData, parsingOption, tableId) {
 
     // console.log('mergedJsonData', mergedJsonData);
 
-    setLocalStorage(mergedJsonData);
+    setLocalStorage(mergedJsonData, tableId);
 
     //* Done with Salsify processing */
     main_process(parsingOption, tableId);
@@ -162,7 +162,7 @@ function pipeify_preprocess(jsonData, parsingOption, tableId) {
     /** @type {SalsifyObject[]} */
     const mergedJsonData = salsify_mergeIngredients(jsonData);
 
-    setLocalStorage(mergedJsonData);
+    setLocalStorage(mergedJsonData, tableId);
 
     //* Done with Salsify processing */
     main_process(parsingOption, tableId);
@@ -271,6 +271,8 @@ function xlsx_exportWYSIWYG(data) {
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
 
     XLSX.writeFile(workbook, 'Pipeify (customer export).xlsx');
+
+    bootToast(`File Download`, 'success', 'Success');
 }
 
 function xlsx_exportForSalsify(data) {
@@ -314,4 +316,6 @@ function xlsx_exportForSalsify(data) {
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
 
     XLSX.writeFile(workbook, fileName);
+
+    bootToast(`File Download`, 'success', 'Success');
 }

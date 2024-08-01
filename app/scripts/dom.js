@@ -1,9 +1,8 @@
-
+/** Tab3 Duplicate */
 const duplicateProductIdForm = document.querySelector(
     '#download-duplicate-salsify-btn'
 );
 if (duplicateProductIdForm) {
-
     duplicateProductIdForm.addEventListener('click', function (event) {
         const productIdInput = document.getElementById('product-id');
         const productIdValue = productIdInput.value.trim();
@@ -26,15 +25,14 @@ if (duplicateProductIdForm) {
                 .removeAttribute('disabled');
             //disable create set button
             document
-                .querySelector('#newIngredSubmit')
+                .querySelector('#newIng-submit-btn')
                 .setAttribute('disabled', true);
         }
     });
 }
 
-/** Tab 2 - Validate and Submit Product ID for New Ingredients */
-// document.addEventListener('DOMContentLoaded', function () {
-const newProductIdForm = document.querySelector('#newIngredSubmit');
+/** Tab2 - New */
+const newProductIdForm = document.querySelector('#newIng-submit-btn');
 if (newProductIdForm) {
     newProductIdForm.addEventListener('click', function (event) {
         const productIdInput = document.getElementById('product-id');
@@ -58,18 +56,16 @@ if (newProductIdForm) {
                 .removeAttribute('disabled');
             //disable create set button
             document
-                .querySelector('#newIngredSubmit')
+                .querySelector('#newIng-submit-btn')
                 .setAttribute('disabled', true);
         }
     });
 }
 
-// NEW
+/** Tab2 - New */
 const newSalsify = document.getElementById('download-new-ing-salsify-btn');
 if (newSalsify) {
     newSalsify.addEventListener('click', (e) => {
-        
-
         const parsingOption = getCheckedRadioButtonId();
 
         //
@@ -88,7 +84,9 @@ if (newClearSalsify) {
         const newTable = document.getElementById('new-table-container');
         newTable.innerHTML = '';
         // process_for_salsify(parsingOption, newTable);
-        document.querySelector('#newIngredSubmit').removeAttribute('disabled');
+        document
+            .querySelector('#newIng-submit-btn')
+            .removeAttribute('disabled');
 
         document
             .querySelector('#download-new-ing-salsify-btn')
@@ -103,13 +101,18 @@ const radioButtonsDiv = document.getElementById('radioButtons');
 if (radioButtonsDiv) {
     radioButtonsDiv.addEventListener('change', (e) => {
         const selectedOption = e.target.id;
+        const validate = 'validate';
 
         // console.log(`change table columns to ${selectedOption}`);
         const dwnbtn = document.getElementById('download-validate-salsify-btn');
-        const custbtn = document.getElementById('download-validate-customer-btn');
+        const custbtn = document.getElementById(
+            'download-validate-customer-btn'
+        );
         const parsingOption = getCheckedRadioButtonId();
 
-        if (getLocalStorage()) {
+        console.log(getLocalStorage('validate'));
+        // console.log(getLocalStorage());
+        if (getLocalStorage(validate)) {
             custbtn.disabled = false;
 
             if (parsingOption === 'option4') {
@@ -117,12 +120,12 @@ if (radioButtonsDiv) {
             } else {
                 dwnbtn.disabled = true;
             }
+
+            main_process(parsingOption, validate);
         } else {
             custbtn.disabled = true;
             dwnbtn.disabled = true;
         }
-
-        main_process(parsingOption);
     });
 }
 
@@ -179,14 +182,14 @@ async function dom_importFileHandler(file, tableId) {
     } catch (error) {
         bootToast(error, 'danger', 'Unable to Import File');
 
-        clearLocalStorageAndTable();
+        clearLocalStorageAndTable(tableId);
 
         console.error('Issue handling file"', error);
     }
 }
 
-//! Do it here
-/* DROP BOX LISTENERS */
+
+/* All DROP BOX LISTENERS */
 const dropAreas = document.querySelectorAll('.drop-area').forEach((element) => {
     element.addEventListener('dragover', (e) => {
         e.preventDefault(); // Necessary for the drop event to be triggered
@@ -197,7 +200,6 @@ const dropAreas = document.querySelectorAll('.drop-area').forEach((element) => {
 
         const closestDropArea = e.target.closest('.drop-area').id;
         if (closestDropArea) {
-
             const tableId = closestDropArea.split('-')[0];
             // Check if files were dropped
             if (e.dataTransfer) {
@@ -233,7 +235,9 @@ const dropAreas = document.querySelectorAll('.drop-area').forEach((element) => {
 });
 
 /** Export WSYWIG File */
-const button_current_table = document.getElementById('download-validate-customer-btn');
+const button_current_table = document.getElementById(
+    'download-validate-customer-btn'
+);
 if (button_current_table) {
     button_current_table.addEventListener('click', (e) => {
         const parsingOption = getCheckedRadioButtonId();
@@ -255,36 +259,46 @@ if (button_salsify_reimport) {
     });
 }
 
-//TODO: clear all tables and filenames .forEach()
-//TODO: Create new is handling itself. This needs to clear local storage for both tables
-function clearLocalStorageAndTable() {
-    localStorage.clear();
+/**
+ * Clears local storage and the specified table.
+ * 
+ * @param {string} tableId - The ID of the table to clear.
+ */
+function clearLocalStorageAndTable(tableId) {
+    localStorage.removeItem(tableId);
+    bootToast(`Local Storage cleared for "${tableId}"`, 'info');
 
-    // console.log('localStorage cleared');
-
-    const table = document.getElementById('validate-table-container');
-    const fileName = document.getElementById('fileName');
+    const table = document.getElementById(`${tableId}-table-container`);
+    const fileName = document.getElementById(`${tableId}-fileName`);
 
     const hasChildren = table.childNodes.length > 0;
 
-    //Clear the table
+    // Clear the table
     if (hasChildren) {
         table.innerHTML = '';
         fileName.innerHTML = '';
-        bootToast(`Local Storage cleared`, 'info');
 
         // Disable download buttons
-        const dwnbtn = document.getElementById('download-for-salsify-btn');
-        const custbtn = document.getElementById('download-validate-customer-btn');
-        custbtn.disabled = true;
+        const dwnbtn = document.getElementById(`download-${tableId}-salsify-btn`);
         dwnbtn.disabled = true;
+
+        const custbtn = document.getElementById('download-validate-customer-btn');
+        if (custbtn) {
+            custbtn.disabled = true;
+        }
     }
 }
 
 /** Clear Button */
-const clearButton = document.getElementById('clear-localstorage-btn');
-if (clearButton) {
-    clearButton.addEventListener('click', () => {
-        clearLocalStorageAndTable();
+const clearValidateButton = document.getElementById('clear-validate-btn');
+if (clearValidateButton) {
+    clearValidateButton.addEventListener('click', () => {
+        clearLocalStorageAndTable('validate');
+    });
+}
+const clearDuplicateButton = document.getElementById('clear-duplicate-btn');
+if (clearDuplicateButton) {
+    clearDuplicateButton.addEventListener('click', () => {
+        clearLocalStorageAndTable('duplicate');
     });
 }
