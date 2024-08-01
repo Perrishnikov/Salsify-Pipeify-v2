@@ -54,7 +54,7 @@ body {
 .drop-area h5 {
     margin-bottom: 0 !important;
 }
-input#product-id, input#replace-product-id {
+input.id-input {
     border: 1px solid var(--bs-secondary);
     border-radius: 0.25rem;
 }

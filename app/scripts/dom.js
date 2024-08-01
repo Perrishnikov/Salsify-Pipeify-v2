@@ -1,135 +1,31 @@
-/** Tab3 Duplicate */
-const duplicateProductIdForm = document.querySelector(
-    '#download-duplicate-salsify-btn'
-);
-if (duplicateProductIdForm) {
-    duplicateProductIdForm.addEventListener('click', function (event) {
-        const productIdInput = document.getElementById('product-id');
-        const productIdValue = productIdInput.value.trim();
+/* Tab1 - VALIDATE */
+document.getElementById('radioButtons').addEventListener('change', (e) => {
+    const selectedOption = e.target.id;
+    const validate = 'validate';
 
-        event.preventDefault(); // Prevent form submission
-        const feedbackDiv = document.querySelector('#newIngredFeedbackDiv');
+    // console.log(`change table columns to ${selectedOption}`);
+    const dwnbtn = document.getElementById('download-validate-salsify-btn');
+    const custbtn = document.getElementById('download-validate-customer-btn');
+    const parsingOption = getCheckedRadioButtonId();
 
-        if (productIdValue.length !== 14 || !productIdValue.startsWith('000')) {
-            feedbackDiv.classList.remove('d-none');
+    console.log(getLocalStorage('validate'));
+    // console.log(getLocalStorage());
+    if (getLocalStorage(validate)) {
+        custbtn.disabled = false;
+
+        if (parsingOption === 'option4') {
+            dwnbtn.disabled = false;
         } else {
-            //main.js
-            // const parsingOption = getCheckedRadioButtonId();
-            createNewTable('option4', productIdValue);
-            productIdInput.value = '';
-            feedbackDiv.classList.add('d-none');
-
-            //enable download button
-            document
-                .querySelector('#download-new-ing-salsify-btn')
-                .removeAttribute('disabled');
-            //disable create set button
-            document
-                .querySelector('#newIng-submit-btn')
-                .setAttribute('disabled', true);
-        }
-    });
-}
-
-/** Tab2 - New */
-const newProductIdForm = document.querySelector('#newIng-submit-btn');
-if (newProductIdForm) {
-    newProductIdForm.addEventListener('click', function (event) {
-        const productIdInput = document.getElementById('product-id');
-        const productIdValue = productIdInput.value.trim();
-
-        event.preventDefault(); // Prevent form submission
-        const feedbackDiv = document.querySelector('#newIngredFeedbackDiv');
-
-        if (productIdValue.length !== 14 || !productIdValue.startsWith('000')) {
-            feedbackDiv.classList.remove('d-none');
-        } else {
-            //main.js
-            // const parsingOption = getCheckedRadioButtonId();
-            createNewTable('option4', productIdValue);
-            productIdInput.value = '';
-            feedbackDiv.classList.add('d-none');
-
-            //enable download button
-            document
-                .querySelector('#download-new-ing-salsify-btn')
-                .removeAttribute('disabled');
-            //disable create set button
-            document
-                .querySelector('#newIng-submit-btn')
-                .setAttribute('disabled', true);
-        }
-    });
-}
-
-/** Tab2 - New */
-const newSalsify = document.getElementById('download-new-ing-salsify-btn');
-if (newSalsify) {
-    newSalsify.addEventListener('click', (e) => {
-        const parsingOption = getCheckedRadioButtonId();
-
-        //
-        const newTable = document.getElementById('table-new');
-        process_for_salsify(parsingOption, newTable);
-    });
-}
-//NEW
-const newClearSalsify = document.getElementById('clear-product-id-btn');
-if (newClearSalsify) {
-    newClearSalsify.addEventListener('click', (e) => {
-        console.log(`clear!`);
-        // console.log(newSalsify.value);
-        // const parsingOption = getCheckedRadioButtonId();
-
-        const newTable = document.getElementById('new-table-container');
-        newTable.innerHTML = '';
-        // process_for_salsify(parsingOption, newTable);
-        document
-            .querySelector('#newIng-submit-btn')
-            .removeAttribute('disabled');
-
-        document
-            .querySelector('#download-new-ing-salsify-btn')
-            .setAttribute('disabled', true);
-
-        document.querySelector('#newIngredFeedbackDiv').classList.add('d-none');
-    });
-}
-
-/* Tab 1 - ONCHAGE - RADIO BUTTON LISTENER */
-const radioButtonsDiv = document.getElementById('radioButtons');
-if (radioButtonsDiv) {
-    radioButtonsDiv.addEventListener('change', (e) => {
-        const selectedOption = e.target.id;
-        const validate = 'validate';
-
-        // console.log(`change table columns to ${selectedOption}`);
-        const dwnbtn = document.getElementById('download-validate-salsify-btn');
-        const custbtn = document.getElementById(
-            'download-validate-customer-btn'
-        );
-        const parsingOption = getCheckedRadioButtonId();
-
-        console.log(getLocalStorage('validate'));
-        // console.log(getLocalStorage());
-        if (getLocalStorage(validate)) {
-            custbtn.disabled = false;
-
-            if (parsingOption === 'option4') {
-                dwnbtn.disabled = false;
-            } else {
-                dwnbtn.disabled = true;
-            }
-
-            main_process(parsingOption, validate);
-        } else {
-            custbtn.disabled = true;
             dwnbtn.disabled = true;
         }
-    });
-}
 
-/* Tab 1 - CHECKED - RADIO BUTTON */
+        main_process(parsingOption, validate);
+    } else {
+        custbtn.disabled = true;
+        dwnbtn.disabled = true;
+    }
+});
+
 /**
  * Gets the ID of the checked radio button.
  * @returns {string|null} The ID of the checked radio button, or null if none is checked.
@@ -152,6 +48,117 @@ function getCheckedRadioButtonId() {
     return checkedRadioButton ? checkedRadioButton.id : null;
 }
 
+/** TAB1 - VALIDATE Export WSYWIG File */
+document
+    .getElementById('download-validate-customer-btn')
+    .addEventListener('click', (e) => {
+        const parsingOption = getCheckedRadioButtonId();
+
+        process_wysiwyg_export(parsingOption);
+    });
+
+/** TAB1 - Export Tab1 for Salsify file */
+document
+    .getElementById('download-validate-salsify-btn')
+    .addEventListener('click', (e) => {
+        const parsingOption = getCheckedRadioButtonId();
+
+        const myTable = document.getElementById('table-validate');
+        process_for_salsify(parsingOption, myTable);
+    });
+
+/** Tab2 - NEW ************************************************************** */
+/** Tab2 - Button - Create */
+document
+    .querySelector('#newIng-submit-btn')
+    .addEventListener('click', function (event) {
+        const productIdInput = document.getElementById('input-newIng');
+        const productIdValue = productIdInput.value.trim();
+
+        event.preventDefault(); // Prevent form submission
+        const feedbackDiv = document.querySelector('#newIngredFeedbackDiv');
+
+        if (productIdValue.length !== 14 || !productIdValue.startsWith('000')) {
+            feedbackDiv.classList.remove('d-none');
+        } else {
+            //main.js
+            // const parsingOption = getCheckedRadioButtonId();
+            createNewTable('option4', productIdValue);
+            productIdInput.value = '';
+            feedbackDiv.classList.add('d-none');
+
+            //enable download button
+            document
+                .querySelector('#download-newIng-salsify-btn')
+                .removeAttribute('disabled');
+            //disable create set button
+            document
+                .querySelector('#newIng-submit-btn')
+                .setAttribute('disabled', true);
+        }
+    });
+
+/** Tab2 - Button - Download Salsify */
+document
+    .getElementById('download-newIng-salsify-btn')
+    .addEventListener('click', (e) => {
+        const parsingOption = getCheckedRadioButtonId();
+
+        //
+        const newTable = document.getElementById('table-new');
+        process_for_salsify(parsingOption, newTable);
+    });
+
+/** Tab2 - Button - Clear */
+document.getElementById('clear-newIng-btn').addEventListener('click', (e) => {
+    console.log(`clear!`);
+    // console.log(newSalsify.value);
+    // const parsingOption = getCheckedRadioButtonId();
+
+    const newTable = document.getElementById('new-table-container');
+    newTable.innerHTML = '';
+    // process_for_salsify(parsingOption, newTable);
+    document.querySelector('#newIng-submit-btn').removeAttribute('disabled');
+
+    document
+        .querySelector('#download-newIng-salsify-btn')
+        .setAttribute('disabled', true);
+
+    document.querySelector('#newIngredFeedbackDiv').classList.add('d-none');
+});
+
+/** Tab3 - DUPLICATE ******************************************************** */
+/** Tab3 - Button - Download Salsify */
+document
+    .querySelector('#download-duplicate-salsify-btn')
+    .addEventListener('click', function (event) {
+        const productIdInput = document.getElementById('input-duplicate');
+        const productIdValue = productIdInput.value.trim();
+
+        event.preventDefault(); // Prevent form submission
+        const feedbackDiv = document.querySelector('#newIngredFeedbackDiv');
+
+        if (productIdValue.length !== 14 || !productIdValue.startsWith('000')) {
+            feedbackDiv.classList.remove('d-none');
+        } else {
+            //main.js
+            // const parsingOption = getCheckedRadioButtonId();
+            createNewTable('option4', productIdValue);
+            productIdInput.value = '';
+            feedbackDiv.classList.add('d-none');
+
+            //enable download button
+            document
+                .querySelector('#download-newIng-salsify-btn')
+                .removeAttribute('disabled');
+            //disable create set button
+            document
+                .querySelector('#newIng-submit-btn')
+                .setAttribute('disabled', true);
+        }
+    });
+
+/** Misc ******************************************************************** */
 /**
  * Handles the import of the file and updates the DOM.
  *
@@ -188,9 +195,8 @@ async function dom_importFileHandler(file, tableId) {
     }
 }
 
-
 /* All DROP BOX LISTENERS */
-const dropAreas = document.querySelectorAll('.drop-area').forEach((element) => {
+document.querySelectorAll('.drop-area').forEach((element) => {
     element.addEventListener('dragover', (e) => {
         e.preventDefault(); // Necessary for the drop event to be triggered
     });
@@ -234,34 +240,9 @@ const dropAreas = document.querySelectorAll('.drop-area').forEach((element) => {
     });
 });
 
-/** Export WSYWIG File */
-const button_current_table = document.getElementById(
-    'download-validate-customer-btn'
-);
-if (button_current_table) {
-    button_current_table.addEventListener('click', (e) => {
-        const parsingOption = getCheckedRadioButtonId();
-
-        process_wysiwyg_export(parsingOption);
-    });
-}
-
-/** Export Tab1 for Salsify file */
-const button_salsify_reimport = document.getElementById(
-    'download-validate-salsify-btn'
-);
-if (button_salsify_reimport) {
-    button_salsify_reimport.addEventListener('click', (e) => {
-        const parsingOption = getCheckedRadioButtonId();
-
-        const myTable = document.getElementById('table-validate');
-        process_for_salsify(parsingOption, myTable);
-    });
-}
-
 /**
  * Clears local storage and the specified table.
- * 
+ *
  * @param {string} tableId - The ID of the table to clear.
  */
 function clearLocalStorageAndTable(tableId) {
@@ -279,10 +260,14 @@ function clearLocalStorageAndTable(tableId) {
         fileName.innerHTML = '';
 
         // Disable download buttons
-        const dwnbtn = document.getElementById(`download-${tableId}-salsify-btn`);
+        const dwnbtn = document.getElementById(
+            `download-${tableId}-salsify-btn`
+        );
         dwnbtn.disabled = true;
 
-        const custbtn = document.getElementById('download-validate-customer-btn');
+        const custbtn = document.getElementById(
+            'download-validate-customer-btn'
+        );
         if (custbtn) {
             custbtn.disabled = true;
         }
