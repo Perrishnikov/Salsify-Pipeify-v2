@@ -687,6 +687,7 @@ function createTableRow(rowData, headerCallback = null, index) {
 }
 
 function replaceProductId(){
+    // only need productId and Ing columns
     console.log('replaceProductId');
 }
 /* ************************************************************** */

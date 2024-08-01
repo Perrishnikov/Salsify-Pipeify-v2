@@ -214,6 +214,10 @@ button.icon {
     max-width: 750px;
   }
 }
+.row {
+  margin-right: 0 !important;
+  margin-left: 0 !important;
+}
 .toast-container {
     position: fixed;
     /* bottom: 20px; Adjust as needed */
