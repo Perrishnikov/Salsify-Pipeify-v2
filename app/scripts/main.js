@@ -686,17 +686,20 @@ function createTableRow(rowData, headerCallback = null, index) {
     return tableRow;
 }
 
-function replaceProductId(productId, tableId) {
-    // only need productId and Ing columns
-    console.log('replaceProductId: ', productId, tableId);
-
-    const data = getLocalStorage(tableId);
-    if (data) {
-        console.log(data);
-    }
+/**
+ * Updates the 'Product ID' in each object of the array to the specified value.
+ *
+ * @param {Array} arr - The array of objects to update.
+ * @param {string} newProductId - The new value to set for the 'Product ID'.
+ * @returns {Array} - A new array of objects with updated 'Product ID'.
+ */
+function updateProductIds(arr, newProductId) {
+    return arr.map((obj) => ({
+        ...obj,
+        'Product ID': newProductId,
+    }));
 }
 
-// Define the filterObjectByKeys function
 /**
  * Filters each object in an array to include only the specified keys.
  *
@@ -714,10 +717,40 @@ const filterObjectsArrayByKeys = (arr, keysToKeep) =>
             }, {})
     );
 
+/**
+ * Gets unique values for a key from an array of objects.
+ *
+ * @param {Array} arr - The array of objects.
+ * @param {string} key - The key to extract values from.
+ * @returns {Array} - Unique values for the key.
+ */
 function getUniqueProductIds(arr, key) {
     const ids = arr.map((obj) => obj[key]);
     return [...new Set(ids)];
 }
+
+/**
+ * Replaces the 'Product ID' in local storage data and updates the storage.
+ *
+ * @param {string} productId - The new 'Product ID' value to set.
+ * @param {string} tableId - The key for accessing the data in local storage.
+ *
+ * @returns {void}
+ */
+function replaceProductId(productId, tableId) {
+    // console.log('replaceProductId: ', productId, tableId);
+
+    const data = getLocalStorage(tableId);
+    if (data) {
+        // console.log(data);
+        const updatedArray = updateProductIds(data, productId);
+        setLocalStorage(updatedArray, tableId);
+        main_process('option4', tableId);
+    } else {
+        bootToast(`No data found for "${tableId}"`, 'danger');
+    }
+}
+
 /* ************************************************************** */
 /**
  *
@@ -752,9 +785,7 @@ function main_process(parsingOption, tableId) {
             custbtn.disabled = true;
             dwnbtn.disabled = true;
         }
-    }
-    //! do it here
-    else if (tableId === 'duplicate') {
+    } else if (tableId === 'duplicate') {
         const uniqueProductIds = getUniqueProductIds(jsonObject, 'Product ID');
 
         // Verify that only 1 product ID exists in the data. Fail if not....
@@ -767,7 +798,7 @@ function main_process(parsingOption, tableId) {
             console.error(uniqueProductIds); // Output: ['123', '456', '789']
             return;
         }
-        
+
         // undisable Replace Product ID button
         const duplicateBtn = document.getElementById('duplicate-submit-btn');
         duplicateBtn.disabled = false;

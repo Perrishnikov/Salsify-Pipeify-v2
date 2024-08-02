@@ -140,7 +140,6 @@ document
                 feedbackDiv.classList.add('d-none');
                 dwnbtn.disabled = false;
             }
-
         }
     });
 
@@ -185,7 +184,7 @@ async function dom_importFileHandler(file, tableId) {
     } catch (error) {
         bootToast(error, 'danger', 'Unable to Import File');
 
-        clearLocalStorageAndTable(tableId);
+        clearDomTable(tableId);
 
         console.error('Issue handling file"', error);
     }
@@ -241,10 +240,7 @@ document.querySelectorAll('.drop-area').forEach((element) => {
  *
  * @param {string} tableId - The ID of the table to clear.
  */
-function clearLocalStorageAndTable(tableId) {
-    localStorage.removeItem(tableId);
-    bootToast(`Local Storage cleared for "${tableId}"`, 'info');
-
+function clearDomTable(tableId) {
     const table = document.getElementById(`${tableId}-table-container`);
     const fileName = document.getElementById(`${tableId}-fileName`);
 
@@ -252,16 +248,6 @@ function clearLocalStorageAndTable(tableId) {
 
     // Clear the table
     if (hasChildren) {
-        table.innerHTML = '';
-        if (fileName) {
-            fileName.innerHTML = '';
-        }
-
-        // Remove feedback message from duplicate and newIng
-        const feedbackDiv = document.querySelector(`#${tableId}-feedback`);
-        if (feedbackDiv) {
-            feedbackDiv.classList.add('d-none');
-        }
 
         // Disable current download buttons
         const dwnbtn = document.getElementById(
@@ -285,16 +271,53 @@ function clearLocalStorageAndTable(tableId) {
         }
     }
 }
+function clearLocalStorage(tableId) {
+    if (getLocalStorage(tableId)) {
+        localStorage.removeItem(tableId);
+        bootToast(`Local Storage cleared for "${tableId}"`, 'info');
+    }
+}
 
+function clearFileName(tableId) {
+    const fileNameDiv = document.getElementById(`${tableId}-fileName`);
+    if (fileNameDiv) {
+        fileNameDiv.innerHTML = '';
+    }
+    // Remove feedback message from duplicate and newIng
+    const feedbackDiv = document.querySelector(`#${tableId}-feedback`);
+    if (feedbackDiv) {
+        feedbackDiv.classList.add('d-none');
+    }
+}
+
+function clearInput(tableId) {
+    const input = document.getElementById(`input-${tableId}`);
+    if (input) {
+        input.value = '';
+    }
+}
 /** Clear Buttons */
-document.getElementById('clear-validate-btn').addEventListener('click', () => {
-    clearLocalStorageAndTable('validate');
+document.getElementById('clear-validate-btn').addEventListener('click', (e) => {
+    const split = e.target.id.split('-')[1];
+    clearDomTable(split);
+    clearLocalStorage(split);
+    clearFileName(split);
 });
 
-document.getElementById('clear-duplicate-btn').addEventListener('click', () => {
-    clearLocalStorageAndTable('duplicate');
-});
+document
+    .getElementById('clear-duplicate-btn')
+    .addEventListener('click', (e) => {
+        const split = e.target.id.split('-')[1];
+        clearDomTable(split);
+        clearLocalStorage(split);
+        clearFileName(split);
+        clearInput(split);
+    });
 
-document.getElementById('clear-newIng-btn').addEventListener('click', () => {
-    clearLocalStorageAndTable('newIng');
+document.getElementById('clear-newIng-btn').addEventListener('click', (e) => {
+    const split = e.target.id.split('-')[1];
+    clearDomTable(split);
+    clearLocalStorage(split);
+    clearFileName(split);
+    clearInput(split);
 });
