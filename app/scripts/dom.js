@@ -125,10 +125,9 @@ document
         if (productIdValue.length !== 14 || !productIdValue.startsWith('000')) {
             feedbackDiv.classList.remove('d-none');
         } else {
-            //! no- import validate table
+            
             const tableId = event.target.id.split('-')[0];
-            // createNewTable('option4', productIdValue);
-            // console.log(tableId);
+            
             if (getLocalStorage(tableId)) {
                 const dwnbtn = document.getElementById(
                     'download-duplicate-salsify-btn'
@@ -139,6 +138,8 @@ document
                 productIdInput.value = '';
                 feedbackDiv.classList.add('d-none');
                 dwnbtn.disabled = false;
+            } else {
+                bootToast(`No data found for "${tableId}"`, 'danger');
             }
         }
     });
@@ -242,7 +243,7 @@ document.querySelectorAll('.drop-area').forEach((element) => {
  */
 function clearDomTable(tableId) {
     const table = document.getElementById(`${tableId}-table-container`);
-    const fileName = document.getElementById(`${tableId}-fileName`);
+    // const fileName = document.getElementById(`${tableId}-fileName`);
 
     const hasChildren = table.childNodes.length > 0;
 
@@ -269,6 +270,10 @@ function clearDomTable(tableId) {
             );
             duplicateBtn.disabled = true;
         }
+    }
+
+    if(table){
+        table.innerHTML = ''
     }
 }
 function clearLocalStorage(tableId) {
@@ -299,6 +304,7 @@ function clearInput(tableId) {
 /** Clear Buttons */
 document.getElementById('clear-validate-btn').addEventListener('click', (e) => {
     const split = e.target.id.split('-')[1];
+    console.log(split);
     clearDomTable(split);
     clearLocalStorage(split);
     clearFileName(split);

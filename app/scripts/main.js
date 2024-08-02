@@ -744,6 +744,13 @@ function replaceProductId(productId, tableId) {
     if (data) {
         // console.log(data);
         const updatedArray = updateProductIds(data, productId);
+        if (updatedArray) {
+            bootToast(
+                `Product ID replaced - ${productId}`,
+                'success',
+                'Success'
+            );
+        }
         setLocalStorage(updatedArray, tableId);
         main_process('option4', tableId);
     } else {
@@ -826,7 +833,7 @@ function main_process(parsingOption, tableId) {
     const myTable = document.createElement('table');
     myTable.setAttribute('id', `table-${tableId}`);
 
-    // TODO: row validations?
+    //? row validations?
     // Check if any Row has a status
     // let rowHasMessages = false;
     // for (const row of rows) {
