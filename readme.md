@@ -37,7 +37,7 @@ Once verified, can either be exported for a client or the corrected version can 
 [x] broken - popover needs to close after click
 [] allow duplicate (change product id) of complicated ingredient set like Alive Multi. CA - US is getting PLM soon
 [x] move this into a scope. ...new WeakSet();
-[] verify clear is clearing scope
+[x] verify clear is clearing scope
 [] move filename into dnd box
 
 [] Check PLM1 Pipeify to see how this will affect it.
@@ -45,11 +45,12 @@ Once verified, can either be exported for a client or the corrected version can 
     Use the JS feature to parse the pipes.
     Use Pipeify to validate PLM1 as it will do NIO.
 [] Yes - should allow for export to PLM1 and original
-[] Create helper symbols to copy and paste
+[] ? Create helper symbols to copy and paste
 [] Need to add any type row or change the Type... (Activated Charcoal )
 
 ---
 [] Drag n drop rows
+[] Feature - Auto order button
 [] ENHANCE: Allow/ account for UPC with PARTCODE (For Customr Download)
 [] Download for customer - how should this look? Wait and see because I don't know
 [] Enhance: Sort columns by Order on both exports

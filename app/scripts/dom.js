@@ -94,7 +94,6 @@ document
             feedbackDiv.classList.remove('d-none');
         } else {
             //main.js
-            // const parsingOption = getCheckedRadioButtonId();
             createNewTable('option4', productIdValue);
 
             productIdInput.value = '';
@@ -104,10 +103,6 @@ document
             document
                 .querySelector('#download-newIng-salsify-btn')
                 .removeAttribute('disabled');
-            //disable create set button
-            // document
-            //     .querySelector('#newIng-submit-btn')
-            //     .setAttribute('disabled', true);
         }
     });
 
@@ -125,19 +120,20 @@ document
         if (productIdValue.length !== 14 || !productIdValue.startsWith('000')) {
             feedbackDiv.classList.remove('d-none');
         } else {
-            
             const tableId = event.target.id.split('-')[0];
-            
-            if (getLocalStorage(tableId)) {
-                const dwnbtn = document.getElementById(
-                    'download-duplicate-salsify-btn'
-                );
-                replaceProductId(productIdValue, tableId);
 
-                // undisable Download For Salsify button
-                productIdInput.value = '';
-                feedbackDiv.classList.add('d-none');
-                dwnbtn.disabled = false;
+            const table = document.getElementById(`table-${tableId}`);
+            if (table) {
+                const success = replaceProductId(productIdValue, table);
+
+                if (success) {
+                    productIdInput.value = '';
+                    feedbackDiv.classList.add('d-none');
+                    const dwnbtn = document.getElementById(
+                        'download-duplicate-salsify-btn'
+                    );
+                    dwnbtn.disabled = false;
+                }
             } else {
                 bootToast(`No data found for "${tableId}"`, 'danger');
             }
@@ -147,10 +143,9 @@ document
 /** Tab3 - Button - Download Salsify */
 document
     .querySelector('#download-duplicate-salsify-btn')
-    .addEventListener('click', function (event) {
-        const parsingOption = getCheckedRadioButtonId();
-
+    .addEventListener('click', () => {
         const newTable = document.getElementById('table-duplicate');
+
         process_for_salsify('option4', newTable);
     });
 
@@ -249,7 +244,6 @@ function clearDomTable(tableId) {
 
     // Clear the table
     if (hasChildren) {
-
         // Disable current download buttons
         const dwnbtn = document.getElementById(
             `download-${tableId}-salsify-btn`
@@ -272,8 +266,8 @@ function clearDomTable(tableId) {
         }
     }
 
-    if(table){
-        table.innerHTML = ''
+    if (table) {
+        table.innerHTML = '';
     }
 }
 function clearLocalStorage(tableId) {

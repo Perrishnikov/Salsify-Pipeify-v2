@@ -304,7 +304,7 @@ const buttonsWithListeners = new WeakSet();
  *
  * @param {string} tableId - The ID of the table element (e.g., 'my-table').
  */
-function applyHandlePopoverMenuClickToTable(tableId = 'my-table') {
+function applyHandlePopoverMenuClickToTable(tableId) {
     // Create a WeakSet to store buttons that already have the event listener attached
     // console.log(tableId);
     // const buttonsWithListeners = new WeakSet();
@@ -391,10 +391,7 @@ function handlePopoverMenuClick(e, tableId) {
                     // console.log({ cellType: ingredientType });
                     //dont duplicate Other row
                     if (ingredientType === LABEL_DATASET_OTHER_INGREDS_A.name) {
-                        bootToast(
-                            `Other Rows may not be added or deleted.`,
-                            'info'
-                        );
+                        bootToast(`Other Rows may not be added.`, 'info');
                         const popover = e.target.closest('[popover]');
                         if (popover) {
                             popover.togglePopover();
@@ -634,9 +631,12 @@ function createMenuPopover(rowId) {
  * @param {number} index - The index of the row.
  * @returns {HTMLTableRowElement} The created table row element.
  */
-function createTableRow(rowData, headerCallback = null, index) {
+function createTableRow(rowData, headerCallback = null) {
     const tableRow = document.createElement('tr');
     tableRow.dataset.row_id = rowData.id;
+    // console.log({ rowData });
+    tableRow.dataset.productId = rowData.productId;
+    tableRow.dataset.type = rowData.type;
 
     // Add header cell if headerCallback is provided
     if (headerCallback) {
@@ -735,26 +735,48 @@ function getUniqueProductIds(arr, key) {
  * @param {string} productId - The new 'Product ID' value to set.
  * @param {string} tableId - The key for accessing the data in local storage.
  *
- * @returns {void}
+ * @returns {bool}
  */
-function replaceProductId(productId, tableId) {
-    // console.log('replaceProductId: ', productId, tableId);
+function replaceProductId(productId, table) {
+    // console.log('replaceProductId: ', productId, table);
 
-    const data = getLocalStorage(tableId);
-    if (data) {
-        // console.log(data);
-        const updatedArray = updateProductIds(data, productId);
-        if (updatedArray) {
-            bootToast(
-                `Product ID replaced - ${productId}`,
-                'success',
-                'Success'
-            );
-        }
-        setLocalStorage(updatedArray, tableId);
-        main_process('option4', tableId);
+    let updatesMade;
+    Array.from(table.children).forEach((row) => {
+        
+        Array.from(row.children).forEach((td) => {
+            // console.log(td);
+            const cell = td.children[0]?.cell;
+
+            if (cell && cell.type === 'Product ID') {
+                // Update cell value
+                if (cell.value !== productId) {
+                    cell.value = productId;
+                    updatesMade = true;
+
+                    // Update HTML value
+                    cell.value = productId;
+
+                    const cellValue =
+                        td.children[0]?.querySelector('.cell-value');
+                    cellValue.innerText = productId;
+
+                    //update dataset
+                    row.dataset.productId = cell.value;
+                }
+            }
+        });
+    });
+
+    if (updatesMade) {
+        bootToast(`Product ID replaced - ${productId}`, 'success', 'Success');
+        return true;
     } else {
-        bootToast(`No data found for "${tableId}"`, 'danger');
+        bootToast(
+            `${productId} matches current Product ID`,
+            'danger',
+            'Failed'
+        );
+        return false;
     }
 }
 
@@ -766,7 +788,7 @@ function replaceProductId(productId, tableId) {
  * @returns
  */
 function main_process(parsingOption, tableId) {
-    console.log({ tableId }, 'do it here DUPLICATE');
+    // console.log({ tableId }, 'do it here DUPLICATE');
 
     // set in salsify_preprocess
     let jsonObject = getLocalStorage(tableId);
@@ -1104,7 +1126,8 @@ function process_wysiwyg_export() {
  * @param {string} parsingOption - The parsing option for reimport.
  */
 function process_for_salsify(parsingOption, tableDataFromDom) {
-    // const myTable = document.getElementById('my-table');
+
+    // console.log(tableDataFromDom);
 
     if (!tableDataFromDom) {
         bootToast(`No Data to Export`, 'danger');
@@ -1285,11 +1308,8 @@ function process_for_salsify(parsingOption, tableDataFromDom) {
             rowObj[LABEL_DATASET_INGREDIENTS_A.id] = result;
         }
 
-        // console.log(rowObj);
         tableData.push(rowObj);
     });
 
-    // console.log(tableData);
     xlsx_exportForSalsify(tableData);
-    // console.log({ arrayOfProductIds });
 }

@@ -154,12 +154,28 @@ class Row {
     /** @type {string} */
     id;
 
+    /** @type {'Nutrients'|'Ingredients'|'Other'} */
+    type;
+
+    /** @type {string} */
+    productId;
+
     constructor(cells, id = '', status = new Status()) {
         this.cells = cells;
         // this.id = generateRandomString(9)
         this.id = id;
 
         this.status = status;
+
+        // prep the dataset values (row_id, productId, type)
+        cells.forEach((element) => {
+            if (element.type === 'Product ID') {
+                this.productId = element.value;
+            }
+            if (element.type === INGREDIENT_TYPE.id) {
+                this.type = element.value;
+            }
+        });
     }
 }
 
