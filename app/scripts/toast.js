@@ -1,3 +1,10 @@
+/**
+ * Displays a Bootstrap toast notification.
+ *
+ * @param {string} message - The message to display in the toast.
+ * @param {string} [type='success'] - The type of the toast (e.g., 'success', 'danger', 'warning', 'info', 'light', 'dark').
+ * @param {string} [title=''] - An optional title for the toast.
+ */
 function bootToast(message, type = 'success', title = '') {
     // success danger warning info light dark
 

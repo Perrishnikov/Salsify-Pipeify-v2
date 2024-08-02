@@ -686,9 +686,37 @@ function createTableRow(rowData, headerCallback = null, index) {
     return tableRow;
 }
 
-function replaceProductId(){
+function replaceProductId(productId, tableId) {
     // only need productId and Ing columns
-    console.log('replaceProductId');
+    console.log('replaceProductId: ', productId, tableId);
+
+    const data = getLocalStorage(tableId);
+    if (data) {
+        console.log(data);
+    }
+}
+
+// Define the filterObjectByKeys function
+/**
+ * Filters each object in an array to include only the specified keys.
+ *
+ * @param {Array} arr - The array of objects to filter.
+ * @param {Array} keysToKeep - The array of keys to keep in each object.
+ * @returns {Array} - The array of filtered objects.
+ */
+const filterObjectsArrayByKeys = (arr, keysToKeep) =>
+    arr.map((obj) =>
+        Object.keys(obj)
+            .filter((key) => keysToKeep.includes(key))
+            .reduce((filteredObj, key) => {
+                filteredObj[key] = obj[key];
+                return filteredObj;
+            }, {})
+    );
+
+function getUniqueProductIds(arr, key) {
+    const ids = arr.map((obj) => obj[key]);
+    return [...new Set(ids)];
 }
 /* ************************************************************** */
 /**
@@ -700,8 +728,12 @@ function replaceProductId(){
 function main_process(parsingOption, tableId) {
     console.log({ tableId }, 'do it here DUPLICATE');
 
-    //! do it here
-    // review how this processes
+    // set in salsify_preprocess
+    let jsonObject = getLocalStorage(tableId);
+    if (!jsonObject) {
+        return;
+    }
+
     // main_process is only called on validate and duplicate
     if (tableId === 'validate') {
         const dwnbtn = document.getElementById('download-validate-salsify-btn');
@@ -720,16 +752,40 @@ function main_process(parsingOption, tableId) {
             custbtn.disabled = true;
             dwnbtn.disabled = true;
         }
-    } else if (tableId === 'duplicate') {
-        //TODO: update buttons
+    }
+    //! do it here
+    else if (tableId === 'duplicate') {
+        const uniqueProductIds = getUniqueProductIds(jsonObject, 'Product ID');
+
+        // Verify that only 1 product ID exists in the data. Fail if not....
+        if (uniqueProductIds.length > 1) {
+            bootToast(
+                `Can only replace Product ID of one item. ${uniqueProductIds.length} found`,
+                'danger',
+                'Failed'
+            );
+            console.error(uniqueProductIds); // Output: ['123', '456', '789']
+            return;
+        }
+        
+        // undisable Replace Product ID button
         const duplicateBtn = document.getElementById('duplicate-submit-btn');
         duplicateBtn.disabled = false;
-    }
 
-    // set in salsify_preprocess
-    const jsonObject = getLocalStorage(tableId);
-    if (!jsonObject) {
-        return;
+        const keepers = [
+            LABEL_DATASET_NUTRIENT_A.id,
+            LABEL_DATASET_INGREDIENTS_A.id,
+            LABEL_DATASET_OTHER_INGREDS_A.id,
+            'Product ID',
+        ];
+
+        // Filter each object in the array
+        const cleanColumnsArray = filterObjectsArrayByKeys(jsonObject, keepers);
+
+        // set and get the keeper columns
+        setLocalStorage(cleanColumnsArray, tableId);
+
+        jsonObject = getLocalStorage(tableId);
     }
 
     // console.log(jsonObject);

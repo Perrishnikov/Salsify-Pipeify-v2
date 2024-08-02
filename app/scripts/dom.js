@@ -126,21 +126,21 @@ document
             feedbackDiv.classList.remove('d-none');
         } else {
             //! no- import validate table
+            const tableId = event.target.id.split('-')[0];
             // createNewTable('option4', productIdValue);
-            
-            replaceProductId()
+            // console.log(tableId);
+            if (getLocalStorage(tableId)) {
+                const dwnbtn = document.getElementById(
+                    'download-duplicate-salsify-btn'
+                );
+                replaceProductId(productIdValue, tableId);
 
-            productIdInput.value = '';
-            feedbackDiv.classList.add('d-none');
+                // undisable Download For Salsify button
+                productIdInput.value = '';
+                feedbackDiv.classList.add('d-none');
+                dwnbtn.disabled = false;
+            }
 
-            //enable download button
-            // document
-            //     .querySelector('#download-duplicate-salsify-btn')
-            //     .removeAttribute('disabled');
-            //disable create set button
-            // document
-            //     .querySelector('#duplicate-submit-btn')
-            //     .setAttribute('disabled', true);
         }
     });
 
@@ -257,20 +257,31 @@ function clearLocalStorageAndTable(tableId) {
             fileName.innerHTML = '';
         }
 
-        //! TODO: dynamic this
-        document.querySelector('#newIng-feedback').classList.add('d-none');
+        // Remove feedback message from duplicate and newIng
+        const feedbackDiv = document.querySelector(`#${tableId}-feedback`);
+        if (feedbackDiv) {
+            feedbackDiv.classList.add('d-none');
+        }
 
-        // Disable download buttons
+        // Disable current download buttons
         const dwnbtn = document.getElementById(
             `download-${tableId}-salsify-btn`
         );
         dwnbtn.disabled = true;
 
+        //disable download customer from validate
         const custbtn = document.getElementById(
             'download-validate-customer-btn'
         );
         if (custbtn) {
             custbtn.disabled = true;
+        }
+        //disable the replace product ID button if duplicate
+        if (tableId === 'duplicate') {
+            const duplicateBtn = document.getElementById(
+                'duplicate-submit-btn'
+            );
+            duplicateBtn.disabled = true;
         }
     }
 }
