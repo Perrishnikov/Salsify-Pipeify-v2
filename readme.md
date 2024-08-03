@@ -39,6 +39,9 @@ Once verified, can either be exported for a client or the corrected version can 
 [x] move this into a scope. ...new WeakSet();
 [x] verify clear is clearing scope
 [] move filename into dnd box
+[] popover help for headers (allowed or disallowed values)
+[] ?disable download if the cursor is focused to prevent unsaved/validated text
+
 
 [] Check PLM1 Pipeify to see how this will affect it.
     Export the PLM1 fields as above, rename columns
@@ -51,15 +54,12 @@ Once verified, can either be exported for a client or the corrected version can 
 ---
 [] Drag n drop rows
 [] Feature - Auto order button
-[] ENHANCE: Allow/ account for UPC with PARTCODE (For Customr Download)
-[] Download for customer - how should this look? Wait and see because I don't know
 [] Enhance: Sort columns by Order on both exports
-Push to Github. See if it works there
+[] Delete optional columns
+
+[x] Push to Github. See if it works there
 [] Changing Option, reverts edited table data. Save to localstorage before change?
-[] Style each partcode together?
-[] Style each ingredient type together?
+[x] Style each partcode together?
+[x] Style each ingredient type together?
 [] Headers checkboxes to hide columns
 [] Option to fix things like remove HTML from cell
-
-[] Show number of errors and warnings?
-[] TODO: row validations?

@@ -176,7 +176,7 @@ async function dom_importFileHandler(file, tableId) {
         const fileType = await xlsx_import_file(file, parsingOption, tableId);
 
         // Update the DOM with the imported file name and type
-        fileNameArea.textContent = `Imported File [${fileType}]: ${fileName}`;
+        fileNameArea.textContent = `[${fileType}]: "${fileName}"`;
     } catch (error) {
         bootToast(error, 'danger', 'Unable to Import File');
 
