@@ -39,17 +39,16 @@ Once verified, can either be exported for a client or the corrected version can 
 [x] move this into a scope. ...new WeakSet();
 [x] verify clear is clearing scope
 [x] move filename into dnd box
-[] popover help for headers (allowed or disallowed values)
-[] ?disable download if the cursor is focused to prevent unsaved/validated text
-[] filename on duplicate failure 
+[x] ?disable download if the cursor is focused to prevent unsaved/validated text
+[x] filename on duplicate failure 
 
 [] Check PLM1 Pipeify to see how this will affect it.
     Export the PLM1 fields as above, rename columns
     Use the JS feature to parse the pipes.
     Use Pipeify to validate PLM1 as it will do NIO.
 [] Yes - should allow for export to PLM1 and original
+[] popover help for headers (allowed or disallowed values)
 [] ? Create helper symbols to copy and paste
-[] Need to add any type row or change the Type... (Activated Charcoal )
 
 ---
 [] Drag n drop rows

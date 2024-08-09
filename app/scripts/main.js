@@ -786,14 +786,17 @@ function replaceProductId(productId, table) {
  * @param {string} tableId - validate | duplicate
  * @returns
  */
-function main_process(parsingOption, tableId) {
+function main_process(parsingOption, tableId, fromWhere) {
     // console.log({ tableId }, 'do it here DUPLICATE');
+
+    
 
     // set in salsify_preprocess
     let jsonObject = getLocalStorage(tableId);
     if (!jsonObject) {
         return;
     }
+
 
     // main_process is only called on validate and duplicate
     if (tableId === 'validate') {
@@ -831,6 +834,8 @@ function main_process(parsingOption, tableId) {
             return;
         }
 
+        bootToast(`Import from ${fromWhere}`, 'success', 'Success');
+        
         // undisable Replace Product ID button
         const duplicateBtn = document.getElementById('duplicate-submit-btn');
         duplicateBtn.disabled = false;
@@ -1133,8 +1138,6 @@ function attachBlurEventToTableCells(table) {
         
         function focusOutHandler() {
             const productReplaced = getLocalStorage('isProductIdReplaced');
-
-            console.log({ productReplaced });
 
             if(productReplaced){
                 duplicateSalsify.disabled = false;

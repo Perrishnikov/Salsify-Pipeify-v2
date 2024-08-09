@@ -20,7 +20,7 @@ document.getElementById('radioButtons').addEventListener('change', (e) => {
             dwnbtn.disabled = true;
         }
 
-        main_process(parsingOption, validate);
+        main_process(parsingOption, validate, null);
     } else {
         custbtn.disabled = true;
         dwnbtn.disabled = true;
@@ -171,15 +171,22 @@ async function dom_importFileHandler(file, tableId) {
 
     // Try to import the file and handle errors
     try {
-        const fileName = file.name;
-
-        // Append file name to DOM
-        const fileNameArea = document.getElementById(`${tableId}-fileName`);
         // Use await to wait for the promise to resolve and retrieve the file type
+        
         const fileType = await xlsx_import_file(file, parsingOption, tableId);
 
+        if (tableId === 'validate') {
+            const fileName = file.name;
+
+            // Append file name to DOM
+            const fileNameArea = document.getElementById(`${tableId}-fileName`);
+            fileNameArea.textContent = `[${fileType}]: "${fileName}"`;
+        }
+        
+        
+
         // Update the DOM with the imported file name and type
-        fileNameArea.textContent = `[${fileType}]: "${fileName}"`;
+        // console.log('success dom_importFileHandler');
     } catch (error) {
         bootToast(error, 'danger', 'Unable to Import File');
 
@@ -202,7 +209,7 @@ document.querySelectorAll('.drop-area').forEach((element) => {
         if (closestDropArea) {
             const tableId = closestDropArea.split('-')[0];
 
-            clearDomTable(tableId)
+            clearDomTable(tableId);
             // Check if files were dropped
             if (e.dataTransfer) {
                 const file = e.dataTransfer.files[0];

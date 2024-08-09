@@ -155,7 +155,7 @@ function salsify_preprocess(jsonData, parsingOption, tableId) {
     setLocalStorage(mergedJsonData, tableId);
 
     //* Done with Salsify processing */
-    main_process(parsingOption, tableId);
+    main_process(parsingOption, tableId, 'Salsify');
 }
 
 function pipeify_preprocess(jsonData, parsingOption, tableId) {
@@ -165,7 +165,7 @@ function pipeify_preprocess(jsonData, parsingOption, tableId) {
     setLocalStorage(mergedJsonData, tableId);
 
     //* Done with Salsify processing */
-    main_process(parsingOption, tableId);
+    main_process(parsingOption, tableId, 'Pipeify');
 }
 
 /* XLSX Processing */
@@ -194,12 +194,12 @@ async function xlsx_import_file(file, parsingOption, tableId) {
                     // Resolve the promise with the fileType
                     reject('FOR CUSTOMER not handled');
                 } else if (metadata?.Title === 'Pipeify v2 For Salsify') {
-                    bootToast('Import from Pipeify', 'success', 'Success');
+                    // bootToast('Import from Pipeify', 'success', 'Success');
                     pipeify_preprocess(jsonData, parsingOption, tableId);
                     // Resolve the promise with the fileType
                     resolve('FROM PIPEIFY');
                 } else if (hasProductId(jsonData)) {
-                    bootToast(`Import from Salsify`, 'success', 'Success');
+                    // bootToast(`Import from Salsify`, 'success', 'Success');
                     salsify_preprocess(jsonData, parsingOption, tableId);
 
                     // Resolve the promise with the fileType
