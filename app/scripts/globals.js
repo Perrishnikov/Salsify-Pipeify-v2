@@ -244,9 +244,10 @@ function cloneEmptyCell(cell) {
 }
 
 /**
- * Stores a JSON object in localStorage.
+ * Stores a JSON object in localStorage under the specified key.
  *
- * @param {Object} jsonObject - The JSON object to store.
+ * @param {Object} jsonObject - The JSON object to be stored.
+ * @param {string} key - The key under which the JSON object is stored.
  */
 function setLocalStorage(jsonObject, key) {
     // Convert the JSON object to a JSON string using JSON.stringify()

@@ -38,10 +38,10 @@ Once verified, can either be exported for a client or the corrected version can 
 [] allow duplicate (change product id) of complicated ingredient set like Alive Multi. CA - US is getting PLM soon
 [x] move this into a scope. ...new WeakSet();
 [x] verify clear is clearing scope
-[] move filename into dnd box
+[x] move filename into dnd box
 [] popover help for headers (allowed or disallowed values)
 [] ?disable download if the cursor is focused to prevent unsaved/validated text
-
+[] filename on duplicate failure 
 
 [] Check PLM1 Pipeify to see how this will affect it.
     Export the PLM1 fields as above, rename columns

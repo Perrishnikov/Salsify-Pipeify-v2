@@ -133,6 +133,9 @@ document
                         'download-duplicate-salsify-btn'
                     );
                     dwnbtn.disabled = false;
+
+                    // set flag for focusIn
+                    localStorage.setItem('isProductIdReplaced', true);
                 }
             } else {
                 bootToast(`No data found for "${tableId}"`, 'danger');
@@ -198,6 +201,8 @@ document.querySelectorAll('.drop-area').forEach((element) => {
         const closestDropArea = e.target.closest('.drop-area').id;
         if (closestDropArea) {
             const tableId = closestDropArea.split('-')[0];
+
+            clearDomTable(tableId)
             // Check if files were dropped
             if (e.dataTransfer) {
                 const file = e.dataTransfer.files[0];
@@ -213,6 +218,8 @@ document.querySelectorAll('.drop-area').forEach((element) => {
         const closestDropArea = e.target.closest('.drop-area').id;
         if (closestDropArea) {
             const tableId = closestDropArea.split('-')[0];
+
+            clearDomTable(tableId);
 
             let fileInput = document.createElement('input');
             fileInput.type = 'file';
@@ -237,6 +244,7 @@ document.querySelectorAll('.drop-area').forEach((element) => {
  * @param {string} tableId - The ID of the table to clear.
  */
 function clearDomTable(tableId) {
+    console.log('clearDomTable:', tableId);
     const table = document.getElementById(`${tableId}-table-container`);
     // const fileName = document.getElementById(`${tableId}-fileName`);
 
@@ -263,6 +271,9 @@ function clearDomTable(tableId) {
                 'duplicate-submit-btn'
             );
             duplicateBtn.disabled = true;
+
+            //clear the flag for focusIn
+            localStorage.removeItem('isProductIdReplaced');
         }
     }
 

@@ -742,7 +742,6 @@ function replaceProductId(productId, table) {
 
     let updatesMade;
     Array.from(table.children).forEach((row) => {
-        
         Array.from(row.children).forEach((td) => {
             // console.log(td);
             const cell = td.children[0]?.cell;
@@ -815,6 +814,10 @@ function main_process(parsingOption, tableId) {
             dwnbtn.disabled = true;
         }
     } else if (tableId === 'duplicate') {
+
+        // clear the flag for focusIn
+        localStorage.removeItem('isProductIdReplaced');
+
         const uniqueProductIds = getUniqueProductIds(jsonObject, 'Product ID');
 
         // Verify that only 1 product ID exists in the data. Fail if not....
@@ -839,7 +842,7 @@ function main_process(parsingOption, tableId) {
             'Product ID',
         ];
 
-        // Filter each object in the array
+        // Filter each object in the array (only relevant cols are kept)
         const cleanColumnsArray = filterObjectsArrayByKeys(jsonObject, keepers);
 
         // set and get the keeper columns
@@ -966,6 +969,7 @@ function getIngredientTypeFromDom(target) {
  * @param {HTMLTableElement} table - The HTML table element to monitor for blur events on its cells.
  */
 function attachBlurEventToTableCells(table) {
+    console.log(table);
     // Define a named event handler function
     function handleBlurEvent(e) {
         /** @type {Cell} */
@@ -1070,6 +1074,77 @@ function attachBlurEventToTableCells(table) {
             popover.remove();
         }
     }
+
+    const tableId = table.id.split('-')[1];
+
+    if (tableId === 'validate') {
+        const validateCustomer = document.querySelector(
+            `#download-${tableId}-customer-btn`
+        );
+        const validateSalsify = document.querySelector(
+            `#download-${tableId}-salsify-btn`
+        );
+
+        // Get initial states before adding event listeners
+        const validateCustomerBefore = validateCustomer.disabled;
+
+        const validateSalsifyBefore = validateSalsify.disabled;
+
+
+        function handleFocusIn(e) {
+            validateCustomer.disabled = true;
+            validateSalsify.disabled = true;
+        }
+
+        function createFocusOutHandler(
+            validateCustomerBefore,
+            validateSalsifyBefore
+        ) {
+            return function handleFocusOut(e) {
+                console.log(
+                    'handleFocusOut',
+                    validateCustomerBefore,
+                    validateSalsifyBefore
+                );
+
+                validateCustomer.disabled = validateCustomerBefore;
+                validateSalsify.disabled = validateSalsifyBefore;
+            };
+        }
+
+        // Create the focus out handler with locked variables
+        const focusOutHandler = createFocusOutHandler(
+            validateCustomerBefore,
+            validateSalsifyBefore
+        );
+
+        // Add event listeners to the table
+        table.addEventListener('focusin', handleFocusIn, true);
+        table.addEventListener('focusout', focusOutHandler, true);
+    } else if (tableId === 'duplicate') {
+        
+        const duplicateSalsify = document.querySelector(
+            `#download-${tableId}-salsify-btn`
+        );
+
+        function handleFocusIn(e) {
+            duplicateSalsify.disabled = true;
+        }
+        
+        function focusOutHandler() {
+            const productReplaced = getLocalStorage('isProductIdReplaced');
+
+            console.log({ productReplaced });
+
+            if(productReplaced){
+                duplicateSalsify.disabled = false;
+            }
+        }
+
+        table.addEventListener('focusin', handleFocusIn, true);
+        table.addEventListener('focusout', focusOutHandler, true);
+    }
+
     table.removeEventListener('mouseover', handleMouseOver, true);
     table.removeEventListener('mouseout', handleMouseOut, true);
     table.addEventListener('mouseover', handleMouseOver, true);
@@ -1126,7 +1201,6 @@ function process_wysiwyg_export() {
  * @param {string} parsingOption - The parsing option for reimport.
  */
 function process_for_salsify(parsingOption, tableDataFromDom) {
-
     // console.log(tableDataFromDom);
 
     if (!tableDataFromDom) {
