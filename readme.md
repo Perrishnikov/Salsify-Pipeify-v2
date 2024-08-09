@@ -1,4 +1,6 @@
 https://perrishnikov.github.io/Salsify-Pipeify-v2/app/
+https://perrishnikov.github.io/Pipeify/
+https://www.npmjs.com/package/xlsx
 
 TODO:
 
