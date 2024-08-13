@@ -1,20 +1,12 @@
-// import { Tooltip, Popover } from './bootstrap.bundle.min.js';
-
-const popoverTriggerList = [].slice.call(
-    document.querySelectorAll('[data-bs-toggle="popover"]')
-);
-const popoverList = popoverTriggerList.map(
-    (popoverTriggerEl) => new Popover(popoverTriggerEl)
-);
 
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize Bootstrap components
-    const tooltipTriggerList = [].slice.call(
-        document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    const tooltipTriggerList = document.querySelectorAll(
+        '[data-bs-toggle="tooltip"]'
     );
-    tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new Tooltip(tooltipTriggerEl);
-    });
+    const tooltipList = [...tooltipTriggerList].map(
+        (tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl)
+    );
 
     const popoverTriggerList = [].slice.call(
         document.querySelectorAll('[data-bs-toggle="popover"]')
@@ -789,14 +781,11 @@ function replaceProductId(productId, table) {
 function main_process(parsingOption, tableId, fromWhere) {
     // console.log({ tableId }, 'do it here DUPLICATE');
 
-    
-
     // set in salsify_preprocess
     let jsonObject = getLocalStorage(tableId);
     if (!jsonObject) {
         return;
     }
-
 
     // main_process is only called on validate and duplicate
     if (tableId === 'validate') {
@@ -817,7 +806,6 @@ function main_process(parsingOption, tableId, fromWhere) {
             dwnbtn.disabled = true;
         }
     } else if (tableId === 'duplicate') {
-
         // clear the flag for focusIn
         localStorage.removeItem('isProductIdReplaced');
 
@@ -835,7 +823,7 @@ function main_process(parsingOption, tableId, fromWhere) {
         }
 
         bootToast(`Import from ${fromWhere}`, 'success', 'Success');
-        
+
         // undisable Replace Product ID button
         const duplicateBtn = document.getElementById('duplicate-submit-btn');
         duplicateBtn.disabled = false;
@@ -1095,7 +1083,6 @@ function attachBlurEventToTableCells(table) {
 
         const validateSalsifyBefore = validateSalsify.disabled;
 
-
         function handleFocusIn(e) {
             validateCustomer.disabled = true;
             validateSalsify.disabled = true;
@@ -1127,7 +1114,6 @@ function attachBlurEventToTableCells(table) {
         table.addEventListener('focusin', handleFocusIn, true);
         table.addEventListener('focusout', focusOutHandler, true);
     } else if (tableId === 'duplicate') {
-        
         const duplicateSalsify = document.querySelector(
             `#download-${tableId}-salsify-btn`
         );
@@ -1135,11 +1121,11 @@ function attachBlurEventToTableCells(table) {
         function handleFocusIn(e) {
             duplicateSalsify.disabled = true;
         }
-        
+
         function focusOutHandler() {
             const productReplaced = getLocalStorage('isProductIdReplaced');
 
-            if(productReplaced){
+            if (productReplaced) {
                 duplicateSalsify.disabled = false;
             }
         }

@@ -105,7 +105,7 @@
                             style="display: none"
                         />
                     </div>
-                    
+
                     <div id="radioButtons" class="mt-4">
                         <h5 class="mb-3">Parsing Options:</h5>
                         <div class="form-check mb-3">
@@ -320,24 +320,41 @@
             >
                 <div class="container mt-4">
                     <form
-                        class="row gx-4 align-items-center pipeify-create needs-validation"
+                        class="d-flex flex-row gx-4 align-items-center pipeify-create needs-validation"
                         novalidate
                     >
-                        <div class="col-auto">
+                        <div class="d-flex flex-row align-items-center">
                             <label for="input-newIng" class="col-form-label">
                                 <h5>Enter Product ID</h5>
                             </label>
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="16"
+                                height="16"
+                                fill="currentColor"
+                                class="bi bi-info-circle ms-2 me-4"
+                                viewBox="0 0 16 16"
+                                data-bs-toggle="tooltip"
+                                data-bs-placement="bottom"
+                                data-bs-title="Required: Salsify Product ID"
+                            >
+                                <path
+                                    d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"
+                                />
+                                <path
+                                    d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0"
+                                />
+                            </svg>
                         </div>
-                        <div class="col-auto">
+                        <div class="col-auto me-4">
                             <input
                                 type="text"
-                                
                                 id="input-newIng"
                                 class="form-control id-input"
                                 aria-describedby="input-newIng"
                             />
                         </div>
-                        <div class="col-auto">
+                        <div class="col-auto me-4">
                             <button
                                 type="submit"
                                 class="btn btn-primary"
@@ -346,7 +363,10 @@
                                 Create Set
                             </button>
                         </div>
-                        <div class="col-auto d-none feedback" id="newIng-feedback">
+                        <div
+                            class="col-auto d-none feedback"
+                            id="newIng-feedback"
+                        >
                             Product ID must be 14 digits long and start with
                             "000".
                         </div>
@@ -409,12 +429,29 @@
                                     aria-label="Close"
                                 ></button>
                             </div>
-                            <div class="modal-body">...</div>
+                            <div class="modal-body">
+                                <ol>
+                                    <li>
+                                        First paste the Product ID of the new
+                                        item, then click Create Set.
+                                    </li>
+                                    <li>Update and add new lines as needed.</li>
+                                    <li>Click Download For Salsify</li>
+                                </ol>
+
+                                <b
+                                    >Only one new item can be created at a
+                                    time.</b
+                                >
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="table-wrapper mt-4 mb-4" id="newIng-table-container">
+                <div
+                    class="table-wrapper mt-4 mb-4"
+                    id="newIng-table-container"
+                >
                     <!-- table-newIng -->
                 </div>
             </div>
@@ -439,29 +476,45 @@
                             onchange=""
                         />
                     </div>
-                    <!-- <div id="duplicate-fileName" class="mt-4"></div> -->
+
                     <form
-                        class="row mt-4 gx-4 mx-1 align-items-center pipeify-create needs-validation"
+                        class="d-flex flex-row mt-4 gx-4 mx-1 align-items-center pipeify-create needs-validation"
                         novalidate
                     >
-                        <div class="col-auto">
+
+                        <div class="d-flex flex-row align-items-center">
                             <label for="input-duplicate" class="col-form-label">
                                 <h5>Product ID Replacement</h5>
                             </label>
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="16"
+                                height="16"
+                                fill="currentColor"
+                                class="bi bi-info-circle ms-2 me-4"
+                                viewBox="0 0 16 16"
+                                data-bs-toggle="tooltip"
+                                data-bs-placement="bottom"
+                                data-bs-title="Required: Replacement Salsify Product ID"
+                            >
+                                <path
+                                    d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"
+                                />
+                                <path
+                                    d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0"
+                                />
+                            </svg>
                         </div>
-                        <div class="col-auto">
+
+                        <div class="col-auto me-4">
                             <input
                                 type="text"
                                 id="input-duplicate"
                                 class="form-control id-input"
                                 aria-describedby="input-duplicate"
                             />
-                            <!-- <div class="invalid-feedback">
-                                Product ID must be 14 digits long and start with
-                                "000".
-                            </div> -->
                         </div>
-                        <div class="col-auto">
+                        <div class="col-auto me-4">
                             <button
                                 type="submit"
                                 class="btn btn-primary"
@@ -471,7 +524,10 @@
                                 Replace
                             </button>
                         </div>
-                        <div class="col-auto d-none feedback" id="duplicate-feedback">
+                        <div
+                            class="col-auto d-none feedback"
+                            id="duplicate-feedback"
+                        >
                             Product ID must be 14 digits long and start with
                             "000".
                         </div>
@@ -489,7 +545,10 @@
                             >
                                 Download For Salsify
                             </button>
-                            <button id="clear-duplicate-btn" class="btn btn-secondary">
+                            <button
+                                id="clear-duplicate-btn"
+                                class="btn btn-secondary"
+                            >
                                 Clear
                             </button>
                         </div>
@@ -499,11 +558,51 @@
                                 type="button"
                                 class="btn btn-info"
                                 data-bs-toggle="modal"
-                                data-bs-target="#help-import-modal"
-                                disabled
+                                data-bs-target="#help-replace-modal"
                             >
                                 Help
                             </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Replace Ingredient Modal -->
+                <div
+                    class="modal fade"
+                    id="help-replace-modal"
+                    tabindex="-1"
+                    aria-labelledby="help-replace-modal"
+                    aria-hidden="true"
+                >
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1
+                                    class="modal-title fs-4"
+                                    id="help-replace-modal"
+                                >
+                                    Replace Salsify Ingredient Set Help
+                                </h1>
+                                <button
+                                    type="button"
+                                    class="btn-close"
+                                    data-bs-dismiss="modal"
+                                    aria-label="Close"
+                                ></button>
+                            </div>
+                            <div class="modal-body">
+                                <ol>
+                                    <li>
+                                        Drag and drop file
+                                        <b>single item spreadsheet into box</b>
+                                    </li>
+                                    <li>
+                                        Paste the <b>Replacement</b> Product ID
+                                        and click Replace
+                                    </li>
+                                    <li>Update and add new lines as needed.</li>
+                                    <li>Click Download For Salsify</li>
+                                </ol>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -580,6 +679,7 @@
             </div>
         </div>
 
+        <script scr="scripts/popper.min.js"></script>
         <script src="scripts/bootstrap.bundle.min.js"></script>
 
         <script src="scripts/toast.js"></script>

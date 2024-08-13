@@ -1,3 +1,10 @@
+const tooltipTriggerList = document.querySelectorAll(
+    '[data-bs-toggle="tooltip"]'
+);
+const tooltipList = [...tooltipTriggerList].map(
+    (tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl)
+);
+
 /** Tab1 - VALIDATE ********************************************************* */
 /** Tab1 - Radio Change */
 document.getElementById('radioButtons').addEventListener('change', (e) => {
@@ -172,7 +179,7 @@ async function dom_importFileHandler(file, tableId) {
     // Try to import the file and handle errors
     try {
         // Use await to wait for the promise to resolve and retrieve the file type
-        
+
         const fileType = await xlsx_import_file(file, parsingOption, tableId);
 
         if (tableId === 'validate') {
@@ -182,8 +189,6 @@ async function dom_importFileHandler(file, tableId) {
             const fileNameArea = document.getElementById(`${tableId}-fileName`);
             fileNameArea.textContent = `[${fileType}]: "${fileName}"`;
         }
-        
-        
 
         // Update the DOM with the imported file name and type
         // console.log('success dom_importFileHandler');
