@@ -43,8 +43,19 @@ function renumberOrderCells(tableId) {
         orderCells.forEach((orderCell, index) => {
             //update DOM
             orderCell.innerText = index + 1;
+
+            const parentCell = orderCell.parentElement.cell;
             //update the data model
-            orderCell.parentElement.cell.value = index + 1;
+            parentCell.value = index + 1;
+
+            // const orderCell = createCell.order({
+            //     value: index + 1,
+            //     isEditable: true,
+            // });
+            const parentClasslist = orderCell.parentElement.classList;
+            const status = parentCell.status = createCell.validateOrder(index + 1);
+            
+            addErrorsToDom(status, parentClasslist);
         });
     });
 }
@@ -791,15 +802,14 @@ function createTableRow(rowData, headerCallback = null) {
             // cellContainer.classList.add('draggable');
         }
 
-        // Add metadata for Auto-Ordering
+        /* Add metadata for Auto-Ordering */
         let metaData = '';
 
         if (cell.isEditable) {
             if (cell.type === ORDER.id) {
-                //! do it here
+
                 metaData = `data-auto_order="${cell.type}"`;
             }
-
             // Set the cell content based on its editable status
             cellContainer.innerHTML = `
                 <span class="chevron-icon">▶</span>
@@ -812,7 +822,6 @@ function createTableRow(rowData, headerCallback = null) {
                 cell.type === 'Product ID' ||
                 cell.type === INGREDIENT_TYPE.id
             ) {
-                //! do it here
                 metaData = `data-auto_order="${cell.type}"`;
             }
             cellContainer.innerHTML = `
@@ -1245,11 +1254,11 @@ function attachBlurEventToTableCells(table) {
             validateSalsifyBefore
         ) {
             return function handleFocusOut(e) {
-                console.log(
-                    'handleFocusOut',
-                    validateCustomerBefore,
-                    validateSalsifyBefore
-                );
+                // console.log(
+                //     'handleFocusOut',
+                //     validateCustomerBefore,
+                //     validateSalsifyBefore
+                // );
 
                 validateCustomer.disabled = validateCustomerBefore;
                 validateSalsify.disabled = validateSalsifyBefore;

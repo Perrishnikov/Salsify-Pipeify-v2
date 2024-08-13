@@ -159,9 +159,16 @@ document
         process_for_salsify('option4', newTable);
     });
 
-document.querySelector('#replace-autoOrder').addEventListener('click', () => {
-    renumberOrderCells('table-duplicate');
-});
+const autoOrderButtons = document
+    .querySelectorAll('button[id*="autoOrder"]')
+    .forEach((element) => {
+        element.addEventListener('click', (e) => {
+            const id = e.target.id.split('-')[0];
+            // console.log({ id });
+            renumberOrderCells(`table-${id}`);
+        });
+    });
+
 /** Misc ******************************************************************** */
 /**
  * Handles the import of the file and updates the DOM.
@@ -324,7 +331,7 @@ function clearInput(tableId) {
 /** Clear Buttons */
 document.getElementById('clear-validate-btn').addEventListener('click', (e) => {
     const split = e.target.id.split('-')[1];
-    console.log(split);
+    // console.log(split);
     clearDomTable(split);
     clearLocalStorage(split);
     clearFileName(split);
