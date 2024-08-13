@@ -45,10 +45,13 @@ Once verified, can either be exported for a client or the corrected version can 
 [x] filename on duplicate failure 
 
 [] Check PLM1 Pipeify to see how this will affect it.
-    Export the PLM1 fields as above, rename columns
+    * Column Names will be different... Import
+    * Export Column Names the PLM1 fields as above, rename columns
     Use the JS feature to parse the pipes.
     Use Pipeify to validate PLM1 as it will do NIO.
+
 [] Yes - should allow for export to PLM1 and original
+
 [] popover help for headers (allowed or disallowed values)
 [] ? Create helper symbols to copy and paste
 

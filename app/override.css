@@ -90,6 +90,9 @@ td {
     border: 1px solid var(--bs-secondary-color);
     padding: calc(var(--padding-margin) / 4);
 }
+.draggable{
+    cursor: all-scroll;
+}
 tr {
     background-color: rgba(var(--bs-body-color-rgb), 0.1);
 }

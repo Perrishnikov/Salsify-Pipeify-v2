@@ -1,3 +1,62 @@
+function enableDragAndDrop(tableId) {
+    const table = document.getElementById(tableId);
+
+    if (table) {
+        let draggedRow = null;
+        let draggedIngredientType = null;
+        let overIngredientType = null;
+
+        table.addEventListener('dragstart', (e) => {
+            if (e.target.tagName === 'TR') {
+                draggedRow = e.target;
+                draggedIngredientType = e.target.dataset.type;
+                // console.log({ draggedRow, draggedIngredientType });
+                draggedRow.style.opacity = 0.5;
+                document.body.style.cursor = 'grab';
+            }
+        });
+
+        table.addEventListener('dragend', () => {
+            if (draggedRow) {
+                draggedRow.style.opacity = 1;
+                draggedRow = null;
+                draggedIngredientType = null;
+                overIngredientType = null;
+            }
+            // Revert cursor back to default
+            document.body.style.cursor = '';
+            updateDividerCss(table);
+        });
+
+        table.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            const overRow = e.target.closest('tr');
+
+            if (overRow) {
+                overIngredientType = overRow.dataset.type;
+            }
+        });
+
+        table.addEventListener('drop', (e) => {
+            e.preventDefault();
+            const targetRow = e.target.closest('tr');
+            // console.log({ targetRow });
+            console.log(overIngredientType, draggedIngredientType);
+            if (overIngredientType === draggedIngredientType) {
+                if (draggedRow && targetRow && draggedRow !== targetRow) {
+                    const parent = targetRow.parentNode;
+                    parent.insertBefore(draggedRow, targetRow.nextSibling);
+                }
+            } else {
+                bootToast('Not a valid drop target', 'danger');
+                // console.error('Cant drop here');
+                
+            }
+        });
+    } else {
+        console.warn(`Table with id "${tableId}" not found.`);
+    }
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize Bootstrap components
@@ -285,6 +344,8 @@ function createNewTable(parsingOption, productIdValue) {
     attachBlurEventToTableCells(newTable);
 
     applyHandlePopoverMenuClickToTable('table-newIng');
+
+    enableDragAndDrop('table-newIng');
 }
 
 // TODO: move this into a scope. Presently needs to be outside because it's adding listerers from three places (461, )
@@ -625,6 +686,7 @@ function createMenuPopover(rowId) {
  */
 function createTableRow(rowData, headerCallback = null) {
     const tableRow = document.createElement('tr');
+    tableRow.draggable = true;
     tableRow.dataset.row_id = rowData.id;
     // console.log({ rowData });
     tableRow.dataset.productId = rowData.productId;
@@ -649,11 +711,13 @@ function createTableRow(rowData, headerCallback = null) {
         // Add classes to rows for type id
         if (cell.type === INGREDIENT_TYPE.id) {
             tableRow.dataset.type = cell.value;
+            cellContainer.classList.add('draggable');
         }
 
         //add the product id for a css divider
         if (cell.type === 'Product ID') {
             tableRow.dataset.productId = cell.value;
+            // cellContainer.classList.add('draggable');
         }
 
         if (cell.isEditable) {
@@ -787,7 +851,7 @@ function main_process(parsingOption, tableId, fromWhere) {
         return;
     }
 
-    // main_process is only called on validate and duplicate
+    //! main_process is only called on validate and duplicate (createNewTable for New Set)
     if (tableId === 'validate') {
         const dwnbtn = document.getElementById('download-validate-salsify-btn');
         const custbtn = document.getElementById(
@@ -904,6 +968,8 @@ function main_process(parsingOption, tableId, fromWhere) {
         attachBlurEventToTableCells(myTable);
 
         applyHandlePopoverMenuClickToTable(`table-${tableId}`);
+
+        enableDragAndDrop(`table-${tableId}`);
     }
 }
 
