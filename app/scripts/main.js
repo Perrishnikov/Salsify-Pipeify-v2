@@ -1,3 +1,12 @@
+/**
+ * Enables dynamic drag-and-drop functionality for table rows.
+ *
+ * @param {string} tableId - The ID of the table element.
+ *
+ * The drag-and-drop behavior is only activated when the mouse is over a
+ * `div` with the class `draggable`. The `draggable` attribute is added
+ * or removed dynamically to allow or prevent dragging.
+ */
 function enableDragAndDrop(tableId) {
     const table = document.getElementById(tableId);
 
@@ -6,11 +15,28 @@ function enableDragAndDrop(tableId) {
         let draggedIngredientType = null;
         let overIngredientType = null;
 
+        table.addEventListener('mouseover', (e) => {
+            const div = e.target.closest('div.draggable');
+            const row = e.target.closest('tr');
+
+            if (div && row) {
+                row.draggable = true; // Enable dragging when mouse is over a div with class "draggable"
+            }
+        });
+
+        table.addEventListener('mouseout', (e) => {
+            const div = e.target.closest('div.draggable');
+            const row = e.target.closest('tr');
+
+            if (div && row) {
+                row.draggable = false; // Disable dragging when mouse leaves the div with class "draggable"
+            }
+        });
+
         table.addEventListener('dragstart', (e) => {
-            if (e.target.tagName === 'TR') {
+            if (e.target.tagName === 'TR' && e.target.draggable) {
                 draggedRow = e.target;
-                draggedIngredientType = e.target.dataset.type;
-                // console.log({ draggedRow, draggedIngredientType });
+                draggedIngredientType = draggedRow.dataset.type;
                 draggedRow.style.opacity = 0.5;
                 document.body.style.cursor = 'grab';
             }
@@ -23,7 +49,6 @@ function enableDragAndDrop(tableId) {
                 draggedIngredientType = null;
                 overIngredientType = null;
             }
-            // Revert cursor back to default
             document.body.style.cursor = '';
             updateDividerCss(table);
         });
@@ -31,7 +56,6 @@ function enableDragAndDrop(tableId) {
         table.addEventListener('dragover', (e) => {
             e.preventDefault();
             const overRow = e.target.closest('tr');
-
             if (overRow) {
                 overIngredientType = overRow.dataset.type;
             }
@@ -40,8 +64,7 @@ function enableDragAndDrop(tableId) {
         table.addEventListener('drop', (e) => {
             e.preventDefault();
             const targetRow = e.target.closest('tr');
-            // console.log({ targetRow });
-            console.log(overIngredientType, draggedIngredientType);
+            // console.log(overIngredientType, draggedIngredientType);
             if (overIngredientType === draggedIngredientType) {
                 if (draggedRow && targetRow && draggedRow !== targetRow) {
                     const parent = targetRow.parentNode;
@@ -49,8 +72,6 @@ function enableDragAndDrop(tableId) {
                 }
             } else {
                 bootToast('Not a valid drop target', 'danger');
-                // console.error('Cant drop here');
-                
             }
         });
     } else {
@@ -686,7 +707,7 @@ function createMenuPopover(rowId) {
  */
 function createTableRow(rowData, headerCallback = null) {
     const tableRow = document.createElement('tr');
-    tableRow.draggable = true;
+    // tableRow.draggable = true; set dynamically in enableDragAndDrop()
     tableRow.dataset.row_id = rowData.id;
     // console.log({ rowData });
     tableRow.dataset.productId = rowData.productId;

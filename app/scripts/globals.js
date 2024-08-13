@@ -63,7 +63,7 @@ const MERGED_INGREDIENTS = {
 /**@type {Col} */
 const INGREDIENT_TYPE = {
     id: 'INGREDIENT_TYPE',
-    name: 'Type',
+    name: 'Type (draggable)',
 };
 
 /**

@@ -56,7 +56,7 @@ Once verified, can either be exported for a client or the corrected version can 
 [] ? Create helper symbols to copy and paste
 
 ---
-[] Drag n drop rows
+[x] Drag n drop rows
 [] Feature - Auto order button
 [] Enhance: Sort columns by Order on both exports
 [] Delete optional columns
