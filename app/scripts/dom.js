@@ -159,6 +159,9 @@ document
         process_for_salsify('option4', newTable);
     });
 
+document.querySelector('#replace-autoOrder').addEventListener('click', () => {
+    renumberOrderCells('table-duplicate');
+});
 /** Misc ******************************************************************** */
 /**
  * Handles the import of the file and updates the DOM.

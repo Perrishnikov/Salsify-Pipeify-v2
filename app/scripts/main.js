@@ -1,4 +1,54 @@
 /**
+ * Renumbers ORDER cells in a table by Product ID and Ingredient Type.
+ *
+ * @param {string} tableId - The ID of the table.
+ */
+function renumberOrderCells(tableId) {
+    const table = document.getElementById(tableId);
+
+    if (!table) {
+        console.warn(`Table with id "${tableId}" not found.`);
+        return;
+    }
+
+    const rows = Array.from(table.querySelectorAll('tr'));
+    const orderMap = new Map();
+
+    // First pass: Collect rows by product ID and ingredient type
+    rows.forEach((row) => {
+        const productIdCell = row.querySelector(
+            '[data-auto_order="Product ID"]'
+        );
+        const ingredientTypeCell = row.querySelector(
+            '[data-auto_order="INGREDIENT_TYPE"]'
+        );
+        const orderCell = row.querySelector('[data-auto_order="ORDER"]');
+
+        if (productIdCell && ingredientTypeCell && orderCell) {
+            const productId = productIdCell.textContent.trim();
+            const ingredientType = ingredientTypeCell.textContent.trim();
+            const key = `${productId}|${ingredientType}`;
+
+            if (!orderMap.has(key)) {
+                orderMap.set(key, []);
+            }
+
+            orderMap.get(key).push(orderCell);
+        }
+    });
+
+    // Second pass: Update ORDER cells
+    orderMap.forEach((orderCells) => {
+        // console.log(orderCells);
+        orderCells.forEach((orderCell, index) => {
+            //update DOM
+            orderCell.innerText = index + 1;
+            //update the data model
+            orderCell.parentElement.cell.value = index + 1;
+        });
+    });
+}
+/**
  * Enables dynamic drag-and-drop functionality for table rows.
  *
  * @param {string} tableId - The ID of the table element.
@@ -741,17 +791,32 @@ function createTableRow(rowData, headerCallback = null) {
             // cellContainer.classList.add('draggable');
         }
 
+        // Add metadata for Auto-Ordering
+        let metaData = '';
+
         if (cell.isEditable) {
+            if (cell.type === ORDER.id) {
+                //! do it here
+                metaData = `data-auto_order="${cell.type}"`;
+            }
+
             // Set the cell content based on its editable status
             cellContainer.innerHTML = `
                 <span class="chevron-icon">▶</span>
-                <span class="cell-value" contenteditable="true">
+                <span class="cell-value" contenteditable="true" ${metaData}>
                     ${cell.value}
                 </span>
             `;
         } else {
+            if (
+                cell.type === 'Product ID' ||
+                cell.type === INGREDIENT_TYPE.id
+            ) {
+                //! do it here
+                metaData = `data-auto_order="${cell.type}"`;
+            }
             cellContainer.innerHTML = `
-                <span class="cell-value">
+                <span class="cell-value" ${metaData}>
                     ${cell.value}
                 </span>
             `;
@@ -824,7 +889,7 @@ function replaceProductId(productId, table) {
             const cell = td.children[0]?.cell;
 
             if (cell && cell.type === 'Product ID') {
-                // Update cell value
+                //update the data model
                 if (cell.value !== productId) {
                     cell.value = productId;
                     updatesMade = true;
@@ -1049,7 +1114,7 @@ function getIngredientTypeFromDom(target) {
  * @param {HTMLTableElement} table - The HTML table element to monitor for blur events on its cells.
  */
 function attachBlurEventToTableCells(table) {
-    console.log(table);
+    // console.log(table);
     // Define a named event handler function
     function handleBlurEvent(e) {
         /** @type {Cell} */
