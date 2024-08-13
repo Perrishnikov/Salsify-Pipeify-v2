@@ -57,7 +57,7 @@ Once verified, can either be exported for a client or the corrected version can 
 
 ---
 [x] Drag n drop rows
-[] Feature - Auto order button
+[x] Feature - Auto order button
 [] Enhance: Sort columns by Order on both exports
 [] Delete optional columns
 
