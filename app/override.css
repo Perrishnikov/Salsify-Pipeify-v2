@@ -63,7 +63,7 @@ input.id-input {
     border: 2px solid var(--bs-secondary);
     border-bottom: none;
 }
-.nav-tabs .nav-item .nav-link:not(.active){
+.nav-tabs .nav-item .nav-link:not(.active) {
     border-bottom: 2px solid var(--bs-secondary);
 }
 /* TABLE */
@@ -90,7 +90,7 @@ td {
     border: 1px solid var(--bs-secondary-color);
     padding: calc(var(--padding-margin) / 4);
 }
-.draggable{
+.draggable {
     cursor: all-scroll;
 }
 tr {
@@ -100,19 +100,19 @@ tr {
 tr:nth-child(even):not(.error-row):not(.warning-row):not(.info-row) {
     background-color: rgba(var(--bs-body-color-rgb), 0.03);
 }
-tr[data-type="Nutrients"] {
+tr[data-type='Nutrients'] {
     /* Your styles here */
     background-color: var(--color-nut) !important;
 }
-tr[data-type="Ingredients"] {
+tr[data-type='Ingredients'] {
     /* Your styles here */
     background-color: var(--color-ing) !important;
 }
-tr[data-type="Other"] {
+tr[data-type='Other'] {
     /* Your styles here */
     background-color: var(--color-other) !important;
 }
-.divider{
+.divider {
     border-top: 4px solid var(--bs-secondary);
 }
 .error-cell {
@@ -150,18 +150,36 @@ tr[data-type="Other"] {
 }
 
 /* POPOVERS */
-[popover] {
-    position: absolute;
-    inset: unset;
+
+@supports (-webkit-appearance: none) {
+    /* Chrome-specific styles go here */
+    [popover] {
+        /* inset: unset; */
+    }
+    :popover-open {
+        cursor: pointer;
+        border-color: var(--bs-secondary-color);
+        position: absolute;
+        left: -75%;
+        position: fixed;
+        top: 0%;
+        /* transform: translateY(-50%); */
+    }
 }
-:popover-open {
-    padding: calc(var(--padding-margin) / 2);
-    /* font-size: var(--font-size); */
-    cursor: pointer;
-    translate: 30px;
-    background-color: white;
-    border-color: var(--bs-secondary-color);
+@supports (-moz-appearance: none) {
+    /* Firefox-specific styles go here */
+    [popover] {
+        inset: unset;
+    }
+    :popover-open {
+        position: relative;
+        padding: calc(var(--padding-margin) / 2);
+        cursor: pointer;
+        translate: 130px;
+        border-color: var(--bs-secondary-color);
+    }
 }
+
 /* error messages - not quite popover */
 .not-popover {
     position: absolute;
@@ -208,18 +226,18 @@ button.icon {
     background-color: var(--bs-light);
     padding: 2rem;
 }
-.feedback{
+.feedback {
     color: var(--bs-form-invalid-color);
 }
 /* bs override */
 @media (min-width: 576px) {
-  .modal-dialog {
-    max-width: 750px;
-  }
+    .modal-dialog {
+        max-width: 750px;
+    }
 }
 .row {
-  margin-right: 0 !important;
-  margin-left: 0 !important;
+    margin-right: 0 !important;
+    margin-left: 0 !important;
 }
 .toast-container {
     position: fixed;
