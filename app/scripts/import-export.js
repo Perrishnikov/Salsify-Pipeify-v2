@@ -275,7 +275,9 @@ function xlsx_exportWYSIWYG(data) {
     bootToast(`File Download`, 'success', 'Success');
 }
 
-function xlsx_exportForSalsify(data) {
+function xlsx_exportForPLM1(data) {
+
+    // array of Object (for PLM_1 export) has ~ and objects
     const worksheet = XLSX.utils.json_to_sheet(data);
 
     // Return and error if there is no table data
@@ -302,6 +304,48 @@ function xlsx_exportForSalsify(data) {
     let fileName = 'Pipeify (Salsify multi-item export).xlsx';
     const uniqueProductIds = [...new Set(data.map((obj) => obj['Product ID']))];
     // console.log(uniqueProductIds);
+    if (uniqueProductIds.length === 1) {
+        fileName = `Pipeify (Salsify ${uniqueProductIds[0]}).xlsx`;
+    }
+
+    workbook.Props = {
+        Title: 'Pipeify v2 For PLM_1',
+        CreatedDate: new Date(),
+        Company: "Nature's Way",
+        Comments: '...',
+    };
+
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+
+    XLSX.writeFile(workbook, fileName);
+
+    bootToast(`File Download`, 'success', 'Success');
+}
+
+function xlsx_exportForSalsify(data) {
+
+    //array of arrays (for Old Ingred Sets)
+    const worksheet = XLSX.utils.aoa_to_sheet(data);
+    // Return and error if there is no table data
+    if (data.length < 1) {
+        bootToast(`No Table Data to Export`, 'danger');
+        return;
+    }
+
+    const workbook = XLSX.utils.book_new();
+
+    //Name the export
+    let fileName = 'Pipeify (Salsify multi-item export).xlsx';
+    const uniqueProductIds = [
+        ...new Set(
+            data.map((row) => {
+                if (row[0] !== 'Product ID') {
+                    return row[0];
+                }
+            })
+        ),
+    ].filter((item) => item !== undefined);
+
     if (uniqueProductIds.length === 1) {
         fileName = `Pipeify (Salsify ${uniqueProductIds[0]}).xlsx`;
     }

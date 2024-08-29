@@ -53,8 +53,10 @@ function renumberOrderCells(tableId) {
             //     isEditable: true,
             // });
             const parentClasslist = orderCell.parentElement.classList;
-            const status = parentCell.status = createCell.validateOrder(index + 1);
-            
+            const status = (parentCell.status = createCell.validateOrder(
+                index + 1
+            ));
+
             addErrorsToDom(status, parentClasslist);
         });
     });
@@ -807,7 +809,6 @@ function createTableRow(rowData, headerCallback = null) {
 
         if (cell.isEditable) {
             if (cell.type === ORDER.id) {
-
                 metaData = `data-auto_order="${cell.type}"`;
             }
             // Set the cell content based on its editable status
@@ -1516,7 +1517,9 @@ function process_for_salsify(parsingOption, tableDataFromDom) {
             }
         });
 
+        /** //*for PLM_1 exporting: This part adds the ~ and is single column, meaning that when importings, one needs to specify the delimiter for each type of ing. Old Ing Sets are column delimited, PLM_1 is ~ delimited
         if (idNuts.length > 0) {
+            console.log(idNuts);
             const result = idNuts
                 .map((innerArray) => innerArray.join('|'))
                 .join('~');
@@ -1525,15 +1528,86 @@ function process_for_salsify(parsingOption, tableDataFromDom) {
         }
 
         if (idIngreds.length > 0) {
+            console.log(idIngreds);
             const result = idIngreds
                 .map((innerArray) => innerArray.join('|'))
                 .join('~');
 
             rowObj[LABEL_DATASET_INGREDIENTS_A.id] = result;
         }
+        
+        tableData.push(rowObj);
+        */
+        if (idNuts.length > 0) {
+            // console.log(idNuts);
+            const result = idNuts.map((innerArray) => innerArray.join('|'));
+            // .join('~');
 
+            rowObj[LABEL_DATASET_NUTRIENT_A.id] = result;
+        }
+
+        if (idIngreds.length > 0) {
+            // console.log(idIngreds);
+            const result = idIngreds.map((innerArray) => innerArray.join('|'));
+            // .join('~');
+
+            rowObj[LABEL_DATASET_INGREDIENTS_A.id] = result;
+        }
+        // console.log(rowObj);
         tableData.push(rowObj);
     });
 
-    xlsx_exportForSalsify(tableData);
+    // PLM_1 export- xlsx_exportForPLM1(tableData);
+
+    // console.log({ tableData });
+    const reformatted = convertToAoA(tableData);
+    xlsx_exportForSalsify(reformatted);
 }
+
+/**
+ * Converts table data to a new format with columns for nutrients, ingredients, and other data.
+ * @param {Array<Object>} tableData - The input data array where each object represents a row.
+ * @returns {Array<Array>} A new table with formatted rows, including headers and consolidated data.
+ */
+const convertToAoA = (tableData) => {
+  let nutCount = 0;
+  let ingredCount = 0;
+  const newTable = [];
+
+  // Calculate max nutrient and ingredient counts
+  tableData.forEach((object) => {
+    const isTypeNut = object[LABEL_DATASET_NUTRIENT_A.id];
+    if (isTypeNut) nutCount = Math.max(nutCount, isTypeNut.length);
+
+    const isTypeIngred = object[LABEL_DATASET_INGREDIENTS_A.id];
+    if (isTypeIngred) ingredCount = Math.max(ingredCount, isTypeIngred.length);
+  });
+
+  // Create header row
+  const headerRow = [
+    'Product ID',
+    ...Array(nutCount).fill(LABEL_DATASET_NUTRIENT_A.id),
+    ...Array(ingredCount).fill(LABEL_DATASET_INGREDIENTS_A.id),
+    LABEL_DATASET_OTHER_INGREDS_A.id
+  ];
+  newTable.push(headerRow);
+
+  // Populate data rows
+  tableData.forEach((object) => {
+    const newRowArray = new Array(headerRow.length);
+    const productId = object['Product ID'];
+    const nuts = object[LABEL_DATASET_NUTRIENT_A.id] || [];
+    const ingreds = object[LABEL_DATASET_INGREDIENTS_A.id] || [];
+    const other = object[LABEL_DATASET_OTHER_INGREDS_A.id] || '';
+
+    newRowArray[0] = productId;
+    nuts.forEach((nut, index) => newRowArray[1 + index] = nut);
+    ingreds.forEach((ingred, index) => newRowArray[1 + nutCount + index] = ingred);
+    newRowArray[newRowArray.length - 1] = other;
+
+    newTable.push(newRowArray);
+  });
+
+//   console.log({ newTable });
+  return newTable;
+};
