@@ -1570,44 +1570,100 @@ function process_for_salsify(parsingOption, tableDataFromDom) {
  * @returns {Array<Array>} A new table with formatted rows, including headers and consolidated data.
  */
 const convertToAoA = (tableData) => {
-  let nutCount = 0;
-  let ingredCount = 0;
-  const newTable = [];
+    let nutCount = 0;
+    let ingredCount = 0;
+    const newTable = [];
 
-  // Calculate max nutrient and ingredient counts
-  tableData.forEach((object) => {
-    const isTypeNut = object[LABEL_DATASET_NUTRIENT_A.id];
-    if (isTypeNut) nutCount = Math.max(nutCount, isTypeNut.length);
+    // Calculate max nutrient and ingredient counts
+    tableData.forEach((object) => {
+        const isTypeNut = object[LABEL_DATASET_NUTRIENT_A.id];
+        if (isTypeNut) nutCount = Math.max(nutCount, isTypeNut.length);
 
-    const isTypeIngred = object[LABEL_DATASET_INGREDIENTS_A.id];
-    if (isTypeIngred) ingredCount = Math.max(ingredCount, isTypeIngred.length);
-  });
+        const isTypeIngred = object[LABEL_DATASET_INGREDIENTS_A.id];
+        if (isTypeIngred)
+            ingredCount = Math.max(ingredCount, isTypeIngred.length);
+    });
 
-  // Create header row
-  const headerRow = [
-    'Product ID',
-    ...Array(nutCount).fill(LABEL_DATASET_NUTRIENT_A.id),
-    ...Array(ingredCount).fill(LABEL_DATASET_INGREDIENTS_A.id),
-    LABEL_DATASET_OTHER_INGREDS_A.id
-  ];
-  newTable.push(headerRow);
+    // Create header row
+    const headerRow = [
+        'Product ID',
+        ...Array(nutCount).fill(LABEL_DATASET_NUTRIENT_A.id),
+        ...Array(ingredCount).fill(LABEL_DATASET_INGREDIENTS_A.id),
+        LABEL_DATASET_OTHER_INGREDS_A.id,
+    ];
+    newTable.push(headerRow);
 
-  // Populate data rows
-  tableData.forEach((object) => {
-    const newRowArray = new Array(headerRow.length);
-    const productId = object['Product ID'];
-    const nuts = object[LABEL_DATASET_NUTRIENT_A.id] || [];
-    const ingreds = object[LABEL_DATASET_INGREDIENTS_A.id] || [];
-    const other = object[LABEL_DATASET_OTHER_INGREDS_A.id] || '';
+    // Populate data rows
+    tableData.forEach((object) => {
+        const newRowArray = new Array(headerRow.length);
+        const productId = object['Product ID'];
+        const nuts = object[LABEL_DATASET_NUTRIENT_A.id] || [];
+        const ingreds = object[LABEL_DATASET_INGREDIENTS_A.id] || [];
+        const other = object[LABEL_DATASET_OTHER_INGREDS_A.id] || '';
 
-    newRowArray[0] = productId;
-    nuts.forEach((nut, index) => newRowArray[1 + index] = nut);
-    ingreds.forEach((ingred, index) => newRowArray[1 + nutCount + index] = ingred);
-    newRowArray[newRowArray.length - 1] = other;
+        newRowArray[0] = productId;
+        nuts.forEach((nut, index) => (newRowArray[1 + index] = nut));
+        ingreds.forEach(
+            (ingred, index) => (newRowArray[1 + nutCount + index] = ingred)
+        );
+        newRowArray[newRowArray.length - 1] = other;
 
-    newTable.push(newRowArray);
-  });
+        newTable.push(newRowArray);
+    });
 
-//   console.log({ newTable });
-  return newTable;
+    //   console.log({ newTable });
+    return newTable;
 };
+
+// !do it here
+function createMiniTableForEdit(text) {
+    // look at createNewTable()
+    let type;
+    let rowStatus = new Status;
+
+    const split = text.split('|');
+    if (split.length === 8) {
+        //create Nutrientt
+        type = LABEL_DATASET_NUTRIENT_A.id;
+        const nutrientCells = createNutrientCells_RowValidation(
+            text,
+            rowStatus
+        );
+        console.log(nutrientCells);
+    } else {
+        //create Ingredient
+        type = LABEL_DATASET_INGREDIENTS_A.id;
+    }
+
+    // Create the table element
+    const newTable = document.createElement('table');
+    newTable.setAttribute('id', 'table-edit');
+
+    //* Create Header Row
+    const headerRow = document.createElement('tr');
+
+    //* Create Ingredient/ Nutrient Row
+    // "edit-table-container"
+
+    console.log(split);
+}
+
+function replicate_1({ row, columnNames }) {
+    const salsifyCells = salsifyKeys.map((name) => {
+        const value = row[name] || '';
+        const header = new Header({ id: name, name });
+        return new Cell({ value, type: name, header });
+    });
+
+    // Create a Cell for the ingredient type
+    const typeCell = new Cell({
+        value: typeValue,
+        type: INGREDIENT_TYPE.id,
+        header: new Header({
+            id: INGREDIENT_TYPE.id,
+            name: INGREDIENT_TYPE.name,
+        }),
+    });
+
+    const newRow = new Row(rowForType);
+}

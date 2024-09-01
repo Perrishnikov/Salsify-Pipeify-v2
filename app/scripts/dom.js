@@ -354,3 +354,41 @@ document.getElementById('clear-newIng-btn').addEventListener('click', (e) => {
     clearFileName(split);
     clearInput(split);
 });
+
+/* Handle paste */
+const editPasteArea = document.getElementById('edit-PasteArea');
+
+editPasteArea.addEventListener('click', async () => {
+    try {
+        const pasteData = await navigator.clipboard.readText();
+        // console.log('Pasted text:', pasteData);
+        const validatedText = validatePaste(pasteData);
+        // make a row
+        // if(validatedText){
+            createMiniTableForEdit(validatedText)
+        // }
+
+    } catch (err) {
+        console.warn('Failed to read clipboard contents:', err);
+    }
+});
+
+function validatePaste(text) {
+    const maxLength = 1000;
+    const minLength = 8;
+
+    if(!text || text.length > maxLength || text.length <minLength){
+        bootToast(`Unable to handle pasted text`, 'danger');
+        return null
+    }
+
+    const count = text.split('|').length;
+    
+    if(count !== 9 && count !== 8){
+        //8 for nutrients, 9 for ingredients
+         bootToast(`Pasted data doesn't appear to be Nutrient or Ingredient...`, 'danger');
+         return null;
+    }
+
+    return text;
+}

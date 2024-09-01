@@ -245,3 +245,26 @@ button.icon {
     /* right: 20px; Adjust as needed */
     /* z-index: 1050; Ensure it's above other content */
 }
+
+.paste-area {
+    border: 2px dashed var(--bs-primary);
+    background-color: var(--bs-light);
+    border-radius: calc(var(--padding-margin) / 4);
+    padding: 2rem;
+    text-align: center;
+    cursor: crosshair;
+    transition: background-color 0.3s, border-color 0.3s;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+.paste-area:hover {
+    background-color: rgba(var(--bs-body-color-rgb), 0.1);
+}
+.paste-area.dragover {
+    background-color: rgba(var(--bs-body-color-rgb), 0.1);
+}
+.paste-area h5 {
+    margin-bottom: 0 !important;
+}
