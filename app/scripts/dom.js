@@ -97,7 +97,7 @@ document
         event.preventDefault(); // Prevent form submission
         const feedbackDiv = document.querySelector('#newIng-feedback');
 
-        if (productIdValue.length !== 14 || !productIdValue.startsWith('000')) {
+        if (productIdValue.length !== 14 || !productIdValue.startsWith('00')) {
             feedbackDiv.classList.remove('d-none');
         } else {
             //main.js
@@ -169,6 +169,17 @@ const autoOrderButtons = document
         });
     });
 
+/** Tab4 - 1 Liners */
+document
+    .querySelector('#copy-edit-salsify-btn')
+    .addEventListener('click', () => {
+        const newTable = document.getElementById('table-edit');
+
+        pipeifyEditForSalsify(newTable);
+    });
+
+
+    
 /** Misc ******************************************************************** */
 /**
  * Handles the import of the file and updates the DOM.
@@ -278,7 +289,9 @@ function clearDomTable(tableId) {
         const dwnbtn = document.getElementById(
             `download-${tableId}-salsify-btn`
         );
-        dwnbtn.disabled = true;
+        if (dwnbtn) {
+            dwnbtn.disabled = true;
+        }
 
         //disable download customer from validate
         const custbtn = document.getElementById(
@@ -355,6 +368,14 @@ document.getElementById('clear-newIng-btn').addEventListener('click', (e) => {
     clearInput(split);
 });
 
+document.getElementById('clear-edit-btn').addEventListener('click', (e) => {
+    const split = e.target.id.split('-')[1];
+    clearDomTable(split);
+    clearLocalStorage(split);
+    clearFileName(split);
+    clearInput(split);
+});
+
 /* Handle paste */
 const editPasteArea = document.getElementById('edit-PasteArea');
 
@@ -362,33 +383,38 @@ editPasteArea.addEventListener('click', async () => {
     try {
         const pasteData = await navigator.clipboard.readText();
         // console.log('Pasted text:', pasteData);
-        const validatedText = validatePaste(pasteData);
+        const validatedText = await validatePaste(pasteData);
         // make a row
         // if(validatedText){
-            createMiniTableForEdit(validatedText)
+        createMiniTableForEdit(validatedText);
         // }
-
     } catch (err) {
-        console.warn('Failed to read clipboard contents:', err);
+        console.error('Failed to read clipboard contents:', err);
     }
 });
 
-function validatePaste(text) {
-    const maxLength = 1000;
-    const minLength = 8;
+async function validatePaste(text) {
+    return new Promise((resolve, reject) => {
+        const maxLength = 1000;
+        const minLength = 8;
 
-    if(!text || text.length > maxLength || text.length <minLength){
-        bootToast(`Unable to handle pasted text`, 'danger');
-        return null
-    }
+        if (!text || text.length > maxLength || text.length < minLength) {
+            bootToast(`Unable to handle pasted text`, 'danger');
+            // return null;
+            reject('Unable to handle pasted text');
+        }
 
-    const count = text.split('|').length;
-    
-    if(count !== 9 && count !== 8){
-        //8 for nutrients, 9 for ingredients
-         bootToast(`Pasted data doesn't appear to be Nutrient or Ingredient...`, 'danger');
-         return null;
-    }
+        const count = text.split('|').length;
 
-    return text;
+        if (count !== 9 && count !== 8) {
+            //8 for nutrients, 9 for ingredients
+            bootToast(
+                `Pasted data doesn't appear to be Nutrient or Ingredient...`,
+                'danger'
+            );
+            reject('Not Ingredient or Nutrient');
+        }
+
+        resolve(text);
+    });
 }

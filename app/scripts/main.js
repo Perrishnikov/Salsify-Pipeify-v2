@@ -772,7 +772,6 @@ function createTableRow(rowData, headerCallback = null) {
     const tableRow = document.createElement('tr');
     // tableRow.draggable = true; set dynamically in enableDragAndDrop()
     tableRow.dataset.row_id = rowData.id;
-    // console.log({ rowData });
     tableRow.dataset.productId = rowData.productId;
     tableRow.dataset.type = rowData.type;
 
@@ -1101,7 +1100,7 @@ function addErrorsToDom(status, parentClasslist) {
  */
 function getIngredientTypeFromDom(target) {
     const parentRow = target.parentNode.parentNode.parentNode;
-
+    console.log(parentRow);
     const ingredientCell = Array.from(parentRow.cells)
         .map((cell) => {
             if (
@@ -1113,9 +1112,9 @@ function getIngredientTypeFromDom(target) {
         })
         .filter((cell) => cell !== undefined);
 
-    // console.log(ingredientCell);
-    const ingredValue = ingredientCell[0].firstChild.cell.value;
-    return ingredValue;
+    console.log(ingredientCell);
+    const ingredType = ingredientCell[0].firstChild.cell.value;
+    return ingredType;
 }
 
 /**
@@ -1123,7 +1122,7 @@ function getIngredientTypeFromDom(target) {
  *
  * @param {HTMLTableElement} table - The HTML table element to monitor for blur events on its cells.
  */
-function attachBlurEventToTableCells(table) {
+function attachBlurEventToTableCells(table, ingredType = null) {
     // console.log(table);
     // Define a named event handler function
     function handleBlurEvent(e) {
@@ -1134,7 +1133,6 @@ function attachBlurEventToTableCells(table) {
             const cellType = cell.type;
 
             // Clean empty cells
-
             let innerText = e.target.innerText.trim();
             // Remove <br> elements
             innerText = innerText.replace(/<br\s*\/?>/gi, '');
@@ -1145,7 +1143,10 @@ function attachBlurEventToTableCells(table) {
             //Set the cell value so it exports
             cell.value = innerText;
 
-            const ingredValue = getIngredientTypeFromDom(e.target);
+            if (!ingredType) {
+                ingredType = getIngredientTypeFromDom(e.target);
+            }
+
             /**@type {Status} */
             let status = null;
 
@@ -1158,11 +1159,11 @@ function attachBlurEventToTableCells(table) {
             } else if (cellType === UOM.id) {
                 status = createCell.validateUom(innerText);
             } else if (cellType === DV.id) {
-                status = createCell.validateDvAmount(innerText, ingredValue);
+                status = createCell.validateDvAmount(innerText, ingredType);
             } else if (cellType === SYMBOL.id) {
-                status = createCell.validateSymbol(innerText, ingredValue);
+                status = createCell.validateSymbol(innerText, ingredType);
             } else if (cellType === FOOT.id) {
-                status = createCell.validateFootnote(innerText, ingredValue);
+                status = createCell.validateFootnote(innerText, ingredType);
             }
             // console.log(status);
 
@@ -1615,55 +1616,99 @@ const convertToAoA = (tableData) => {
     return newTable;
 };
 
-// !do it here
-function createMiniTableForEdit(text) {
-    // look at createNewTable()
-    let type;
-    let rowStatus = new Status;
+/**
+ * Asynchronously creates a mini table for editing based on the provided text.
+ *
+ * @param {string} text - The text from the clipboard to be parsed and used for table creation.
+ * @returns {Promise<void>} - A promise that resolves when the table is successfully created and displayed.
+ */
+async function createMiniTableForEdit(text) {
+    return new Promise((resolve, reject) => {
+        let typeId;
+        let typeName;
+        const rowStatus = new Status();
+        let newRow;
 
-    const split = text.split('|');
-    if (split.length === 8) {
-        //create Nutrientt
-        type = LABEL_DATASET_NUTRIENT_A.id;
-        const nutrientCells = createNutrientCells_RowValidation(
-            text,
-            rowStatus
-        );
-        console.log(nutrientCells);
-    } else {
-        //create Ingredient
-        type = LABEL_DATASET_INGREDIENTS_A.id;
-    }
+        const split = text.split('|');
 
-    // Create the table element
-    const newTable = document.createElement('table');
-    newTable.setAttribute('id', 'table-edit');
+        if (split.length === 8) {
+            // Create Nutrient
+            typeId = LABEL_DATASET_NUTRIENT_A.id;
+            typeName = LABEL_DATASET_NUTRIENT_A.name;
+            const nutrientCells = createNutrientCells_RowValidation(split, rowStatus);
 
-    //* Create Header Row
-    const headerRow = document.createElement('tr');
+            nutrientCells.forEach(cell => {
+                cell.isEditable = true;
+            });
 
-    //* Create Ingredient/ Nutrient Row
-    // "edit-table-container"
+            newRow = new Row(nutrientCells, 'editRow', rowStatus);
+            newRow.type = LABEL_DATASET_NUTRIENT_A.name;
 
-    console.log(split);
+        } else if (split.length === 9) {
+            // Create Ingredient
+            typeId = LABEL_DATASET_INGREDIENTS_A.id;
+            typeName = LABEL_DATASET_INGREDIENTS_A.name;
+            const ingreCells = createIngredientCells_RowValidation(split, rowStatus);
+
+            ingreCells.forEach(cell => {
+                cell.isEditable = true;
+            });
+
+            newRow = new Row(ingreCells, 'editRow', rowStatus);
+            newRow.type = LABEL_DATASET_INGREDIENTS_A.name;
+
+        } else {
+            reject(new Error('Unable to Parse Clipboard Text.'));
+            return;
+        }
+
+        // Create the table element
+        const editTable = document.createElement('table');
+        editTable.setAttribute('id', 'table-edit');
+
+        // Create Header Row
+        const headerRow = document.createElement('tr');
+        newRow.cells.forEach(cell => {
+            const th = document.createElement('th');
+            th.textContent = cell.header.name;
+            headerRow.appendChild(th);
+        });
+        editTable.appendChild(headerRow);
+
+        // Create Ingredient/Nutrient Row
+        const tableRow = createTableRow(newRow);
+        editTable.appendChild(tableRow);
+
+        // Get container element to append the table
+        const tableContainer = document.getElementById('edit-table-container');
+
+        if (tableContainer) {
+            // Clear any old table
+            tableContainer.innerHTML = '';
+            // Append the new table
+            tableContainer.appendChild(editTable);
+
+            // Attach event handlers
+            attachBlurEventToTableCells(editTable, typeId);
+            applyHandlePopoverMenuClickToTable('table-edit');
+
+            // Notify success
+            bootToast(`${typeName} successfully pasted`, 'success');
+
+            // Update pipeify button text
+            const pipeifyButton = document.querySelector('#copy-edit-salsify-btn');
+            if (pipeifyButton) {
+                pipeifyButton.textContent = `Pipeify ${typeName}`;
+            }
+
+            resolve(); // Resolve the promise on success
+        } else {
+            reject(new Error('Table container not found.'));
+        }
+    });
 }
 
-function replicate_1({ row, columnNames }) {
-    const salsifyCells = salsifyKeys.map((name) => {
-        const value = row[name] || '';
-        const header = new Header({ id: name, name });
-        return new Cell({ value, type: name, header });
-    });
-
-    // Create a Cell for the ingredient type
-    const typeCell = new Cell({
-        value: typeValue,
-        type: INGREDIENT_TYPE.id,
-        header: new Header({
-            id: INGREDIENT_TYPE.id,
-            name: INGREDIENT_TYPE.name,
-        }),
-    });
-
-    const newRow = new Row(rowForType);
+async function pipeifyEditForSalsify(domTable) {
+    //TODO: parse the table and add to clipboard
+    console.log(domTable);
 }

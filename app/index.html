@@ -708,22 +708,7 @@
                                 </h5>
                             </div>
 
-                            <li>Symbol list</li>
-                            <li>button to copy line</li>
-                            <ol>
-                                <li>in Salsify, copy line via EDIT</li>
-
-                                <li>
-                                    Click the big button to paste. Automatically
-                                    determines type based on number of pipes.
-                                    *Make sure the browser allows pasting*
-                                </li>
-                                <li>Make updates</li>
-                                <li>
-                                    Click copy button and ctrl-v back into
-                                    Salsify
-                                </li>
-                            </ol>
+                            <!-- Text Here -->
                         </div>
                         <div
                             class="tab-pane fade"
@@ -760,7 +745,7 @@
                                     id="copy-edit-salsify-btn"
                                     class="btn btn-primary me-2"
                                 >
-                                    Download For Salsify
+                                    Pipeify
                                 </button>
                                 <button
                                     id="clear-edit-btn"
@@ -769,6 +754,7 @@
                                     Clear
                                 </button>
                             </div>
+                            <div class="flex row"><h3>Symbols</h3>†</div>
                             <div class="">
                                 <!-- Button trigger modal -->
                                 <button
@@ -783,11 +769,51 @@
                         </div>
                     </div>
                 </div>
+                <!-- Edit 1 liner Modal -->
                 <div
-                    class="table-wrapper mt-4 mb-4"
-                    id="edit-table-container"
+                    class="modal fade"
+                    id="help-edit-modal"
+                    tabindex="-1"
+                    aria-labelledby="help-edit-modal"
+                    aria-hidden="true"
                 >
-                    <!-- table-validate -->
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1
+                                    class="modal-title fs-4"
+                                    id="help-edit-modal"
+                                >
+                                    Edit 1 Liner Help
+                                </h1>
+                                <button
+                                    type="button"
+                                    class="btn-close"
+                                    data-bs-dismiss="modal"
+                                    aria-label="Close"
+                                ></button>
+                            </div>
+                            <div class="modal-body">
+                                <ol>
+                                    <li>In Salsify, copy line via EDIT</li>
+                                    <li>
+                                        Click the big button to paste.
+                                        Automatically determines type based on
+                                        number of pipes. *Make sure the browser
+                                        allows pasting*
+                                    </li>
+                                    <li>Update line as needed.</li>
+                                    <li>
+                                        Click <i>Pipeify</i> button to copy
+                                        properly piped text to clipboard
+                                    </li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-wrapper mt-4 mb-4" id="edit-table-container">
+                    <!-- table-edit -->
                 </div>
             </div>
             <!-- </div> -->
