@@ -1132,15 +1132,13 @@ function attachBlurEventToTableCells(table, ingredType = null) {
         if (cell) {
             const cellType = cell.type;
 
-            // Clean empty cells
-            let innerText = e.target.innerText.trim();
-            // Remove <br> elements
-            innerText = innerText.replace(/<br\s*\/?>/gi, '');
+            // Clean up the inner text
+            let innerText = e.target.innerText.trim(); // Trim leading/trailing whitespace
+            console.log(innerText);
+            innerText = innerText.replace(/<br\s*\/?>/gi, ''); // Remove <br> elements
+            innerText = innerText.replace(/[\r\n]+/g, ''); // Remove carriage returns and newlines
 
-            // Remove carriage returns and newlines
-            innerText = innerText.replace(/[\r\n]+/g, '');
-
-            //Set the cell value so it exports
+            // Set the cell value so it exports
             cell.value = innerText;
 
             if (!ingredType) {
@@ -1635,28 +1633,32 @@ async function createMiniTableForEdit(text) {
             // Create Nutrient
             typeId = LABEL_DATASET_NUTRIENT_A.id;
             typeName = LABEL_DATASET_NUTRIENT_A.name;
-            const nutrientCells = createNutrientCells_RowValidation(split, rowStatus);
+            const nutrientCells = createNutrientCells_RowValidation(
+                split,
+                rowStatus
+            );
 
-            nutrientCells.forEach(cell => {
+            nutrientCells.forEach((cell) => {
                 cell.isEditable = true;
             });
 
             newRow = new Row(nutrientCells, 'editRow', rowStatus);
             newRow.type = LABEL_DATASET_NUTRIENT_A.name;
-
         } else if (split.length === 9) {
             // Create Ingredient
             typeId = LABEL_DATASET_INGREDIENTS_A.id;
             typeName = LABEL_DATASET_INGREDIENTS_A.name;
-            const ingreCells = createIngredientCells_RowValidation(split, rowStatus);
+            const ingreCells = createIngredientCells_RowValidation(
+                split,
+                rowStatus
+            );
 
-            ingreCells.forEach(cell => {
+            ingreCells.forEach((cell) => {
                 cell.isEditable = true;
             });
 
             newRow = new Row(ingreCells, 'editRow', rowStatus);
             newRow.type = LABEL_DATASET_INGREDIENTS_A.name;
-
         } else {
             reject(new Error('Unable to Parse Clipboard Text.'));
             return;
@@ -1668,7 +1670,7 @@ async function createMiniTableForEdit(text) {
 
         // Create Header Row
         const headerRow = document.createElement('tr');
-        newRow.cells.forEach(cell => {
+        newRow.cells.forEach((cell) => {
             const th = document.createElement('th');
             th.textContent = cell.header.name;
             headerRow.appendChild(th);
@@ -1696,7 +1698,9 @@ async function createMiniTableForEdit(text) {
             bootToast(`${typeName} successfully pasted`, 'success');
 
             // Update pipeify button text
-            const pipeifyButton = document.querySelector('#copy-edit-salsify-btn');
+            const pipeifyButton = document.querySelector(
+                '#copy-edit-salsify-btn'
+            );
             if (pipeifyButton) {
                 pipeifyButton.textContent = `Pipeify ${typeName}`;
             }
@@ -1708,7 +1712,94 @@ async function createMiniTableForEdit(text) {
     });
 }
 
+/**
+ * Pipeifies the edited table data for Salsify and copies it to the clipboard.
+ * @param {HTMLTableElement} domTable - The DOM table element to parse.
+ * @returns {Promise<void>} - A promise that resolves after the text is copied to the clipboard.
+ */
 async function pipeifyEditForSalsify(domTable) {
-    //TODO: parse the table and add to clipboard
-    console.log(domTable);
+    // Get the table rows
+    const rows = domTable.querySelectorAll('tr');
+
+    const ingredientType = rows[1].dataset.type;
+
+    let array;
+    if (ingredientType === LABEL_DATASET_NUTRIENT_A.name) {
+        array = new Array(8).fill('');
+    } else if (ingredientType === LABEL_DATASET_INGREDIENTS_A.name) {
+        array = new Array(9).fill('');
+    }
+
+    rows.forEach((row, rowIndex) => {
+        if (rowIndex === 0) return;
+
+        Array.from(row.cells).forEach((cell) => {
+            const cellContainer = cell.firstChild;
+            /** @type {Cell} */
+            const cellData = cellContainer ? cellContainer.cell : undefined;
+
+            if (!cellData) return;
+            const { type, value } = cellData;
+
+            if (ingredientType === LABEL_DATASET_NUTRIENT_A.name) {
+                // nutrient
+                if (type === ORDER.id) {
+                    array[0] = value;
+                } else if (type === DESCRIPTION.id) {
+                    array[1] = value;
+                } else if (type === QUANTITY.id) {
+                    array[3] = value;
+                } else if (type === UOM.id) {
+                    array[4] = value;
+                } else if (type === DV.id) {
+                    array[5] = value;
+                } else if (type === SYMBOL.id) {
+                    array[6] = value;
+                } else if (type === FOOT.id) {
+                    array[7] = value;
+                }
+            } else if (ingredientType === LABEL_DATASET_INGREDIENTS_A.name) {
+                //ingredient
+                if (type === ORDER.id) {
+                    array[0] = value;
+                } else if (type === DESCRIPTION.id) {
+                    array[1] = value;
+                } else if (type === QUANTITY.id) {
+                    array[2] = value;
+                } else if (type === UOM.id) {
+                    array[3] = value;
+                } else if (type === DV.id) {
+                    array[5] = value;
+                } else if (type === SYMBOL.id) {
+                    array[6] = value;
+                } else if (type === FOOT.id) {
+                    array[7] = value;
+                }
+            } else {
+                console.error('Unmatched Type');
+            }
+        });
+    });
+    if (array.length > 0) {
+        const pipeify = array.join('|');
+        // console.log(pipeify);
+
+        async function copyToClipboard(text) {
+            try {
+                await navigator.clipboard.writeText(text);
+                // console.log('Text copied to clipboard:', text);
+                bootToast(
+                    `${ingredientType} pipeified and copied to clipboard`,
+                    'success'
+                );
+            } catch (err) {
+                console.error('Failed to copy text to clipboard:', err);
+                bootToast(`${ingredientType} unable to Pipeify`, 'danger');
+            }
+        }
+
+        copyToClipboard(pipeify);
+    } else {
+        bootToast(`Array has 0 length`, 'danger');
+    }
 }

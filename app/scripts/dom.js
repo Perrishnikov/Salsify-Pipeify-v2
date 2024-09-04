@@ -179,7 +179,7 @@ document
     });
 
 
-    
+
 /** Misc ******************************************************************** */
 /**
  * Handles the import of the file and updates the DOM.
@@ -374,6 +374,11 @@ document.getElementById('clear-edit-btn').addEventListener('click', (e) => {
     clearLocalStorage(split);
     clearFileName(split);
     clearInput(split);
+    // Update pipeify button text
+    const pipeifyButton = document.querySelector('#copy-edit-salsify-btn');
+    if (pipeifyButton) {
+        pipeifyButton.textContent = `Pipeify`;
+    }
 });
 
 /* Handle paste */
@@ -382,7 +387,10 @@ const editPasteArea = document.getElementById('edit-PasteArea');
 editPasteArea.addEventListener('click', async () => {
     try {
         const pasteData = await navigator.clipboard.readText();
-        // console.log('Pasted text:', pasteData);
+        console.log('Pasted text:', pasteData);
+        if(!pasteData){
+            bootToast(`Unable to read clipboard`, 'danger')
+        }
         const validatedText = await validatePaste(pasteData);
         // make a row
         // if(validatedText){
@@ -399,7 +407,10 @@ async function validatePaste(text) {
         const minLength = 8;
 
         if (!text || text.length > maxLength || text.length < minLength) {
-            bootToast(`Unable to handle pasted text`, 'danger');
+            bootToast(
+                `Unable to handle pasted text. Out of range: ${text.length}`,
+                'danger'
+            );
             // return null;
             reject('Unable to handle pasted text');
         }
@@ -409,7 +420,7 @@ async function validatePaste(text) {
         if (count !== 9 && count !== 8) {
             //8 for nutrients, 9 for ingredients
             bootToast(
-                `Pasted data doesn't appear to be Nutrient or Ingredient...`,
+                `Pasted data doesn't appear to be Nutrient or Ingredient. Pipe count = ${count}`,
                 'danger'
             );
             reject('Not Ingredient or Nutrient');
@@ -418,3 +429,44 @@ async function validatePaste(text) {
         resolve(text);
     });
 }
+
+/**
+ * Handles the paste event to insert plain text into the focused element.
+ * 
+ * @param {ClipboardEvent} e - The paste event.
+ * @returns {Promise<void>}
+ */
+document.addEventListener('paste', async (e) => {
+    e.preventDefault(); // Prevent the default paste action
+
+    try {
+        // Get the text from the clipboard
+        const text = await navigator.clipboard.readText();
+        console.log('Pasted text:', text);
+
+        // Determine the focused element
+        const focusedElement = document.activeElement;
+
+        // Check if the focused element is editable or an input
+        if (
+            focusedElement &&
+            (focusedElement.isContentEditable ||
+                focusedElement.tagName === 'TEXTAREA' ||
+                focusedElement.tagName === 'INPUT')
+        ) {
+            // Set the text in the focused element
+            if (focusedElement.isContentEditable) {
+                focusedElement.textContent = text; // For contenteditable
+            } else if (
+                focusedElement.tagName === 'TEXTAREA' ||
+                focusedElement.tagName === 'INPUT'
+            ) {
+                focusedElement.value = text; // For textarea/input
+            }
+        } else {
+            console.warn('Focused element is not editable');
+        }
+    } catch (err) {
+        console.error('Failed to read clipboard contents:', err);
+    }
+});
