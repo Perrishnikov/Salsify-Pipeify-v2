@@ -1,0 +1,25 @@
+1. Incorrect. We're not doing an central index.html. We're using /us and /ca
+
+2. We're consolidating all the parsing options into three consolidated with minimal validation at this point. See overview
+   [action:importSpreadsheet] - must be spreadsheet. Must look like Salsify export TBD.
+   [action:pasteRowCA]
+   [action:pasteTableUS]
+   Full details TBD
+
+3. Ignore for now.
+
+4. No cell validation for now.
+
+5. Regards mapping imported fields to columns, and maps columns to exported fields. Stub for now. Will detail later.
+
+6. PLM1 (US) fields are different than the CA fields. each countryCode will have its own parsing. See overview.md
+
+7. v3 has different functionality regarding pasting. CA can paste rows and US can paste tables. No one-liners.
+
+8. Live preview is a new feature of v3. Stub in.
+
+9. v3, for now, will not have popovers, autoorder. I think the modal was only for the help. No modal for now.
+
+10. I dont think we'll need localstorage anymore. We can modify v2 state in v3 if desired.
+
+Code should continue to be Function focused.
