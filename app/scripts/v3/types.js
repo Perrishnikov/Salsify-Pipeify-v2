@@ -24,6 +24,29 @@
  */ //TODO: custom type
 
 /**
+ * @typedef {Object} V3DelimitedParseOptions
+ * @property {string} [rowDelimiter]
+ * @property {string} [cellDelimiter]
+ */ //TODO: custom type
+
+/**
+ * @typedef {Object} V3SpreadsheetData
+ * @property {string[]} headers
+ * @property {string[][]} rows
+ */ //TODO: custom type
+
+/**
+ * @typedef {Object} V3ImportResult
+ * @property {boolean} ok
+ * @property {string} fileName
+ * @property {string} countryCode
+ * @property {string} productId
+ * @property {Record<string, V3Row[]>} tableData
+ * @property {string[]} errors
+ * @property {string[]} warnings
+ */ //TODO: custom type
+
+/**
  * @typedef {Object} V3State
  * @property {string} countryCode
  * @property {V3TableDef[]} tableDefs
@@ -38,7 +61,7 @@
 
 /**
  * @typedef {Object} V3Actions
- * @property {(file: File) => void} importSpreadsheet
+ * @property {(file: File) => Promise<V3ImportResult|null>} importSpreadsheet
  * @property {(text: string) => void} pasteRowCA
  * @property {(text: string) => void} pasteTableUS
  * @property {(option: string) => void} pipeifyUS

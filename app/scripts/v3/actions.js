@@ -9,7 +9,7 @@ import { stateResetTables } from './state.js';
  * @property {V3State} state
  * @property {V3Ui} ui
  * @property {{
- *   mapImportToTables: (file: File, countryCode: string) => Object,
+ *   mapImportToTables: (file: File, countryCode: string, tableDefs: import('./types.js').V3TableDef[]) => Promise<import('./types.js').V3ImportResult>,
  *   mapTablesToExport: (tableData: Object, countryCode: string, option: string) => Object
  * }} mapping
  */
@@ -25,19 +25,34 @@ export function actionsCreateActions(deps) {
 
   /**
    * @param {File} file
+   * @returns {Promise<import('./types.js').V3ImportResult|null>}
    */
-  function importSpreadsheet(file) {
+  async function importSpreadsheet(file) {
     if (!file) {
-      return;
+      ui.renderStatus('No file selected for import.', 'warning');
+      return null;
     }
-    mapping.mapImportToTables(file, state.countryCode);
+    let result;
+    try {
+      result = await mapping.mapImportToTables(
+        file,
+        state.countryCode,
+        state.tableDefs
+      );
+    } catch (error) {
+      ui.renderStatus('Import failed while reading the file.', 'danger');
+      return null;
+    }
+    if (!result || !result.ok) {
+      const message = result ? result.errors.join(' ') : 'Import failed.';
+      ui.renderStatus(message, 'danger');
+      return result || null;
+    }
+    state.tableData = result.tableData;
     state.lastAction = 'import';
-    ui.renderStatus('Imported file (stub): ' + file.name, 'info');
-    console.log(
-      '[v3] importSpreadsheet stub',
-      file.name,
-      state.countryCode
-    );
+    ui.renderStatus('Imported file: ' + file.name, 'info');
+    console.log('[v3] importSpreadsheet', file.name, state.countryCode);
+    return result;
   }
 
   /**

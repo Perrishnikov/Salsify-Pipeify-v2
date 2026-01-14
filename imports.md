@@ -5,7 +5,7 @@ Lets work on [action:importSpreadsheet] for CA and US. Depending on the countryC
 Validation:
 - file must be csv or xlsx
 - Must have "Product ID" as one of the column heads in row A
-- the only column that there can be more than 1 identical header is LABEL_DATASET_NUTRIENT_A - en-US, otherwise, we require 0-1 of the same name. Issue error if not.
+- the only column that there can be more than 1 identical header is LABEL_DATASET_INGREDIENTS_A - en-US - en-US, otherwise, we require 0-1 of the same name. Issue error if not.
 
 Filter:
 - filter out everything but the header row (1) and the first row where we have a 14 digit Product ID value AND salsify:data_inheritance_hierarchy_level_id = varient. If nothing is returned, this needs to be fed back to the user via our error channel or something appropriate
@@ -14,7 +14,7 @@ Extract:
 - Now that we have only two rows, lets get the columns we care about.
 - CA: 
   Product ID
-  LABEL_DATASET_NUTRIENT_A - en-US
+  LABEL_DATASET_INGREDIENTS_A - en-US - en-US
   LABEL_DATASET_OTHER_INGREDS_A
 - US:
   Product ID
@@ -23,7 +23,7 @@ Extract:
   PLM1_INGREDIENT_DRAFT_TEXT
 
 
-Merge LABEL_DATASET_NUTRIENT_A - en-US Columns:
+Merge LABEL_DATASET_INGREDIENTS_A - en-US - en-US Columns:
 - Normalize to match format of US. US row values should already be "pipeified"
 1. Take each matching cell's value, placing ~ at the end of each, merging them into a single long string; ~ delimited. There will be a trailing ~ in the last cell.
 
@@ -34,7 +34,7 @@ US example to match
 ## Mapping to tables
 
 ### Ingredients Table
-- CA uses LABEL_DATASET_NUTRIENT_A - en-US 
+- CA uses LABEL_DATASET_INGREDIENTS_A - en-US - en-US 
 - US uses PLM1_RAW_MAT_QTY_DRAFT
 - we now expect that US and CA are normalized to the same delimination:
     cell data is "|" delimited and row delimited with "~"
@@ -78,3 +78,6 @@ US example
 Example
 0.0.0 | Calories | | 5 | CAL | | | | | ~ 
 1.0.0 | Total Carbohydrate | | 1 | G | <1 | % | † | †Percent Daily Values (DV) are based on a 2,000 calorie diet. | ~ 2.0.0 | Vitamin A (RAE) | Vitamin A (as 50% beta-carotene [1500 mcg], 50% retinyl acetate [1500 mcg]) | 3,000 | mcg | 333 | % | | | ~ 
+
+## Pasting Tables and Rows
+TODO:

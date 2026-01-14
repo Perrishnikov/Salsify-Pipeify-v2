@@ -180,10 +180,17 @@ function initWireActions(countryCode, state, actions, ui) {
                 return;
             }
             const file = event.dataTransfer.files[0];
-            fileName.textContent = file.name;
+            if (fileName) {
+                fileName.textContent = file.name;
+            }
             ui.renderStatus('Import ready: ' + file.name, 'info');
-            actions.importSpreadsheet(file);
-            initUpdateLivePreview(state.countryCode, 'import');
+            actions.importSpreadsheet(file).then(function (result) {
+                if (!result || !result.ok) {
+                    return;
+                }
+                initRenderTableShells(state);
+                initUpdateLivePreview(state.countryCode, 'import');
+            });
         });
 
         fileInput.addEventListener('change', function (event) {
@@ -191,10 +198,17 @@ function initWireActions(countryCode, state, actions, ui) {
             if (!file) {
                 return;
             }
-            fileName.textContent = file.name;
+            if (fileName) {
+                fileName.textContent = file.name;
+            }
             ui.renderStatus('Import ready: ' + file.name, 'info');
-            actions.importSpreadsheet(file);
-            initUpdateLivePreview(state.countryCode, 'import');
+            actions.importSpreadsheet(file).then(function (result) {
+                if (!result || !result.ok) {
+                    return;
+                }
+                initRenderTableShells(state);
+                initUpdateLivePreview(state.countryCode, 'import');
+            });
         });
     }
 
