@@ -19,7 +19,6 @@ TODO:
 - no 1 liner; data is one long string
 
 ### CA tabs (/CA/index.html)
-
 - [Create/Edit Set]
 - no [Duplicate Set]; use "Change Product ID" button
 - no 1 liner; create/edit and copy/paste row into proper table
@@ -131,7 +130,7 @@ note: visually separate fixed columns from the editable cells with a heavier col
 4. <Description>
 5. <Qty>
 6. <UOM>
-7. <Symbols> \*\*
+7. <Symbol> \*\*
 8. <Definitions> \*\*Daily Value (DV) not established.
 
 [US-NUTRIENT] PLM1
@@ -142,7 +141,7 @@ note: visually separate fixed columns from the editable cells with a heavier col
 6. <UOM>
 7. <DV>
 8. <Pct> exclude. Implied %
-9. <Symbols> †
+9. <Symbol> †
 10. <Definitions> †Percent Daily Values (DV) are based on a 2,000 calorie diet.
 
 [OTHER]
@@ -165,7 +164,7 @@ From
 <UOM>
 <DV>
 <Pct>
-<Symbols>
+<Symbol>
 
 To
 [action:pipeifyTableUS]:
