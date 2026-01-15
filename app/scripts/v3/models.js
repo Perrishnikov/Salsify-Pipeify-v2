@@ -11,7 +11,7 @@ const modelsColumnBase = {
   uom: { id: 'UOM', label: 'UOM' },
   dv: { id: 'DV', label: 'DV' },
   pct: { id: 'PCT', label: 'Pct' },
-  symbol: { id: 'SYMBOL', label: 'Symbol' },
+  symbol: { id: 'SYMBOL', label: 'Sym' },
   definition: { id: 'definition', label: 'Definition' },
 };
 
