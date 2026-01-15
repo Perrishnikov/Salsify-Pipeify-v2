@@ -239,9 +239,9 @@ function initWireActions(countryCode, state, actions, ui) {
     }
 
     if (countryCode === 'CA') {
-        initWirePasteHandlers(state, actions, ui, 'row');
+        initWirePasteHandlers(state, actions, 'row');
     } else if (countryCode === 'US') {
-        initWirePasteHandlers(state, actions, ui, 'table');
+        initWirePasteHandlers(state, actions, 'table');
     }
 
     initWirePasteButtons(state, actions, ui);
@@ -251,11 +251,10 @@ function initWireActions(countryCode, state, actions, ui) {
 /**
  * @param {import('./types.js').V3State} state
  * @param {import('./types.js').V3Actions} actions
- * @param {import('./types.js').V3Ui} ui
  * @param {'row'|'table'} mode
  * @returns {void}
  */
-function initWirePasteHandlers(state, actions, ui, mode) {
+function initWirePasteHandlers(state, actions, mode) {
     const container = initGetById('tables-container');
     if (!container) {
         return;
@@ -270,9 +269,16 @@ function initWirePasteHandlers(state, actions, ui, mode) {
                 return;
             }
             event.preventDefault();
-            actions.pasteRowCA(text);
-            ui.renderStatus('Row paste captured.', 'info');
-            initUpdateLivePreview(state.countryCode, 'paste-row');
+            const target = event.target;
+            const tableEl = target ? target.closest('[data-table-key]') : null;
+            const rowEl = target ? target.closest('[data-row-id]') : null;
+            const tableKey = tableEl ? tableEl.dataset.tableKey || '' : '';
+            const rowId = rowEl ? rowEl.dataset.rowId || '' : '';
+            const didPaste = actions.pasteRowCA(text, tableKey, rowId);
+            if (didPaste) {
+                initRenderTableShells(state);
+                initUpdateLivePreview(state.countryCode, 'paste-row');
+            }
         });
         return;
     }
@@ -285,9 +291,14 @@ function initWirePasteHandlers(state, actions, ui, mode) {
             return;
         }
         event.preventDefault();
-        actions.pasteTableUS(text);
-        ui.renderStatus('Table paste captured.', 'info');
-        initUpdateLivePreview(state.countryCode, 'paste-table');
+        const target = event.target;
+        const tableEl = target ? target.closest('[data-table-key]') : null;
+        const tableKey = tableEl ? tableEl.dataset.tableKey || '' : '';
+        const didPaste = actions.pasteTableUS(text, tableKey);
+        if (didPaste) {
+            initRenderTableShells(state);
+            initUpdateLivePreview(state.countryCode, 'paste-table');
+        }
     });
 }
 
@@ -315,14 +326,21 @@ function initWirePasteButtons(state, actions, ui) {
                     return;
                 }
                 if (target.dataset.pasteAction === 'row') {
-                    actions.pasteRowCA(text);
-                    ui.renderStatus('Row paste captured.', 'info');
-                    initUpdateLivePreview(state.countryCode, 'paste-row');
+                    const tableKey = target.dataset.tableKey || '';
+                    const rowId = target.dataset.rowId || '';
+                    const didPaste = actions.pasteRowCA(text, tableKey, rowId);
+                    if (didPaste) {
+                        initRenderTableShells(state);
+                        initUpdateLivePreview(state.countryCode, 'paste-row');
+                    }
                     return;
                 }
-                actions.pasteTableUS(text);
-                ui.renderStatus('Table paste captured.', 'info');
-                initUpdateLivePreview(state.countryCode, 'paste-table');
+                const tableKey = target.dataset.tableKey || '';
+                const didPaste = actions.pasteTableUS(text, tableKey);
+                if (didPaste) {
+                    initRenderTableShells(state);
+                    initUpdateLivePreview(state.countryCode, 'paste-table');
+                }
             })
             .catch(function () {
                 ui.renderStatus(

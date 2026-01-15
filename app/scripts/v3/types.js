@@ -62,8 +62,8 @@
 /**
  * @typedef {Object} V3Actions
  * @property {(file: File) => Promise<V3ImportResult|null>} importSpreadsheet
- * @property {(text: string) => void} pasteRowCA
- * @property {(text: string) => void} pasteTableUS
+ * @property {(text: string, tableKey?: string, rowId?: string) => boolean} pasteRowCA
+ * @property {(text: string, tableKey?: string) => boolean} pasteTableUS
  * @property {(option: string) => void} pipeifyUS
  * @property {(option: string) => void} pipeifyCA
  * @property {() => void} changeProductId

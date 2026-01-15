@@ -64,20 +64,20 @@ function modelsOtherColumns() {
 const modelsTablesByCountry = {
   US: [
     {
-      key: 'US_INGREDIENTS',
-      name: 'Ingredients',
-      tableId: 'PLM1_RAW_MAT_QTY_DRAFT',
-      rowType: 'Ingredients',
-      pasteMode: 'table',
-      columns: modelsIngredientColumns(),
-    },
-    {
       key: 'US_NUTRIENTS',
       name: 'Nutrients',
       tableId: 'PLM1_LDS_NUTRIENT',
       rowType: 'Nutrients',
       pasteMode: 'table',
       columns: modelsNutrientColumns(),
+    },
+    {
+      key: 'US_INGREDIENTS',
+      name: 'Ingredients',
+      tableId: 'PLM1_RAW_MAT_QTY_DRAFT',
+      rowType: 'Ingredients',
+      pasteMode: 'table',
+      columns: modelsIngredientColumns(),
     },
     {
       key: 'US_OTHER',

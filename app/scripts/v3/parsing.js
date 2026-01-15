@@ -25,9 +25,6 @@ export function parsingSplitRows(text, delimiter) {
         .split(delimiter)
         .map(function (part) {
             return parsingNormalizeValue(part);
-        })
-        .filter(function (part) {
-            return part.length > 0;
         });
 }
 

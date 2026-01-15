@@ -186,7 +186,7 @@ export async function mappingMapImportToTables(
         ingredientTableDef,
         productId,
         ingredientValue,
-        { addExtraRow: true, ensureRow: true }
+        { addExtraRow: true, ensureRow: true, retainBlankRows: true }
     );
 
     const otherTableDef = mappingGetTableDef(
@@ -228,7 +228,7 @@ export async function mappingMapImportToTables(
             nutrientTableDef,
             productId,
             nutrientValue,
-            { ensureRow: true }
+            { ensureRow: true, retainBlankRows: true }
         );
     }
 

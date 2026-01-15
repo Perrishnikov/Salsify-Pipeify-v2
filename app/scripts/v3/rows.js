@@ -36,6 +36,7 @@ function rowsHasValues(values) {
  * @typedef {Object} RowsBuildOptions
  * @property {boolean} [addExtraRow]
  * @property {boolean} [ensureRow]
+ * @property {boolean} [retainBlankRows]
  */ //TODO: custom type
 
 /**
@@ -54,6 +55,7 @@ export function rowsBuildIngredientRows(
     const config = options || {};
     const rows = [];
     const parsedRows = parsingParseDelimitedTable(text);
+    const keepBlankRows = config.retainBlankRows === true;
 
     parsedRows.forEach(function (cells) {
         const values = {
@@ -64,7 +66,7 @@ export function rowsBuildIngredientRows(
             SYMBOLS: parsingNormalizeValue(cells[6]),
             DEFINITIONS: parsingNormalizeValue(cells[7]),
         };
-        if (!rowsHasValues(values)) {
+        if (!rowsHasValues(values) && !keepBlankRows) {
             return;
         }
         rows.push(rowsCreateRow(tableDef, rows.length + 1, productId, values));
@@ -88,6 +90,7 @@ export function rowsBuildNutrientRows(tableDef, productId, text, options) {
     const config = options || {};
     const rows = [];
     const parsedRows = parsingParseDelimitedTable(text);
+    const keepBlankRows = config.retainBlankRows === true;
 
     parsedRows.forEach(function (cells) {
         const description =
@@ -101,7 +104,7 @@ export function rowsBuildNutrientRows(tableDef, productId, text, options) {
             SYMBOLS: parsingNormalizeValue(cells[6]),
             DEFINITIONS: parsingNormalizeValue(cells[7]),
         };
-        if (!rowsHasValues(values)) {
+        if (!rowsHasValues(values) && !keepBlankRows) {
             return;
         }
         rows.push(rowsCreateRow(tableDef, rows.length + 1, productId, values));
