@@ -4,9 +4,9 @@ import { parsingNormalizeValue } from './parsing.js';
 
 /**
  * @typedef {Object} ImportUtilsHeaderRules
- * @property {string} allowedDuplicateHeader
- * @property {string[]} requiredHeaders
- * @property {string} productIdHeader
+ * @property {string[]} [allowedDuplicateHeaders]
+ * @property {string[]} [requiredHeaders]
+ * @property {string} [productIdHeader]
  */ //TODO: custom type
 
 /**
@@ -194,20 +194,27 @@ export function importUtilsValidateHeaders(headers, rules) {
     const errors = [];
     const counts = importUtilsCountHeaders(headers);
     const required = rules ? rules.requiredHeaders || [] : [];
-    const allowedDuplicateHeader = rules ? rules.allowedDuplicateHeader : '';
+    const allowedDuplicateHeaders = rules
+        ? rules.allowedDuplicateHeaders || []
+        : [];
     const productIdHeader = rules ? rules.productIdHeader : '';
+    const allowedDuplicates = new Set(allowedDuplicateHeaders);
+    const requiredSet = new Set(required);
 
-    if (productIdHeader && !counts[productIdHeader]) {
-        errors.push('Missing required header: ' + productIdHeader + '.');
+    if (productIdHeader) {
+        requiredSet.add(productIdHeader);
     }
 
     Object.keys(counts).forEach(function (header) {
-        if (counts[header] > 1 && header !== allowedDuplicateHeader) {
+        if (!requiredSet.has(header)) {
+            return;
+        }
+        if (counts[header] > 1 && !allowedDuplicates.has(header)) {
             errors.push('Duplicate header not allowed: ' + header + '.');
         }
     });
 
-    required.forEach(function (header) {
+    requiredSet.forEach(function (header) {
         if (!counts[header]) {
             errors.push('Missing required header: ' + header + '.');
         }

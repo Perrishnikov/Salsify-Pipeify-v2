@@ -3,8 +3,7 @@
 
 /** @type {Record<string, V3Column>} */
 const modelsColumnBase = {
-  action: { id: 'ROW_ACTIONS', label: '', isControl: true },
-  paste: { id: 'ROW_PASTE', label: 'Row Paste', isControl: true },
+  paste: { id: 'ROW_PASTE', label: '', isControl: true },
   productId: { id: 'PRODUCT_ID', label: 'Product ID', isFixed: true },
   order: { id: 'ORDER', label: 'Order' },
   description: { id: 'DESCRIPTION', label: 'Description' },
@@ -27,7 +26,7 @@ const modelsColumnBase = {
  */
 function modelsIngredientColumns(options) {
   const config = options || {};
-  const columns = [modelsColumnBase.action];
+  const columns = [];
   if (config.includePaste) {
     columns.push(modelsColumnBase.paste);
   }
@@ -49,7 +48,7 @@ function modelsIngredientColumns(options) {
  */
 function modelsNutrientColumns(options) {
   const config = options || {};
-  const columns = [modelsColumnBase.action];
+  const columns = [];
   if (config.includePaste) {
     columns.push(modelsColumnBase.paste);
   }

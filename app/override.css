@@ -1,270 +1,426 @@
 :root {
-    --font-size: 1rem; /* Define a variable named --font-size */
-    --font-size-smaller: 0.9rem;
-    --padding-margin: 16px;
-    --color-nut: rgba(173, 216, 230, 0.2);
-    --color-ing: rgba(144, 238, 144, 0.2);
-    --color-other: rgba(240, 128, 128, 0.2);
+  --font-size: 1rem; /* Define a variable named --font-size */
+  --font-size-smaller: 0.9rem;
+  --padding-margin: 16px;
+  --color-nut: rgba(173, 216, 230, 0.2);
+  --color-ing: rgba(144, 238, 144, 0.2);
+  --color-other: rgba(240, 128, 128, 0.2);
+  --v3-row-actions-width: 120px;
+  --v3-row-actions-gap: 12px;
+  --v3-row-actions-pad: 6px;
+  --v3-col-min-width: 50px;
+  --v3-col-description-min-width: 210px;
+  --v3-col-definition-min-width: 180px;
+  --v3-col-fit-width: 1%;
+  --v3-col-fill-width: 100%;
 }
 
 .bs-secondary {
-    background-color: var(--bs-secondary-bg) !important;
-    color: var(--bs-secondary-color) !important;
+  background-color: var(--bs-secondary-bg) !important;
+  color: var(--bs-secondary-color) !important;
 }
 .bs-tertiary {
-    background-color: var(--bs-tertiary-bg) !important;
-    color: var(--bs-tertiary-color) !important;
+  background-color: var(--bs-tertiary-bg) !important;
+  color: var(--bs-tertiary-color) !important;
 }
 .bs-warning {
-    background-color: var(--bs-warning) !important;
-    color: var(--bs-dark) !important;
+  background-color: var(--bs-warning) !important;
+  color: var(--bs-dark) !important;
 }
 .bs-danger {
-    background-color: var(--bs-danger) !important;
-    color: var(--bs-light) !important;
+  background-color: var(--bs-danger) !important;
+  color: var(--bs-light) !important;
 }
 
 /* BS COLORS ABOVE */
 
 body {
-    font-family: 'Roboto', sans-serif;
-    width: 100% !important;
+  font-family: 'Roboto', sans-serif;
+  width: 100% !important;
 }
 
 /* DROP */
 .drop-area {
-    border: 2px dashed var(--bs-primary);
-    background-color: var(--bs-light);
-    border-radius: calc(var(--padding-margin) / 4);
-    padding: 2rem;
-    text-align: center;
-    cursor: pointer;
-    transition: background-color 0.3s, border-color 0.3s;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
+  border: 2px dashed var(--bs-primary);
+  background-color: var(--bs-light);
+  border-radius: calc(var(--padding-margin) / 4);
+  padding: 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.3s, border-color 0.3s;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
 }
 .drop-area:hover {
-    background-color: rgba(var(--bs-body-color-rgb), 0.1);
+  background-color: rgba(var(--bs-body-color-rgb), 0.1);
 }
 .drop-area.dragover {
-    background-color: rgba(var(--bs-body-color-rgb), 0.1);
+  background-color: rgba(var(--bs-body-color-rgb), 0.1);
 }
 .drop-area h5 {
-    margin-bottom: 0 !important;
+  margin-bottom: 0 !important;
 }
 input.id-input {
-    border: 1px solid var(--bs-secondary);
-    border-radius: 0.25rem;
+  border: 1px solid var(--bs-secondary);
+  border-radius: 0.25rem;
 }
 /* NAV overrides */
 .nav-tabs .nav-link.active {
-    border: 2px solid var(--bs-secondary);
-    border-bottom: none;
+  border: 2px solid var(--bs-secondary);
+  border-bottom: none;
 }
 .nav-tabs .nav-item .nav-link:not(.active) {
-    border-bottom: 2px solid var(--bs-secondary);
+  border-bottom: 2px solid var(--bs-secondary);
 }
 /* TABLE */
 .table-wrapper {
-    margin-left: 2rem;
-    margin-right: 2rem;
+  margin-left: 2rem;
+  margin-right: 2rem;
 }
 table {
-    border-collapse: collapse;
-    width: 100%;
-    /* table-layout: auto; */
+  border-collapse: collapse;
+  width: 100%;
+  /* table-layout: auto; */
+}
+.v3-table-section {
+  position: relative;
+}
+.v3-row-actions {
+  position: absolute;
+  left: calc(
+    var(--v3-row-actions-width) * -1 - var(--v3-row-actions-gap)
+  );
+  width: var(--v3-row-actions-width);
+  display: flex;
+  flex-direction: column;
+  z-index: 1;
+}
+.v3-row-actions-header {
+  min-height: 0;
+}
+.v3-row-action {
+  display: flex;
+  align-items: center;
+  padding: 0 var(--v3-row-actions-pad);
+  box-sizing: border-box;
+}
+.v3-row-action .dropdown {
+  width: 100%;
+}
+.v3-row-action .btn {
+  width: 100%;
 }
 h5 {
-    margin-bottom: 0 !important;
-    /* margin-bottom: calc(var(--padding-margin) * 2); */
-    /* width: 100%; */
+  margin-bottom: 0 !important;
+  /* margin-bottom: calc(var(--padding-margin) * 2); */
+  /* width: 100%; */
 }
 th {
-    /* background-color: #b9b9b9; */
-    border: 1px solid var(--bs-secondary-color);
-    padding: calc(var(--padding-margin) / 2);
+  /* background-color: #b9b9b9; */
+  border: 1px solid var(--bs-secondary-color);
+  padding: calc(var(--padding-margin) / 2);
+}
+th.v3-col-paste,
+td.v3-col-paste,
+th.v3-col-product-id,
+td.v3-col-product-id {
+  width: 1%;
+  white-space: nowrap;
+}
+th.v3-col-order {
+  white-space: nowrap;
+}
+.v3-table-section table[data-table-key] th[data-col-id='ORDER'],
+.v3-table-section table[data-table-key] td[data-col-id='ORDER'],
+.v3-table-section table[data-table-key] th[data-col-id='QTY'],
+.v3-table-section table[data-table-key] td[data-col-id='QTY'],
+.v3-table-section table[data-table-key] th[data-col-id='UOM'],
+.v3-table-section table[data-table-key] td[data-col-id='UOM'],
+.v3-table-section table[data-table-key] th[data-col-id='DV'],
+.v3-table-section table[data-table-key] td[data-col-id='DV'],
+.v3-table-section table[data-table-key] th[data-col-id='PCT'],
+.v3-table-section table[data-table-key] td[data-col-id='PCT'],
+.v3-table-section table[data-table-key] th[data-col-id='SYMBOL'],
+.v3-table-section table[data-table-key] td[data-col-id='SYMBOL'] {
+  min-width: var(--v3-col-min-width);
+  width: var(--v3-col-fit-width);
+}
+.v3-table-section table[data-table-key] th[data-col-id='ORDER'],
+.v3-table-section table[data-table-key] th[data-col-id='QTY'],
+.v3-table-section table[data-table-key] th[data-col-id='UOM'],
+.v3-table-section table[data-table-key] th[data-col-id='DV'],
+.v3-table-section table[data-table-key] th[data-col-id='PCT'],
+.v3-table-section table[data-table-key] th[data-col-id='SYMBOL'] {
+  white-space: nowrap;
+}
+.v3-table-section table[data-table-key] td[data-col-id='ORDER'],
+.v3-table-section table[data-table-key] td[data-col-id='QTY'],
+.v3-table-section table[data-table-key] td[data-col-id='UOM'],
+.v3-table-section table[data-table-key] td[data-col-id='DV'],
+.v3-table-section table[data-table-key] td[data-col-id='PCT'],
+.v3-table-section table[data-table-key] td[data-col-id='SYMBOL'] {
+  white-space: normal;
+  overflow-wrap: normal;
+}
+.v3-table-section
+  table[data-table-key]
+  td[data-col-id='ORDER']
+  .cell-value,
+.v3-table-section
+  table[data-table-key]
+  td[data-col-id='QTY']
+  .cell-value,
+.v3-table-section
+  table[data-table-key]
+  td[data-col-id='UOM']
+  .cell-value,
+.v3-table-section
+  table[data-table-key]
+  td[data-col-id='DV']
+  .cell-value,
+.v3-table-section
+  table[data-table-key]
+  td[data-col-id='PCT']
+  .cell-value,
+.v3-table-section
+  table[data-table-key]
+  td[data-col-id='SYMBOL']
+  .cell-value {
+  min-width: var(--v3-col-min-width);
+  white-space: normal;
+  overflow-wrap: normal;
+}
+.v3-table-section table[data-table-key] th[data-col-id='DESCRIPTION'],
+.v3-table-section
+  table[data-table-key]
+  td[data-col-id='DESCRIPTION'] {
+  min-width: var(--v3-col-description-min-width);
+  white-space: normal;
+  width: var(--v3-col-fill-width);
+}
+.v3-table-section table[data-table-key] th[data-col-id='definition'],
+.v3-table-section table[data-table-key] td[data-col-id='definition'] {
+  min-width: var(--v3-col-definition-min-width);
+  white-space: normal;
+}
+.v3-table-section
+  table[data-table-key]
+  td[data-col-id='DESCRIPTION']
+  .cell-value {
+  width: var(--v3-col-fill-width);
+}
+.v3-table-section
+  table[data-table-key]
+  td[data-col-id='definition']
+  .cell-value {
+  min-width: var(--v3-col-definition-min-width);
+}
+.v3-table-section
+  table[data-table-key]
+  td[data-col-id='DESCRIPTION']
+  .cell-container,
+.v3-table-section
+  table[data-table-key]
+  td[data-col-id='definition']
+  .cell-container {
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+.v3-table-section
+  table[data-table-key]
+  td[data-col-id='DESCRIPTION']
+  .cell-value,
+.v3-table-section
+  table[data-table-key]
+  td[data-col-id='definition']
+  .cell-value {
+  overflow-wrap: anywhere;
+  text-align: left;
+}
+.v3-col-paste .cell-container {
+  display: inline-flex;
 }
 td {
-    border: 1px solid var(--bs-secondary-color);
-    padding: calc(var(--padding-margin) / 4);
+  border: 1px solid var(--bs-secondary-color);
+  padding: calc(var(--padding-margin) / 4);
 }
 .draggable {
-    cursor: all-scroll;
+  cursor: all-scroll;
 }
 tr {
-    background-color: rgba(var(--bs-body-color-rgb), 0.1);
+  background-color: rgba(var(--bs-body-color-rgb), 0.1);
 }
 /* Alternate row color for better visual separation */
 tr:nth-child(even):not(.error-row):not(.warning-row):not(.info-row) {
-    background-color: rgba(var(--bs-body-color-rgb), 0.03);
+  background-color: rgba(var(--bs-body-color-rgb), 0.03);
 }
 tr[data-type='Nutrients'] {
-    /* Your styles here */
-    background-color: var(--color-nut) !important;
+  /* Your styles here */
+  background-color: var(--color-nut) !important;
 }
 tr[data-type='Ingredients'] {
-    /* Your styles here */
-    background-color: var(--color-ing) !important;
+  /* Your styles here */
+  background-color: var(--color-ing) !important;
 }
 tr[data-type='Other'] {
-    /* Your styles here */
-    background-color: var(--color-other) !important;
+  /* Your styles here */
+  background-color: var(--color-other) !important;
 }
 .divider {
-    border-top: 4px solid var(--bs-secondary);
+  border-top: 4px solid var(--bs-secondary);
 }
 .error-cell {
-    background-color: var(--bs-danger) !important;
-    color: var(--bs-light) !important;
+  background-color: var(--bs-danger) !important;
+  color: var(--bs-light) !important;
 }
 .warning-cell {
-    background-color: var(--bs-warning) !important;
-    color: var(--bs-dark) !important;
+  background-color: var(--bs-warning) !important;
+  color: var(--bs-dark) !important;
 }
 
 .cell-value {
-    flex-grow: 1;
-    border: 1px solid transparent;
-    padding: calc(var(--padding-margin) / 4);
+  flex-grow: 1;
+  border: 1px solid transparent;
+  padding: calc(var(--padding-margin) / 4);
 }
 .cell-value:focus {
-    flex-grow: 1;
-    border: 1px solid var(--bs-primary);
-    outline: none;
-    padding: calc(var(--padding-margin) / 4);
+  flex-grow: 1;
+  border: 1px solid var(--bs-primary);
+  outline: none;
+  padding: calc(var(--padding-margin) / 4);
 }
 .cell-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
 }
 
 .cell-container .chevron-icon {
-    font-size: calc(var(--font-size) / 2);
-    pointer-events: none;
-    margin-left: calc(var(--padding-margin) / -4);
-    margin-right: 1px;
+  font-size: calc(var(--font-size) / 2);
+  pointer-events: none;
+  margin-left: calc(var(--padding-margin) / -4);
+  margin-right: 1px;
 }
 
 /* POPOVERS */
 
 @supports (-webkit-appearance: none) {
-    /* Chrome-specific styles go here */
-    [popover] {
-        /* inset: unset; */
-    }
-    :popover-open {
-        cursor: pointer;
-        border-color: var(--bs-secondary-color);
-        position: absolute;
-        left: -75%;
-        position: fixed;
-        top: 0%;
-        /* transform: translateY(-50%); */
-    }
+  /* Chrome-specific styles go here */
+  [popover] {
+    /* inset: unset; */
+  }
+  :popover-open {
+    cursor: pointer;
+    border-color: var(--bs-secondary-color);
+    position: absolute;
+    left: -75%;
+    position: fixed;
+    top: 0%;
+    /* transform: translateY(-50%); */
+  }
 }
 @supports (-moz-appearance: none) {
-    /* Firefox-specific styles go here */
-    [popover] {
-        inset: unset;
-    }
-    :popover-open {
-        position: relative;
-        padding: calc(var(--padding-margin) / 2);
-        cursor: pointer;
-        translate: 130px;
-        border-color: var(--bs-secondary-color);
-    }
+  /* Firefox-specific styles go here */
+  [popover] {
+    inset: unset;
+  }
+  :popover-open {
+    position: relative;
+    padding: calc(var(--padding-margin) / 2);
+    cursor: pointer;
+    translate: 130px;
+    border-color: var(--bs-secondary-color);
+  }
 }
 
 /* error messages - not quite popover */
 .not-popover {
-    position: absolute;
-    background-color: white;
-    border-radius: calc(var(--padding-margin) / 4);
-    padding: calc(var(--padding-margin) / 2);
-    box-shadow: '0 2px 5px rgba(0, 0, 0, 0.1)';
-    background-color: var(--bs-light);
-    font-weight: bold;
-    /* border: below; */
+  position: absolute;
+  background-color: white;
+  border-radius: calc(var(--padding-margin) / 4);
+  padding: calc(var(--padding-margin) / 2);
+  box-shadow: '0 2px 5px rgba(0, 0, 0, 0.1)';
+  background-color: var(--bs-light);
+  font-weight: bold;
+  /* border: below; */
 }
 .warning-border {
-    border: 2px dashed var(--bs-warning) !important;
+  border: 2px dashed var(--bs-warning) !important;
 }
 .danger-border {
-    border: 2px dashed var(--bs-danger) !important;
+  border: 2px dashed var(--bs-danger) !important;
 }
 /* ADD, REMOVE BUTTONS PARENT */
 .popover-menu:popover-open {
-    display: flex;
-    flex-direction: column;
-    padding: calc(var(--padding-margin) / 2);
-    border-width: 1px;
-    border-radius: calc(var(--padding-margin) / 2);
-    justify-content: flex-start;
+  display: flex;
+  flex-direction: column;
+  padding: calc(var(--padding-margin) / 2);
+  border-width: 1px;
+  border-radius: calc(var(--padding-margin) / 2);
+  justify-content: flex-start;
 }
 button.popover-menu-item {
-    display: flex;
-    margin-bottom: calc(var(--padding-margin) / 2);
+  display: flex;
+  margin-bottom: calc(var(--padding-margin) / 2);
 }
 .popover-menu-item:last-child {
-    margin-bottom: 0;
+  margin-bottom: 0;
 }
 
 button.icon {
-    all: unset; /* Remove all inherited styles */
-    align-items: center;
-    cursor: pointer;
+  all: unset; /* Remove all inherited styles */
+  align-items: center;
+  cursor: pointer;
 }
 /* Enter Product ID box */
 .pipeify-create {
-    border: 2px solid var(--bs-secondary);
-    border-radius: 0.25rem;
-    background-color: var(--bs-light);
-    padding: 2rem;
+  border: 2px solid var(--bs-secondary);
+  border-radius: 0.25rem;
+  background-color: var(--bs-light);
+  padding: 2rem;
 }
 .feedback {
-    color: var(--bs-form-invalid-color);
+  color: var(--bs-form-invalid-color);
 }
 /* bs override */
 @media (min-width: 576px) {
-    .modal-dialog {
-        max-width: 750px;
-    }
+  .modal-dialog {
+    max-width: 750px;
+  }
 }
 .row {
-    margin-right: 0 !important;
-    margin-left: 0 !important;
+  margin-right: 0 !important;
+  margin-left: 0 !important;
 }
 .toast-container {
-    position: fixed;
-    /* bottom: 20px; Adjust as needed */
-    /* right: 20px; Adjust as needed */
-    /* z-index: 1050; Ensure it's above other content */
+  position: fixed;
+  /* bottom: 20px; Adjust as needed */
+  /* right: 20px; Adjust as needed */
+  /* z-index: 1050; Ensure it's above other content */
 }
 
 .paste-area {
-    border: 2px dashed var(--bs-primary);
-    background-color: var(--bs-light);
-    border-radius: calc(var(--padding-margin) / 4);
-    padding: 2rem;
-    text-align: center;
-    cursor: crosshair;
-    transition: background-color 0.3s, border-color 0.3s;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
+  border: 2px dashed var(--bs-primary);
+  background-color: var(--bs-light);
+  border-radius: calc(var(--padding-margin) / 4);
+  padding: 2rem;
+  text-align: center;
+  cursor: crosshair;
+  transition: background-color 0.3s, border-color 0.3s;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
 }
 .paste-area:hover {
-    background-color: rgba(var(--bs-body-color-rgb), 0.1);
+  background-color: rgba(var(--bs-body-color-rgb), 0.1);
 }
 .paste-area.dragover {
-    background-color: rgba(var(--bs-body-color-rgb), 0.1);
+  background-color: rgba(var(--bs-body-color-rgb), 0.1);
 }
 .paste-area h5 {
-    margin-bottom: 0 !important;
+  margin-bottom: 0 !important;
 }

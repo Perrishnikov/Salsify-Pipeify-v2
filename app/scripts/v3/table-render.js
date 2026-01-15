@@ -39,6 +39,55 @@ function tableRenderCreateRowActionItem(label, action, tableKey, rowId) {
 }
 
 /**
+ * @param {V3TableDef} tableDef
+ * @param {string} rowId
+ * @returns {HTMLDivElement}
+ */
+function tableRenderCreateRowActionsDropdown(tableDef, rowId) {
+    const dropdown = tableRenderCreateElement('div', 'dropdown');
+    dropdown.dataset.rowMenuContainer = 'true';
+    const toggle = tableRenderCreateElement(
+        'button',
+        'btn btn-light btn-sm dropdown-toggle',
+        'Row Actions'
+    );
+    toggle.type = 'button';
+    toggle.dataset.rowMenu = 'true';
+    toggle.setAttribute('aria-expanded', 'false');
+
+    const menu = tableRenderCreateElement('div', 'dropdown-menu');
+    menu.dataset.rowMenuList = 'true';
+    menu.appendChild(
+        tableRenderCreateRowActionItem(
+            'Add Above',
+            'add-above',
+            tableDef.key,
+            rowId
+        )
+    );
+    menu.appendChild(
+        tableRenderCreateRowActionItem(
+            'Add Below',
+            'add-below',
+            tableDef.key,
+            rowId
+        )
+    );
+    menu.appendChild(
+        tableRenderCreateRowActionItem(
+            'Delete',
+            'delete',
+            tableDef.key,
+            rowId
+        )
+    );
+
+    dropdown.appendChild(toggle);
+    dropdown.appendChild(menu);
+    return dropdown;
+}
+
+/**
  * @param {V3Row} row
  * @param {import('./types.js').V3Column} column
  * @returns {string}
@@ -62,10 +111,20 @@ function tableRenderGetCellValue(row, column) {
  */
 function tableRenderHeaderRow(tableDef) {
     const headerRow = document.createElement('tr');
+    headerRow.dataset.rowHeader = 'true';
     tableDef.columns.forEach(function (column) {
         const label = column.label || '';
         const th = tableRenderCreateElement('th', '', label);
         th.dataset.colId = column.id;
+        if (column.id === 'ROW_PASTE') {
+            th.classList.add('v3-col-paste');
+        }
+        if (column.id === 'PRODUCT_ID') {
+            th.classList.add('v3-col-product-id');
+        }
+        if (column.id === 'ORDER') {
+            th.classList.add('v3-col-order');
+        }
         headerRow.appendChild(th);
     });
     return headerRow;
@@ -92,86 +151,44 @@ function tableRenderRow(tableDef, row, rowIndex) {
 
     tableDef.columns.forEach(function (column) {
         const td = document.createElement('td');
+        td.dataset.colId = column.id;
         const cellContainer = tableRenderCreateElement('div', 'cell-container');
         const value = tableRenderGetCellValue(row, column);
 
         if (column.isControl) {
-            const rowId = tr.dataset.rowId || '';
-            if (column.id === 'ROW_ACTIONS') {
-                if (tableDef.rowType !== 'Other') {
-                    const dropdown = tableRenderCreateElement(
-                        'div',
-                        'dropdown'
-                    );
-                    dropdown.dataset.rowMenuContainer = 'true';
-                    const toggle = tableRenderCreateElement(
-                        'button',
-                        'btn btn-light btn-sm dropdown-toggle',
-                        'Row Actions'
-                    );
-                    toggle.type = 'button';
-                    toggle.dataset.rowMenu = 'true';
-                    toggle.setAttribute('aria-expanded', 'false');
-
-                    const menu = tableRenderCreateElement(
-                        'div',
-                        'dropdown-menu'
-                    );
-                    menu.dataset.rowMenuList = 'true';
-                    menu.appendChild(
-                        tableRenderCreateRowActionItem(
-                            'Add Above',
-                            'add-above',
-                            tableDef.key,
-                            rowId
-                        )
-                    );
-                    menu.appendChild(
-                        tableRenderCreateRowActionItem(
-                            'Add Below',
-                            'add-below',
-                            tableDef.key,
-                            rowId
-                        )
-                    );
-                    menu.appendChild(
-                        tableRenderCreateRowActionItem(
-                            'Delete',
-                            'delete',
-                            tableDef.key,
-                            rowId
-                        )
-                    );
-
-                    dropdown.appendChild(toggle);
-                    dropdown.appendChild(menu);
-                    cellContainer.appendChild(dropdown);
-                }
-            } else if (column.id === 'ROW_PASTE') {
-                if (tableDef.pasteMode === 'row') {
-                    const pasteButton = tableRenderCreateElement(
-                        'button',
-                        'btn btn-light btn-sm',
-                        'Row Paste'
-                    );
-                    pasteButton.type = 'button';
-                    pasteButton.dataset.pasteAction = 'row';
-                    pasteButton.dataset.tableKey = tableDef.key;
-                    pasteButton.dataset.rowId = rowId;
-                    cellContainer.appendChild(pasteButton);
-                }
+            if (column.id === 'ROW_PASTE') {
+                td.classList.add('v3-col-paste');
+            }
+            if (column.id === 'ROW_PASTE' && tableDef.pasteMode === 'row') {
+                const rowId = tr.dataset.rowId || '';
+                const pasteButton = tableRenderCreateElement(
+                    'button',
+                    'btn btn-light btn-sm',
+                    'Row Paste'
+                );
+                pasteButton.type = 'button';
+                pasteButton.dataset.pasteAction = 'row';
+                pasteButton.dataset.tableKey = tableDef.key;
+                pasteButton.dataset.rowId = rowId;
+                cellContainer.appendChild(pasteButton);
             }
         } else {
+            if (column.id === 'PRODUCT_ID') {
+                td.classList.add('v3-col-product-id');
+            }
+            if (column.id === 'ORDER') {
+                td.classList.add('v3-col-order');
+            }
             const cellValue = tableRenderCreateElement(
                 'div',
                 'cell-value',
                 String(value)
             );
             cellValue.dataset.colId = column.id;
-            if (!column.isFixed) {
-                cellValue.setAttribute('contenteditable', 'true');
-            } else {
+            if (column.isFixed) {
                 cellValue.setAttribute('contenteditable', 'false');
+            } else {
+                cellValue.setAttribute('contenteditable', 'true');
             }
             cellContainer.appendChild(cellValue);
         }
@@ -199,4 +216,42 @@ export function tableRenderRenderTable(tableDef, rows) {
     });
 
     return table;
+}
+
+/**
+ * @param {V3TableDef} tableDef
+ * @param {V3Row[]} rows
+ * @returns {HTMLDivElement|null}
+ */
+export function tableRenderRenderRowActions(tableDef, rows) {
+    if (!tableDef || tableDef.rowType === 'Other') {
+        return null;
+    }
+
+    const container = tableRenderCreateElement('div', 'v3-row-actions');
+    container.dataset.rowActions = 'true';
+    container.dataset.tableKey = tableDef.key;
+
+    const headerSpacer = tableRenderCreateElement(
+        'div',
+        'v3-row-actions-header'
+    );
+    headerSpacer.dataset.rowActionsHeader = 'true';
+    container.appendChild(headerSpacer);
+
+    rows.forEach(function (row, index) {
+        const rowId = row && row.id ? row.id : 'row-' + (index + 1);
+        const actionRow = tableRenderCreateElement(
+            'div',
+            'v3-row-action'
+        );
+        actionRow.dataset.rowActionRow = 'true';
+        actionRow.dataset.rowId = rowId;
+        actionRow.appendChild(
+            tableRenderCreateRowActionsDropdown(tableDef, rowId)
+        );
+        container.appendChild(actionRow);
+    });
+
+    return container;
 }

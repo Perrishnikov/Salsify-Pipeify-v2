@@ -12,7 +12,10 @@ import {
     stateDeleteRow,
     stateUpdateCell,
 } from './state.js';
-import { tableRenderRenderTable } from './table-render.js';
+import {
+    tableRenderRenderRowActions,
+    tableRenderRenderTable,
+} from './table-render.js';
 
 /**
  * @param {string} id
@@ -99,6 +102,8 @@ function initRenderTableShells(state) {
     state.tableDefs.forEach(function (tableDef) {
         const section = document.createElement('div');
         section.className = 'mb-4';
+        section.classList.add('v3-table-section');
+        section.dataset.tableSection = 'true';
 
         const headerRow = document.createElement('div');
         headerRow.className =
@@ -122,7 +127,17 @@ function initRenderTableShells(state) {
 
         const rows = stateGetTableRows(state, tableDef.key);
         const table = tableRenderRenderTable(tableDef, rows);
-        section.appendChild(table);
+        const rowActions = tableRenderRenderRowActions(tableDef, rows);
+        if (rowActions) {
+            section.appendChild(table);
+            section.appendChild(rowActions);
+            requestAnimationFrame(function () {
+                initSyncRowActionHeights(table, rowActions);
+            });
+            initBindRowActionResize();
+        } else {
+            section.appendChild(table);
+        }
         container.appendChild(section);
     });
 }
@@ -370,6 +385,75 @@ function initReadClipboardText() {
         return navigator.clipboard.readText();
     }
     return Promise.reject(new Error('Clipboard read not supported.'));
+}
+
+/** @type {boolean} */
+let initRowActionsResizeBound = false;
+
+/**
+ * @returns {void}
+ */
+function initBindRowActionResize() {
+    if (initRowActionsResizeBound) {
+        return;
+    }
+    initRowActionsResizeBound = true;
+    window.addEventListener('resize', function () {
+        initSyncAllRowActionHeights();
+    });
+}
+
+/**
+ * @returns {void}
+ */
+function initSyncAllRowActionHeights() {
+    const tables = document.querySelectorAll('[data-row-actions]');
+    tables.forEach(function (actions) {
+        const tableKey = actions.dataset.tableKey || '';
+        if (!tableKey) {
+            return;
+        }
+        const shell = actions.closest('[data-table-section]');
+        const table = shell
+            ? shell.querySelector(`table[data-table-key="${tableKey}"]`)
+            : null;
+        if (!table) {
+            return;
+        }
+        initSyncRowActionHeights(table, actions);
+    });
+}
+
+/**
+ * @param {HTMLTableElement} table
+ * @param {HTMLElement} actions
+ * @returns {void}
+ */
+function initSyncRowActionHeights(table, actions) {
+    if (!table || !actions) {
+        return;
+    }
+    const section = actions.closest('[data-table-section]');
+    const tableRect = table.getBoundingClientRect();
+    const sectionRect = section
+        ? section.getBoundingClientRect()
+        : { top: 0 };
+    actions.style.top = `${tableRect.top - sectionRect.top}px`;
+    const headerRow = table.querySelector('[data-row-header]');
+    const headerSpacer = actions.querySelector('[data-row-actions-header]');
+    if (headerRow && headerSpacer) {
+        headerSpacer.style.height = `${headerRow.getBoundingClientRect().height}px`;
+    }
+
+    const bodyRows = Array.from(table.querySelectorAll('[data-row-id]'));
+    const actionRows = actions.querySelectorAll('[data-row-action-row]');
+    actionRows.forEach(function (actionRow, index) {
+        const row = bodyRows[index];
+        if (!row) {
+            return;
+        }
+        actionRow.style.height = `${row.getBoundingClientRect().height}px`;
+    });
 }
 
 /**

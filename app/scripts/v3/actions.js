@@ -314,15 +314,13 @@ export function actionsCreateActions(deps) {
       nextRows = rowsBuildIngredientRows(
         tableDef,
         productId,
-        normalizedText,
-        { retainBlankRows: true }
+        normalizedText
       );
     } else if (tableKey === 'US_NUTRIENTS') {
       nextRows = rowsBuildNutrientRows(
         tableDef,
         productId,
-        normalizedText,
-        { retainBlankRows: true }
+        normalizedText
       );
     } else {
       const otherText = actionsStripTrailingRowDelimiter(normalizedText);

@@ -34,9 +34,7 @@ function rowsHasValues(values) {
 
 /**
  * @typedef {Object} RowsBuildOptions
- * @property {boolean} [addExtraRow]
  * @property {boolean} [ensureRow]
- * @property {boolean} [retainBlankRows]
  */ //TODO: custom type
 
 /**
@@ -55,7 +53,6 @@ export function rowsBuildIngredientRows(
     const config = options || {};
     const rows = [];
     const parsedRows = parsingParseDelimitedTable(text);
-    const keepBlankRows = config.retainBlankRows === true;
 
     parsedRows.forEach(function (cells) {
         const values = {
@@ -66,13 +63,13 @@ export function rowsBuildIngredientRows(
             SYMBOL: parsingNormalizeValue(cells[4]),
             definition: parsingNormalizeValue(cells[5]),
         };
-        if (!rowsHasValues(values) && !keepBlankRows) {
+        if (!rowsHasValues(values)) {
             return;
         }
         rows.push(rowsCreateRow(tableDef, rows.length + 1, productId, values));
     });
 
-    if (config.addExtraRow || (config.ensureRow && rows.length === 0)) {
+    if (config.ensureRow && rows.length === 0) {
         rows.push(rowsCreateRow(tableDef, rows.length + 1, productId, {}));
     }
 
@@ -90,7 +87,6 @@ export function rowsBuildNutrientRows(tableDef, productId, text, options) {
     const config = options || {};
     const rows = [];
     const parsedRows = parsingParseDelimitedTable(text);
-    const keepBlankRows = config.retainBlankRows === true;
 
     parsedRows.forEach(function (cells) {
         const description =
@@ -106,7 +102,7 @@ export function rowsBuildNutrientRows(tableDef, productId, text, options) {
             SYMBOL: parsingNormalizeValue(cells[7]),
             definition: parsingNormalizeValue(cells[8]),
         };
-        if (!rowsHasValues(values) && !keepBlankRows) {
+        if (!rowsHasValues(values)) {
             return;
         }
         rows.push(rowsCreateRow(tableDef, rows.length + 1, productId, values));

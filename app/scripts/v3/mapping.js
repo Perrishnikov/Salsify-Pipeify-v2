@@ -41,6 +41,7 @@ const mappingCountryConfig = {
             'PLM1_LDS_NUTRIENT',
             'PLM1_INGREDIENT_DRAFT_TEXT',
         ],
+        allowedDuplicateHeaders: [],
     },
     CA: {
         ingredient: {
@@ -57,6 +58,7 @@ const mappingCountryConfig = {
             mappingAllowedDuplicateHeader,
             'LABEL_DATASET_OTHER_INGREDS_A',
         ],
+        allowedDuplicateHeaders: [mappingAllowedDuplicateHeader],
     },
 };
 
@@ -125,8 +127,8 @@ export async function mappingMapImportToTables(
     const headerErrors = importUtilsValidateHeaders(
         spreadsheet.headers,
         {
-            allowedDuplicateHeader: mappingAllowedDuplicateHeader,
             requiredHeaders: countryConfig.requiredHeaders,
+            allowedDuplicateHeaders: countryConfig.allowedDuplicateHeaders,
             productIdHeader: mappingProductIdHeader,
         }
     );
@@ -227,7 +229,7 @@ export async function mappingMapImportToTables(
         ingredientTableDef,
         productId,
         ingredientValue,
-        { ensureRow: true, retainBlankRows: true }
+        { ensureRow: true }
     );
 
     tableData[countryConfig.other.tableKey] = rowsBuildOtherRows(
@@ -241,7 +243,7 @@ export async function mappingMapImportToTables(
             nutrientTableDef,
             productId,
             nutrientValue,
-            { ensureRow: true, retainBlankRows: true }
+            { ensureRow: true }
         );
     }
 
