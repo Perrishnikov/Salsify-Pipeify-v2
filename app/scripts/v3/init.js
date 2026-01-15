@@ -8,6 +8,8 @@ import { livePreviewRender } from './live-preview.js';
 import {
     stateCreateState,
     stateGetTableRows,
+    stateInsertRow,
+    stateDeleteRow,
     stateUpdateCell,
 } from './state.js';
 import { tableRenderRenderTable } from './table-render.js';
@@ -106,7 +108,7 @@ function initRenderTableShells(state) {
         title.textContent = tableDef.name;
         headerRow.appendChild(title);
 
-        if (tableDef.pasteMode === 'table') {
+        if (tableDef.pasteMode === 'table' && tableDef.rowType !== 'Other') {
             const pasteButton = document.createElement('button');
             pasteButton.type = 'button';
             pasteButton.className = 'btn btn-outline-secondary btn-sm';
@@ -253,6 +255,7 @@ function initWireActions(countryCode, state, actions, ui) {
     }
 
     initWirePasteButtons(state, actions, ui);
+    initWireRowActions(state);
     initWireEditableCells(state);
 }
 
@@ -367,6 +370,90 @@ function initReadClipboardText() {
         return navigator.clipboard.readText();
     }
     return Promise.reject(new Error('Clipboard read not supported.'));
+}
+
+/**
+ * @param {import('./types.js').V3State} state
+ * @returns {void}
+ */
+function initWireRowActions(state) {
+    const container = initGetById('tables-container');
+    if (!container) {
+        return;
+    }
+
+    /**
+     * @returns {void}
+     */
+    function closeMenus() {
+        container
+            .querySelectorAll('[data-row-menu-container]')
+            .forEach(function (dropdown) {
+                if (!dropdown.classList.contains('show')) {
+                    return;
+                }
+                dropdown.classList.remove('show');
+                const menu = dropdown.querySelector('[data-row-menu-list]');
+                if (menu) {
+                    menu.classList.remove('show');
+                }
+                const toggle = dropdown.querySelector('[data-row-menu]');
+                if (toggle) {
+                    toggle.setAttribute('aria-expanded', 'false');
+                }
+            });
+    }
+
+    container.addEventListener('click', function (event) {
+        const menuToggle = event.target.closest('[data-row-menu]');
+        if (menuToggle) {
+            const dropdown = menuToggle.closest('[data-row-menu-container]');
+            const menu = dropdown
+                ? dropdown.querySelector('[data-row-menu-list]')
+                : null;
+            if (!dropdown || !menu) {
+                return;
+            }
+            const willOpen = !menu.classList.contains('show');
+            closeMenus();
+            if (willOpen) {
+                dropdown.classList.add('show');
+                menu.classList.add('show');
+                menuToggle.setAttribute('aria-expanded', 'true');
+            }
+            return;
+        }
+
+        const target = event.target.closest('[data-row-action]');
+        if (!target) {
+            if (!event.target.closest('[data-row-menu-container]')) {
+                closeMenus();
+            }
+            return;
+        }
+
+        const action = target.dataset.rowAction || '';
+        const tableKey = target.dataset.tableKey || '';
+        const rowId = target.dataset.rowId || '';
+        if (!action || !tableKey || !rowId) {
+            return;
+        }
+
+        let didChange = false;
+        if (action === 'add-above') {
+            didChange = stateInsertRow(state, tableKey, rowId, 'above');
+        } else if (action === 'add-below') {
+            didChange = stateInsertRow(state, tableKey, rowId, 'below');
+        } else if (action === 'delete') {
+            didChange = stateDeleteRow(state, tableKey, rowId);
+        }
+
+        closeMenus();
+        if (didChange) {
+            initRenderTableShells(state);
+            initUpdateLivePreview(state.countryCode, 'row-action');
+        }
+    });
 }
 
 /**

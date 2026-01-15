@@ -4,6 +4,7 @@
 /** @type {Record<string, V3Column>} */
 const modelsColumnBase = {
   action: { id: 'ROW_ACTIONS', label: '', isControl: true },
+  paste: { id: 'ROW_PASTE', label: 'Row Paste', isControl: true },
   productId: { id: 'PRODUCT_ID', label: 'Product ID', isFixed: true },
   order: { id: 'ORDER', label: 'Order' },
   description: { id: 'DESCRIPTION', label: 'Description' },
@@ -16,27 +17,43 @@ const modelsColumnBase = {
 };
 
 /**
+ * @typedef {Object} ModelsColumnOptions
+ * @property {boolean} [includePaste]
+ */ //TODO: custom type
+
+/**
+ * @param {ModelsColumnOptions} [options]
  * @returns {V3Column[]}
  */
-function modelsIngredientColumns() {
-  return [
-    modelsColumnBase.action,
+function modelsIngredientColumns(options) {
+  const config = options || {};
+  const columns = [modelsColumnBase.action];
+  if (config.includePaste) {
+    columns.push(modelsColumnBase.paste);
+  }
+  columns.push(
     modelsColumnBase.productId,
     modelsColumnBase.order,
     modelsColumnBase.description,
     modelsColumnBase.quantity,
     modelsColumnBase.uom,
     modelsColumnBase.symbol,
-    modelsColumnBase.definition,
-  ];
+    modelsColumnBase.definition
+  );
+  return columns;
 }
 
 /**
+ * @param {ModelsColumnOptions} [options]
  * @returns {V3Column[]}
  */
-function modelsNutrientColumns() {
-  return [
-    modelsColumnBase.action,
+function modelsNutrientColumns(options) {
+  const config = options || {};
+  const columns = [modelsColumnBase.action];
+  if (config.includePaste) {
+    columns.push(modelsColumnBase.paste);
+  }
+  columns.push(
     modelsColumnBase.productId,
     modelsColumnBase.order,
     modelsColumnBase.description,
@@ -45,16 +62,17 @@ function modelsNutrientColumns() {
     modelsColumnBase.dv,
     modelsColumnBase.pct,
     modelsColumnBase.symbol,
-    modelsColumnBase.definition,
-  ];
+    modelsColumnBase.definition
+  );
+  return columns;
 }
 
 /**
+ * @param {ModelsColumnOptions} [options]
  * @returns {V3Column[]}
  */
-function modelsOtherColumns() {
+function modelsOtherColumns(options) {
   return [
-    modelsColumnBase.action,
     modelsColumnBase.productId,
     modelsColumnBase.description,
   ];
@@ -95,7 +113,7 @@ const modelsTablesByCountry = {
       tableId: 'Ingredients - Long',
       rowType: 'Ingredients',
       pasteMode: 'row',
-      columns: modelsIngredientColumns(),
+      columns: modelsIngredientColumns({ includePaste: true }),
     },
     {
       key: 'CA_OTHER',

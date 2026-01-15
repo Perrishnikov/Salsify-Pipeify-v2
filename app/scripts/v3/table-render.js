@@ -19,6 +19,26 @@ function tableRenderCreateElement(tag, className, text) {
 }
 
 /**
+ * @param {string} label
+ * @param {string} action
+ * @param {string} tableKey
+ * @param {string} rowId
+ * @returns {HTMLButtonElement}
+ */
+function tableRenderCreateRowActionItem(label, action, tableKey, rowId) {
+    const button = tableRenderCreateElement(
+        'button',
+        'dropdown-item',
+        label
+    );
+    button.type = 'button';
+    button.dataset.rowAction = action;
+    button.dataset.tableKey = tableKey;
+    button.dataset.rowId = rowId;
+    return button;
+}
+
+/**
  * @param {V3Row} row
  * @param {import('./types.js').V3Column} column
  * @returns {string}
@@ -76,17 +96,70 @@ function tableRenderRow(tableDef, row, rowIndex) {
         const value = tableRenderGetCellValue(row, column);
 
         if (column.isControl) {
-            if (tableDef.pasteMode === 'row') {
-                const pasteButton = tableRenderCreateElement(
-                    'button',
-                    'btn btn-light btn-sm',
-                    'Paste'
-                );
-                pasteButton.type = 'button';
-                pasteButton.dataset.pasteAction = 'row';
-                pasteButton.dataset.tableKey = tableDef.key;
-                pasteButton.dataset.rowId = tr.dataset.rowId || '';
-                cellContainer.appendChild(pasteButton);
+            const rowId = tr.dataset.rowId || '';
+            if (column.id === 'ROW_ACTIONS') {
+                if (tableDef.rowType !== 'Other') {
+                    const dropdown = tableRenderCreateElement(
+                        'div',
+                        'dropdown'
+                    );
+                    dropdown.dataset.rowMenuContainer = 'true';
+                    const toggle = tableRenderCreateElement(
+                        'button',
+                        'btn btn-light btn-sm dropdown-toggle',
+                        'Row Actions'
+                    );
+                    toggle.type = 'button';
+                    toggle.dataset.rowMenu = 'true';
+                    toggle.setAttribute('aria-expanded', 'false');
+
+                    const menu = tableRenderCreateElement(
+                        'div',
+                        'dropdown-menu'
+                    );
+                    menu.dataset.rowMenuList = 'true';
+                    menu.appendChild(
+                        tableRenderCreateRowActionItem(
+                            'Add Above',
+                            'add-above',
+                            tableDef.key,
+                            rowId
+                        )
+                    );
+                    menu.appendChild(
+                        tableRenderCreateRowActionItem(
+                            'Add Below',
+                            'add-below',
+                            tableDef.key,
+                            rowId
+                        )
+                    );
+                    menu.appendChild(
+                        tableRenderCreateRowActionItem(
+                            'Delete',
+                            'delete',
+                            tableDef.key,
+                            rowId
+                        )
+                    );
+
+                    dropdown.appendChild(toggle);
+                    dropdown.appendChild(menu);
+                    cellContainer.appendChild(dropdown);
+                }
+            } else if (column.id === 'ROW_PASTE') {
+                if (tableDef.pasteMode === 'row') {
+                    const pasteButton = tableRenderCreateElement(
+                        'button',
+                        'btn btn-light btn-sm',
+                        'Row Paste'
+                    );
+                    pasteButton.type = 'button';
+                    pasteButton.dataset.pasteAction = 'row';
+                    pasteButton.dataset.tableKey = tableDef.key;
+                    pasteButton.dataset.rowId = rowId;
+                    cellContainer.appendChild(pasteButton);
+                }
             }
         } else {
             const cellValue = tableRenderCreateElement(

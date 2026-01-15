@@ -1,6 +1,6 @@
 import { rowsBuildIngredientRows, rowsBuildNutrientRows, rowsBuildOtherRows } from './rows.js';
 import { pasteClassifyClipboard, pasteFormatClipboardPreview } from './paste.js';
-import { stateResetTables } from './state.js';
+import { stateGetTableProductId, stateResetTables } from './state.js';
 
 /** @typedef {import('./types.js').V3Actions} V3Actions */
 /** @typedef {import('./types.js').V3State} V3State */
@@ -62,21 +62,6 @@ function actionsGetTableDef(tableDefs, tableKey) {
   return null;
 }
 
-/**
- * @param {V3State} state
- * @param {string} tableKey
- * @returns {string}
- */
-function actionsGetTableProductId(state, tableKey) {
-  const rows = state.tableData[tableKey] || [];
-  for (let i = 0; i < rows.length; i += 1) {
-    const cells = rows[i] && rows[i].cells ? rows[i].cells : null;
-    if (cells && cells.PRODUCT_ID) {
-      return cells.PRODUCT_ID;
-    }
-  }
-  return '';
-}
 
 /**
  * @param {string} tableKey
@@ -273,7 +258,7 @@ export function actionsCreateActions(deps) {
       return false;
     }
 
-    const productId = actionsGetTableProductId(state, tableKey);
+    const productId = stateGetTableProductId(state, tableKey);
     const rowText = actionsStripTrailingRowDelimiter(normalizedText);
     let sourceRows;
     if (tableKey === 'CA_INGREDIENTS') {
@@ -323,7 +308,7 @@ export function actionsCreateActions(deps) {
       return false;
     }
 
-    const productId = actionsGetTableProductId(state, tableKey);
+    const productId = stateGetTableProductId(state, tableKey);
     let nextRows = [];
     if (tableKey === 'US_INGREDIENTS') {
       nextRows = rowsBuildIngredientRows(
