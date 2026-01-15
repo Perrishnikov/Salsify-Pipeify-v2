@@ -5,9 +5,9 @@
   --color-nut: rgba(173, 216, 230, 0.2);
   --color-ing: rgba(144, 238, 144, 0.2);
   --color-other: rgba(240, 128, 128, 0.2);
-  --v3-row-actions-width: 120px;
-  --v3-row-actions-gap: 3px;
-  --v3-row-actions-pad: 6px;
+  --v3-row-actions-width: 30px;
+  --v3-row-actions-gap: 0px;
+  --v3-row-actions-pad: var(--v3-cell-pad);
   --v3-col-min-width: 50px;
   --v3-col-description-min-width: 210px;
   --v3-col-definition-min-width: 180px;
@@ -17,6 +17,7 @@
   --v3-header-pad: 6px;
   --v3-row-action-inner-border: 1px;
   --v3-row-action-inner-border-color: rgba(var(--bs-body-color-rgb), 0.12);
+  --v3-row-action-icon-size: 18px;
   --v3-row-paste-size: 21px;
   --v3-row-paste-icon-size: 18px;
   --v3-row-paste-margin-x: 6px;
@@ -98,9 +99,9 @@ table {
   position: absolute;
   top: 0;
   left: calc(
-    var(--v3-row-actions-width) * -1 - var(--v3-row-actions-gap) +
-      var(--v3-row-actions-pad)
+    var(--v3-row-actions-width) * -1 - var(--v3-row-actions-pad)
   );
+  right: auto;
   width: var(--v3-row-actions-width);
   display: flex;
   flex-direction: column;
@@ -108,8 +109,9 @@ table {
 }
 .v3-row-action {
   display: flex;
-  align-items: center;
-  padding: 0 var(--v3-row-actions-pad);
+  align-items: stretch;
+  justify-content: flex-end;
+  padding: 0;
   box-sizing: border-box;
   position: absolute;
   left: 0;
@@ -117,16 +119,50 @@ table {
 }
 .v3-row-action .dropdown {
   width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: stretch;
+  align-self: stretch;
 }
 .v3-row-action .btn {
   width: 100%;
-  box-shadow: inset 0 0 0 var(--v3-row-action-inner-border)
-    var(--v3-row-action-inner-border-color);
-  display: inline-flex;
+  min-width: 100%;
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  display: flex;
   align-items: center;
   justify-content: center;
   height: 100%;
-  padding: 0 var(--v3-row-actions-pad);
+  min-height: 100%;
+  align-self: stretch;
+  padding: 0;
+  line-height: 0;
+  box-sizing: border-box;
+}
+.v3-row-action .btn:hover,
+.v3-row-action .btn:focus,
+.v3-row-action .btn:active,
+.v3-row-action .btn:focus-visible {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+.v3-row-action-button {
+  line-height: 0;
+}
+.outised-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  align-self: stretch;
+}
+.v3-row-action-icon {
+  width: 30px;
+  height: 30px;
+  display: block;
 }
 h5 {
   margin-bottom: 0 !important;

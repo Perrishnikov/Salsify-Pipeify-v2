@@ -19,6 +19,22 @@ function tableRenderCreateElement(tag, className, text) {
 }
 
 /**
+ * @param {string} name
+ * @param {string} className
+ * @returns {HTMLImageElement}
+ */
+function tableRenderCreateIcon(name, className) {
+    const icon = document.createElement('img');
+    if (className) {
+        icon.className = className;
+    }
+    icon.alt = '';
+    icon.setAttribute('aria-hidden', 'true');
+    icon.src = new URL(`../../icons/${name}.svg`, import.meta.url).toString();
+    return icon;
+}
+
+/**
  * @param {string} label
  * @param {string} action
  * @param {string} tableKey
@@ -48,12 +64,20 @@ function tableRenderCreateRowActionsDropdown(tableDef, rowId) {
     dropdown.dataset.rowMenuContainer = 'true';
     const toggle = tableRenderCreateElement(
         'button',
-        'btn btn-light btn-sm dropdown-toggle',
-        'Row Actions'
+        'btn btn-light btn-sm v3-row-action-button',
+        ''
     );
     toggle.type = 'button';
     toggle.dataset.rowMenu = 'true';
     toggle.setAttribute('aria-expanded', 'false');
+    toggle.setAttribute('aria-label', 'Row Actions');
+    toggle.title = 'Row Actions';
+    const iconWrap = document.createElement('span');
+    iconWrap.className = 'outised-icon';
+    iconWrap.appendChild(
+        tableRenderCreateIcon('delete', 'v3-row-action-icon')
+    );
+    toggle.appendChild(iconWrap);
 
     const menu = tableRenderCreateElement('div', 'dropdown-menu');
     menu.dataset.rowMenuList = 'true';
@@ -171,15 +195,12 @@ function tableRenderRow(tableDef, row, rowIndex) {
                 pasteButton.dataset.pasteAction = 'row';
                 pasteButton.dataset.tableKey = tableDef.key;
                 pasteButton.dataset.rowId = rowId;
-                const icon = document.createElement('img');
-                icon.className = 'v3-row-paste-icon';
-                icon.alt = '';
-                icon.setAttribute('aria-hidden', 'true');
-                icon.src = new URL(
-                    '../../icons/clipboard.svg',
-                    import.meta.url
-                ).toString();
-                pasteButton.appendChild(icon);
+                pasteButton.appendChild(
+                    tableRenderCreateIcon(
+                        'clipboard',
+                        'v3-row-paste-icon'
+                    )
+                );
                 cellContainer.appendChild(pasteButton);
             }
         } else {

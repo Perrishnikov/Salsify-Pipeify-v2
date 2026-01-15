@@ -392,6 +392,8 @@ function initReadClipboardText() {
 let initRowActionsResizeBound = false;
 /** @type {WeakMap<HTMLElement, ResizeObserver>} */
 const initRowActionObservers = new WeakMap();
+/** @type {boolean} */
+let initRowActionsDocumentBound = false;
 
 /**
  * @returns {void}
@@ -513,6 +515,16 @@ function initWireRowActions(state) {
                     toggle.setAttribute('aria-expanded', 'false');
                 }
             });
+    }
+
+    if (!initRowActionsDocumentBound) {
+        initRowActionsDocumentBound = true;
+        document.addEventListener('click', function (event) {
+            if (event.target.closest('[data-row-menu-container]')) {
+                return;
+            }
+            closeMenus();
+        });
     }
 
     container.addEventListener('click', function (event) {
