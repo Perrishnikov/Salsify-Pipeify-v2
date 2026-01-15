@@ -46,8 +46,16 @@ function initRenderStatus(message, tone) {
     if (!message) {
         return;
     }
+    const toneMap = {
+        error: 'danger',
+        warn: 'warning',
+        warning: 'warning',
+        info: 'info',
+        success: 'success',
+        danger: 'danger',
+    };
     const alert = document.createElement('div');
-    const alertTone = tone || 'info';
+    const alertTone = toneMap[tone] || tone || 'info';
     alert.className = 'alert alert-' + alertTone;
     alert.textContent = message;
     container.appendChild(alert);

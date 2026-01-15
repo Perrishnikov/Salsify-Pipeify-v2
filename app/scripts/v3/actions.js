@@ -141,7 +141,7 @@ function actionsStripTrailingRowDelimiter(text) {
  * @param {string} text
  * @param {{type: string, label: string}} target
  * @param {V3Ui} ui
- * @returns {{normalizedText: string}|null}
+ * @returns {{normalizedText: string, classification: {matches: string[], pipeCounts: number[], rowInfo: {text: string, isEmpty: boolean, pipeCount: number}[]}}|null}
  */
 function actionsValidatePaste(text, target, ui) {
   const classification = pasteClassifyClipboard(text);
@@ -172,7 +172,22 @@ function actionsValidatePaste(text, target, ui) {
     return null;
   }
 
-  return { normalizedText: normalizedText };
+  return { normalizedText: normalizedText, classification: classification };
+}
+
+/**
+ * @param {{text: string, isEmpty: boolean, pipeCount: number}[]} rowInfo
+ * @param {number} pipeCount
+ * @returns {string}
+ */
+function actionsFindRowByPipeCount(rowInfo, pipeCount) {
+  if (!rowInfo || !rowInfo.length) {
+    return '';
+  }
+  const match = rowInfo.find(function (row) {
+    return row && !row.isEmpty && row.pipeCount === pipeCount;
+  });
+  return match ? match.text : '';
 }
 
 /**
@@ -296,6 +311,11 @@ export function actionsCreateActions(deps) {
       return false;
     }
     const normalizedText = validation.normalizedText;
+    const badRowText =
+      target.type === 'us-nutrient-table'
+        ? actionsFindRowByPipeCount(validation.classification.rowInfo, 7)
+        : '';
+    const hasSevenPipeRow = Boolean(badRowText);
 
     const tableDef = actionsGetTableDef(state.tableDefs, tableKey);
     if (!tableDef) {
@@ -326,6 +346,13 @@ export function actionsCreateActions(deps) {
 
     state.tableData[tableKey] = nextRows;
     state.lastAction = 'paste-table';
+    if (hasSevenPipeRow) {
+      ui.renderStatus(
+        'PLM -> Salsify Bug found: ' + actionsGetClipboardPreview(badRowText),
+        'warning'
+      );
+      return true;
+    }
     ui.renderStatus('Table paste applied.', 'info');
     return true;
   }

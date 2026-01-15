@@ -63,8 +63,8 @@ export function rowsBuildIngredientRows(
             DESCRIPTION: parsingNormalizeValue(cells[1]),
             QTY: parsingNormalizeValue(cells[2]),
             UOM: parsingNormalizeValue(cells[3]),
-            SYMBOLS: parsingNormalizeValue(cells[6]),
-            DEFINITIONS: parsingNormalizeValue(cells[7]),
+            SYMBOL: parsingNormalizeValue(cells[4]),
+            definition: parsingNormalizeValue(cells[5]),
         };
         if (!rowsHasValues(values) && !keepBlankRows) {
             return;
@@ -100,9 +100,11 @@ export function rowsBuildNutrientRows(tableDef, productId, text, options) {
             ORDER: parsingNormalizeValue(cells[0]),
             DESCRIPTION: description,
             QTY: parsingNormalizeValue(cells[3]),
-            UOM: parsingNormalizeValue(cells[5]),
-            SYMBOLS: parsingNormalizeValue(cells[6]),
-            DEFINITIONS: parsingNormalizeValue(cells[7]),
+            UOM: parsingNormalizeValue(cells[4]),
+            DV: parsingNormalizeValue(cells[5]),
+            PCT: parsingNormalizeValue(cells[6]),
+            SYMBOL: parsingNormalizeValue(cells[7]),
+            definition: parsingNormalizeValue(cells[8]),
         };
         if (!rowsHasValues(values) && !keepBlankRows) {
             return;

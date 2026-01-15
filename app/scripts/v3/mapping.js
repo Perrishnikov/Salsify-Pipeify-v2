@@ -182,13 +182,6 @@ export async function mappingMapImportToTables(
         );
     }
 
-    tableData[countryConfig.ingredient.tableKey] = rowsBuildIngredientRows(
-        ingredientTableDef,
-        productId,
-        ingredientValue,
-        { addExtraRow: true, ensureRow: true, retainBlankRows: true }
-    );
-
     const otherTableDef = mappingGetTableDef(
         tableDefs,
         countryConfig.other.tableKey
@@ -203,14 +196,11 @@ export async function mappingMapImportToTables(
         headerIndexMap,
         countryConfig.other.sourceHeader
     );
-    tableData[countryConfig.other.tableKey] = rowsBuildOtherRows(
-        otherTableDef,
-        productId,
-        otherValue
-    );
+    let nutrientTableDef = null;
+    let nutrientValue = '';
 
     if (countryCode === 'US') {
-        const nutrientTableDef = mappingGetTableDef(
+        nutrientTableDef = mappingGetTableDef(
             tableDefs,
             countryConfig.nutrient.tableKey
         );
@@ -219,11 +209,34 @@ export async function mappingMapImportToTables(
             return result;
         }
 
-        const nutrientValue = importUtilsGetColumnValue(
+        nutrientValue = importUtilsGetColumnValue(
             row,
             headerIndexMap,
             countryConfig.nutrient.sourceHeader
         );
+    }
+
+    if (!ingredientValue && !otherValue && !nutrientValue) {
+        result.errors.push(
+            'No importable data found in non-Product ID columns. Check the country export (US vs CA).'
+        );
+        return result;
+    }
+
+    tableData[countryConfig.ingredient.tableKey] = rowsBuildIngredientRows(
+        ingredientTableDef,
+        productId,
+        ingredientValue,
+        { ensureRow: true, retainBlankRows: true }
+    );
+
+    tableData[countryConfig.other.tableKey] = rowsBuildOtherRows(
+        otherTableDef,
+        productId,
+        otherValue
+    );
+
+    if (countryCode === 'US') {
         tableData[countryConfig.nutrient.tableKey] = rowsBuildNutrientRows(
             nutrientTableDef,
             productId,

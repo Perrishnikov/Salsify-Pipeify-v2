@@ -1,13 +1,25 @@
 /**
+ * @typedef {Object} PasteRowInfo
+ * @property {string} text
+ * @property {boolean} isEmpty
+ * @property {number} pipeCount
+ */ //TODO: custom type
+
+/**
  * @typedef {Object} PasteClassification
  * @property {string} normalizedText
  * @property {string[]} matches
  * @property {string[]} rows
  * @property {number[]} pipeCounts
+ * @property {PasteRowInfo[]} rowInfo
  */ //TODO: custom type
 
 const pasteRowDelimiter = '~';
 const pasteCellDelimiter = '|';
+const pasteIngredientMinPipes = 6;
+const pasteIngredientMaxPipes = 8;
+const pasteNutrientMinPipes = 7;
+const pasteNutrientMaxPipes = 9;
 
 /**
  * @param {string} value
@@ -35,6 +47,16 @@ function pasteIsRowEmpty(value) {
     return true;
   }
   return value.trim().length === 0;
+}
+
+/**
+ * @param {number} value
+ * @param {number} min
+ * @param {number} max
+ * @returns {boolean}
+ */
+function pasteIsPipeCountInRange(value, min, max) {
+  return value >= min && value <= max;
 }
 
 /**
@@ -80,14 +102,15 @@ export function pasteFormatClipboardPreview(text, maxLength) {
  */
 export function pasteClassifyClipboard(text) {
   const normalized = pasteNormalizeClipboardText(text);
-  if (!normalized) {
-    return {
-      normalizedText: '',
-      matches: [],
-      rows: [],
-      pipeCounts: [],
-    };
-  }
+    if (!normalized) {
+        return {
+            normalizedText: '',
+            matches: [],
+            rows: [],
+            pipeCounts: [],
+            rowInfo: [],
+        };
+    }
 
   const rows = normalized.split(pasteRowDelimiter);
   const rowInfo = rows.map(function (row) {
@@ -113,8 +136,13 @@ export function pasteClassifyClipboard(text) {
     (rows.length === 1 || rowInfo[1].isEmpty);
 
   if (singleRowEligible) {
-    // if (pipeCounts[0] === 9) {
-    if (pipeCounts[0] >= 6 && pipeCounts[0] <= 8) {
+    if (
+      pasteIsPipeCountInRange(
+        pipeCounts[0],
+        pasteIngredientMinPipes,
+        pasteIngredientMaxPipes
+      )
+    ) {
       matches.push('ca-ingredient-row');
     }
     if (pipeCounts[0] === 0) {
@@ -125,15 +153,22 @@ export function pasteClassifyClipboard(text) {
   if (hasRowDelimiter && nonEmptyRows.length > 0) {
     if (
       pipeCounts.every(function (count) {
-        // return count === 9;
-        return count >= 6 && count <= 8;
+        return pasteIsPipeCountInRange(
+          count,
+          pasteIngredientMinPipes,
+          pasteIngredientMaxPipes
+        );
       })
     ) {
       matches.push('us-ingredient-table');
     }
     if (
       pipeCounts.every(function (count) {
-        return count === 9;
+        return pasteIsPipeCountInRange(
+          count,
+          pasteNutrientMinPipes,
+          pasteNutrientMaxPipes
+        );
       })
     ) {
       matches.push('us-nutrient-table');
@@ -145,5 +180,6 @@ export function pasteClassifyClipboard(text) {
     matches: matches,
     rows: rows,
     pipeCounts: pipeCounts,
+    rowInfo: rowInfo,
   };
 }

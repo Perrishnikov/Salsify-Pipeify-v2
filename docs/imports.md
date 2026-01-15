@@ -74,13 +74,19 @@ US example
 2. [0index] -> Order
 3. [coalesce(2index then 1index]) -> Description
 4. [3index] -> Qty
-5. [5index] -> UOM
-6. [6index] -> Symbol
-7. [7index] -> Definitions
+5. [4index] -> UOM
+6. [5index] -> DV
+7. [6index] -> Pct
+8. [7index] -> Symbol
+9. [8index] -> Definitions
 
 Example
 (9 pipes) 0.0.0 | Calories | | 5 | CAL | | | | | ~ 
-1.0.0 | Total Carbohydrate | | 1 | G | <1 | % | † | †Percent Daily Values (DV) are based on a 2,000 calorie diet. | ~ 2.0.0 | Vitamin A (RAE) | Vitamin A (as 50% beta-carotene [1500 mcg], 50% retinyl acetate [1500 mcg]) | 3,000 | mcg | 333 | % | | | ~ 
+1.0.0 | Total Carbohydrate | | 1 | G | <1 | % | † | †Percent Daily Values (DV) are based on a 2,000 calorie diet. | ~ 
+2.0.0 | Vitamin A (RAE) | Vitamin A (as 50% beta-carotene [1500 mcg], 50% retinyl acetate [1500 mcg]) | 3,000 | mcg | 333 | % | | | ~ 
+
+0.0.0 | Folate     | | 400 mcg DFE 100 | %   | | |     ~ 
+0.1.0 | Folic Acid | | 240             | mcg | | | | | ~
 
 ## Pasting Tables and Rows
 ### Validation (Row & Table)
