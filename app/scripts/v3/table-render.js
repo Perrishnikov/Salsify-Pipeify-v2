@@ -111,7 +111,6 @@ function tableRenderGetCellValue(row, column) {
  */
 function tableRenderHeaderRow(tableDef) {
     const headerRow = document.createElement('tr');
-    headerRow.dataset.rowHeader = 'true';
     tableDef.columns.forEach(function (column) {
         const label = column.label || '';
         const th = tableRenderCreateElement('th', '', label);
@@ -163,13 +162,24 @@ function tableRenderRow(tableDef, row, rowIndex) {
                 const rowId = tr.dataset.rowId || '';
                 const pasteButton = tableRenderCreateElement(
                     'button',
-                    'btn btn-light btn-sm',
-                    'Row Paste'
+                    'btn btn-light btn-sm v3-row-paste-button',
+                    ''
                 );
                 pasteButton.type = 'button';
+                pasteButton.setAttribute('aria-label', 'Row Paste');
+                pasteButton.title = 'Row Paste';
                 pasteButton.dataset.pasteAction = 'row';
                 pasteButton.dataset.tableKey = tableDef.key;
                 pasteButton.dataset.rowId = rowId;
+                const icon = document.createElement('img');
+                icon.className = 'v3-row-paste-icon';
+                icon.alt = '';
+                icon.setAttribute('aria-hidden', 'true');
+                icon.src = new URL(
+                    '../../icons/clipboard.svg',
+                    import.meta.url
+                ).toString();
+                pasteButton.appendChild(icon);
                 cellContainer.appendChild(pasteButton);
             }
         } else {
@@ -231,13 +241,6 @@ export function tableRenderRenderRowActions(tableDef, rows) {
     const container = tableRenderCreateElement('div', 'v3-row-actions');
     container.dataset.rowActions = 'true';
     container.dataset.tableKey = tableDef.key;
-
-    const headerSpacer = tableRenderCreateElement(
-        'div',
-        'v3-row-actions-header'
-    );
-    headerSpacer.dataset.rowActionsHeader = 'true';
-    container.appendChild(headerSpacer);
 
     rows.forEach(function (row, index) {
         const rowId = row && row.id ? row.id : 'row-' + (index + 1);

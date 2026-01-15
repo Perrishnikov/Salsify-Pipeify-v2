@@ -135,6 +135,7 @@ function initRenderTableShells(state) {
                 initSyncRowActionHeights(table, rowActions);
             });
             initBindRowActionResize();
+            initObserveRowActionTable(table, rowActions);
         } else {
             section.appendChild(table);
         }
@@ -389,6 +390,8 @@ function initReadClipboardText() {
 
 /** @type {boolean} */
 let initRowActionsResizeBound = false;
+/** @type {WeakMap<HTMLElement, ResizeObserver>} */
+const initRowActionObservers = new WeakMap();
 
 /**
  * @returns {void}
@@ -429,30 +432,54 @@ function initSyncAllRowActionHeights() {
  * @param {HTMLElement} actions
  * @returns {void}
  */
+function initObserveRowActionTable(table, actions) {
+    if (!table || !actions || typeof ResizeObserver === 'undefined') {
+        return;
+    }
+    if (initRowActionObservers.has(actions)) {
+        return;
+    }
+    const observer = new ResizeObserver(function () {
+        initSyncRowActionHeights(table, actions);
+    });
+    observer.observe(table);
+    initRowActionObservers.set(actions, observer);
+}
+
+/**
+ * @param {HTMLTableElement} table
+ * @param {HTMLElement} actions
+ * @returns {void}
+ */
 function initSyncRowActionHeights(table, actions) {
     if (!table || !actions) {
         return;
     }
     const section = actions.closest('[data-table-section]');
-    const tableRect = table.getBoundingClientRect();
     const sectionRect = section
         ? section.getBoundingClientRect()
         : { top: 0 };
+    const tableRect = table.getBoundingClientRect();
     actions.style.top = `${tableRect.top - sectionRect.top}px`;
-    const headerRow = table.querySelector('[data-row-header]');
-    const headerSpacer = actions.querySelector('[data-row-actions-header]');
-    if (headerRow && headerSpacer) {
-        headerSpacer.style.height = `${headerRow.getBoundingClientRect().height}px`;
-    }
-
+    actions.style.height = `${tableRect.height}px`;
     const bodyRows = Array.from(table.querySelectorAll('[data-row-id]'));
+    const rowById = bodyRows.reduce(function (acc, row) {
+        const rowId = row.dataset.rowId || '';
+        if (rowId) {
+            acc[rowId] = row;
+        }
+        return acc;
+    }, {});
     const actionRows = actions.querySelectorAll('[data-row-action-row]');
     actionRows.forEach(function (actionRow, index) {
-        const row = bodyRows[index];
+        const rowId = actionRow.dataset.rowId || '';
+        const row = rowById[rowId] || bodyRows[index];
         if (!row) {
             return;
         }
-        actionRow.style.height = `${row.getBoundingClientRect().height}px`;
+        const rowRect = row.getBoundingClientRect();
+        actionRow.style.top = `${rowRect.top - tableRect.top}px`;
+        actionRow.style.height = `${rowRect.height}px`;
     });
 }
 
