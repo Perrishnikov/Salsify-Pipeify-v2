@@ -1,5 +1,12 @@
-import { rowsBuildIngredientRows, rowsBuildNutrientRows, rowsBuildOtherRows } from './rows.js';
-import { pasteClassifyClipboard, pasteFormatClipboardPreview } from './paste.js';
+import {
+  rowsBuildIngredientRows,
+  rowsBuildNutrientRows,
+  rowsBuildOtherRows,
+} from './rows.js';
+import {
+  pasteClassifyClipboard,
+  pasteFormatClipboardPreview,
+} from './paste.js';
 import { stateGetTableProductId, stateResetTables } from './state.js';
 
 /** @typedef {import('./types.js').V3Actions} V3Actions */
@@ -62,7 +69,6 @@ function actionsGetTableDef(tableDefs, tableKey) {
   return null;
 }
 
-
 /**
  * @param {string} tableKey
  * @returns {{type: string, label: string}|null}
@@ -81,7 +87,7 @@ function actionsGetPasteTarget(tableKey) {
 function actionsGetClipboardPreview(text) {
   const preview = pasteFormatClipboardPreview(
     text,
-    actionsPastePreviewMaxLength
+    actionsPastePreviewMaxLength,
   );
   return `"${preview}"`;
 }
@@ -92,8 +98,17 @@ function actionsGetClipboardPreview(text) {
  * @param {boolean} preserveProductId
  * @returns {void}
  */
-function actionsApplyRowCells(targetRow, sourceRow, preserveProductId) {
-  if (!targetRow || !targetRow.cells || !sourceRow || !sourceRow.cells) {
+function actionsApplyRowCells(
+  targetRow,
+  sourceRow,
+  preserveProductId,
+) {
+  if (
+    !targetRow ||
+    !targetRow.cells ||
+    !sourceRow ||
+    !sourceRow.cells
+  ) {
     return;
   }
   Object.keys(targetRow.cells).forEach(function (key) {
@@ -140,7 +155,7 @@ function actionsValidatePaste(text, target, ui) {
     const preview = actionsGetClipboardPreview(normalizedText);
     ui.renderStatus(
       'Unable to classify clipboard text. ' + preview,
-      'danger'
+      'danger',
     );
     return null;
   }
@@ -150,14 +165,21 @@ function actionsValidatePaste(text, target, ui) {
       actionsPasteLabelByType[classification.matches[0]] || 'Unknown';
     const preview = actionsGetClipboardPreview(normalizedText);
     ui.renderStatus(
-      'Clipboard looks like ' + detected + ', not ' + target.label + '. ' +
+      'Clipboard looks like ' +
+        detected +
+        ', not ' +
+        target.label +
+        '. ' +
         preview,
-      'danger'
+      'danger',
     );
     return null;
   }
 
-  return { normalizedText: normalizedText, classification: classification };
+  return {
+    normalizedText: normalizedText,
+    classification: classification,
+  };
 }
 
 /**
@@ -198,21 +220,30 @@ export function actionsCreateActions(deps) {
       result = await mapping.mapImportToTables(
         file,
         state.countryCode,
-        state.tableDefs
+        state.tableDefs,
       );
     } catch (error) {
-      ui.renderStatus('Import failed while reading the file.', 'danger');
+      ui.renderStatus(
+        'Import failed while reading the file.',
+        'danger',
+      );
       return null;
     }
     if (!result || !result.ok) {
-      const message = result ? result.errors.join(' ') : 'Import failed.';
+      const message = result
+        ? result.errors.join(' ')
+        : 'Import failed.';
       ui.renderStatus(message, 'danger');
       return result || null;
     }
     state.tableData = result.tableData;
     state.lastAction = 'import';
     ui.renderStatus('Imported file: ' + file.name, 'info');
-    console.log('[v3] importSpreadsheet', file.name, state.countryCode);
+    console.log(
+      '[v3] importSpreadsheet',
+      file.name,
+      state.countryCode,
+    );
     return result;
   }
 
@@ -240,13 +271,19 @@ export function actionsCreateActions(deps) {
 
     const tableDef = actionsGetTableDef(state.tableDefs, tableKey);
     if (!tableDef) {
-      ui.renderStatus('Missing table definition for paste target.', 'danger');
+      ui.renderStatus(
+        'Missing table definition for paste target.',
+        'danger',
+      );
       return false;
     }
 
     const tableRows = state.tableData[tableKey];
     if (!tableRows) {
-      ui.renderStatus('Missing table data for paste target.', 'danger');
+      ui.renderStatus(
+        'Missing table data for paste target.',
+        'danger',
+      );
       return false;
     }
 
@@ -262,9 +299,14 @@ export function actionsCreateActions(deps) {
     const rowText = actionsStripTrailingRowDelimiter(normalizedText);
     let sourceRows;
     if (tableKey === 'CA_INGREDIENTS') {
-      sourceRows = rowsBuildIngredientRows(tableDef, productId, rowText, {
-        ensureRow: true,
-      });
+      sourceRows = rowsBuildIngredientRows(
+        tableDef,
+        productId,
+        rowText,
+        {
+          ensureRow: true,
+        },
+      );
     } else {
       sourceRows = rowsBuildOtherRows(tableDef, productId, rowText);
     }
@@ -298,13 +340,19 @@ export function actionsCreateActions(deps) {
     const normalizedText = validation.normalizedText;
     const badRowText =
       target.type === 'us-nutrient-table'
-        ? actionsFindRowByPipeCount(validation.classification.rowInfo, 7)
+        ? actionsFindRowByPipeCount(
+            validation.classification.rowInfo,
+            7,
+          )
         : '';
     const hasSevenPipeRow = Boolean(badRowText);
 
     const tableDef = actionsGetTableDef(state.tableDefs, tableKey);
     if (!tableDef) {
-      ui.renderStatus('Missing table definition for paste target.', 'danger');
+      ui.renderStatus(
+        'Missing table definition for paste target.',
+        'danger',
+      );
       return false;
     }
 
@@ -314,16 +362,17 @@ export function actionsCreateActions(deps) {
       nextRows = rowsBuildIngredientRows(
         tableDef,
         productId,
-        normalizedText
+        normalizedText,
       );
     } else if (tableKey === 'US_NUTRIENTS') {
       nextRows = rowsBuildNutrientRows(
         tableDef,
         productId,
-        normalizedText
+        normalizedText,
       );
     } else {
-      const otherText = actionsStripTrailingRowDelimiter(normalizedText);
+      const otherText =
+        actionsStripTrailingRowDelimiter(normalizedText);
       nextRows = rowsBuildOtherRows(tableDef, productId, otherText);
     }
 
@@ -331,13 +380,52 @@ export function actionsCreateActions(deps) {
     state.lastAction = 'paste-table';
     if (hasSevenPipeRow) {
       ui.renderStatus(
-        'PLM -> Salsify Bug found: ' + actionsGetClipboardPreview(badRowText),
-        'warning'
+        'PLM -> Salsify Bug found: ' +
+          actionsGetClipboardPreview(badRowText),
+        'warning',
       );
       return true;
     }
     ui.renderStatus('Table paste applied.', 'info');
     return true;
+  }
+
+  //pipeify CA Ingredients Table (export) and Copy Row, US table (eport) and copy
+  //! Do it here
+  function getCaRowData(rowId) {
+    const { cells } = state.tableData.CA_INGREDIENTS.filter((row) => {
+      return row.id === rowId;
+    })[0]; //first / only array element
+    return cells;
+  }
+
+  function pipeify(cells) {
+    const pipeify = array.join('|');
+  }
+
+  function createIngredientsArray(cells) {
+    const { ORDER, DESCRIPTION } = cells;
+  }
+
+  /**
+   * @param {string} tableKey
+   * @param {string} rowId
+   * @returns {void}
+   */
+  function pipeifyRowCA(tableKey, rowId) {
+    if (!tableKey || !rowId) {
+      ui.renderStatus('Select a row to copy.', 'warning');
+      return;
+    }
+    console.log(state, rowId);
+    state.lastAction = 'pipeify-row-ca';
+
+    const rowData = getCaRowData(rowId);
+
+    console.log('rowData', rowData);
+
+    ui.renderStatus('Row copy ready (stub) for CA.', 'info');
+    console.log('[v3] pipeifyRowCA stub', tableKey, rowId);
   }
 
   /**
@@ -347,7 +435,7 @@ export function actionsCreateActions(deps) {
     mapping.mapTablesToExport(
       state.tableData,
       'US',
-      option || 'keep'
+      option || 'keep',
     );
     state.lastAction = 'pipeify-us';
     ui.renderStatus('Download set ready (stub) for US.', 'info');
@@ -361,7 +449,7 @@ export function actionsCreateActions(deps) {
     mapping.mapTablesToExport(
       state.tableData,
       'CA',
-      option || 'keep'
+      option || 'keep',
     );
     state.lastAction = 'pipeify-ca';
     ui.renderStatus('Download set ready (stub) for CA.', 'info');
@@ -391,6 +479,7 @@ export function actionsCreateActions(deps) {
     importSpreadsheet: importSpreadsheet,
     pasteRowCA: pasteRowCA,
     pasteTableUS: pasteTableUS,
+    pipeifyRowCA: pipeifyRowCA,
     pipeifyUS: pipeifyUS,
     pipeifyCA: pipeifyCA,
     changeProductId: changeProductId,

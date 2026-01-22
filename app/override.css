@@ -16,7 +16,10 @@
   --v3-cell-pad: 3px;
   --v3-header-pad: 6px;
   --v3-row-action-inner-border: 1px;
-  --v3-row-action-inner-border-color: rgba(var(--bs-body-color-rgb), 0.12);
+  --v3-row-action-inner-border-color: rgba(
+    var(--bs-body-color-rgb),
+    0.12
+  );
   --v3-row-action-icon-size: 18px;
   --v3-row-paste-size: 21px;
   --v3-row-paste-icon-size: 18px;
@@ -55,7 +58,9 @@ body {
   padding: 2rem;
   text-align: center;
   cursor: pointer;
-  transition: background-color 0.3s, border-color 0.3s;
+  transition:
+    background-color 0.3s,
+    border-color 0.3s;
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -84,8 +89,8 @@ input.id-input {
 }
 /* TABLE */
 .table-wrapper {
-  margin-left: 2rem;
-  margin-right: 2rem;
+  /* margin-left: 2rem; */
+  /* margin-right: 2rem; */
 }
 table {
   border-collapse: collapse;
@@ -176,6 +181,8 @@ th {
 }
 th.v3-col-paste,
 td.v3-col-paste,
+th.v3-col-copy,
+td.v3-col-copy,
 th.v3-col-product-id,
 td.v3-col-product-id {
   width: 1%;
@@ -292,11 +299,16 @@ th.v3-col-order {
   text-align: left;
 }
 .v3-col-paste .cell-container {
-  display: inline-flex;
+  /* display: inline-flex; */
   align-items: center;
   justify-content: center;
 }
-.v3-row-paste-button {
+.v3-col-copy .cell-container {
+  align-items: center;
+  justify-content: center;
+}
+.v3-row-paste-button,
+.v3-row-copy-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -306,14 +318,17 @@ th.v3-col-order {
   margin: 0 var(--v3-row-paste-margin-x);
   line-height: 0;
 }
-.v3-row-paste-icon {
+.v3-row-paste-icon,
+.v3-row-copy-icon {
   width: var(--v3-row-paste-icon-size);
   height: var(--v3-row-paste-icon-size);
   display: block;
 }
 td {
   border: 1px solid var(--bs-secondary-color);
-  padding: var(--v3-cell-pad), var(--v3-cell-pad) / 2;
+  padding:
+    var(--v3-cell-pad),
+    var(--v3-cell-pad) / 2;
 }
 .draggable {
   cursor: all-scroll;
@@ -478,7 +493,9 @@ button.icon {
   padding: 2rem;
   text-align: center;
   cursor: crosshair;
-  transition: background-color 0.3s, border-color 0.3s;
+  transition:
+    background-color 0.3s,
+    border-color 0.3s;
   display: flex;
   flex-direction: row;
   justify-content: center;

@@ -4,6 +4,7 @@
 /** @type {Record<string, V3Column>} */
 const modelsColumnBase = {
   paste: { id: 'ROW_PASTE', label: '', isControl: true },
+  copy: { id: 'ROW_COPY', label: '', isControl: true },
   productId: { id: 'PRODUCT_ID', label: 'Product ID', isFixed: true },
   order: { id: 'ORDER', label: 'Order' },
   description: { id: 'DESCRIPTION', label: 'Description' },
@@ -18,6 +19,7 @@ const modelsColumnBase = {
 /**
  * @typedef {Object} ModelsColumnOptions
  * @property {boolean} [includePaste]
+ * @property {boolean} [includeCopy]
  */ //TODO: custom type
 
 /**
@@ -39,6 +41,9 @@ function modelsIngredientColumns(options) {
     modelsColumnBase.symbol,
     modelsColumnBase.definition
   );
+  if (config.includeCopy) {
+    columns.push(modelsColumnBase.copy);
+  }
   return columns;
 }
 
@@ -112,7 +117,10 @@ const modelsTablesByCountry = {
       tableId: 'Ingredients - Long',
       rowType: 'Ingredients',
       pasteMode: 'row',
-      columns: modelsIngredientColumns({ includePaste: true }),
+      columns: modelsIngredientColumns({
+        includePaste: true,
+        includeCopy: true,
+      }),
     },
     {
       key: 'CA_OTHER',

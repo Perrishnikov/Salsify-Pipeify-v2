@@ -271,6 +271,7 @@ function initWireActions(countryCode, state, actions, ui) {
     }
 
     initWirePasteButtons(state, actions, ui);
+    initWireCopyButtons(actions);
     initWireRowActions(state);
     initWireEditableCells(state);
 }
@@ -375,6 +376,27 @@ function initWirePasteButtons(state, actions, ui) {
                     'warning'
                 );
             });
+    });
+}
+
+/**
+ * @param {import('./types.js').V3Actions} actions
+ * @returns {void}
+ */
+function initWireCopyButtons(actions) {
+    const container = initGetById('tables-container');
+    if (!container) {
+        return;
+    }
+
+    container.addEventListener('click', function (event) {
+        const target = event.target.closest('[data-copy-action]');
+        if (!target) {
+            return;
+        }
+        const tableKey = target.dataset.tableKey || '';
+        const rowId = target.dataset.rowId || '';
+        actions.pipeifyRowCA(tableKey, rowId);
     });
 }
 

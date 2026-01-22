@@ -64,6 +64,7 @@
  * @property {(file: File) => Promise<V3ImportResult|null>} importSpreadsheet
  * @property {(text: string, tableKey?: string, rowId?: string) => boolean} pasteRowCA
  * @property {(text: string, tableKey?: string) => boolean} pasteTableUS
+ * @property {(tableKey: string, rowId: string) => void} pipeifyRowCA
  * @property {(option: string) => void} pipeifyUS
  * @property {(option: string) => void} pipeifyCA
  * @property {() => void} changeProductId
