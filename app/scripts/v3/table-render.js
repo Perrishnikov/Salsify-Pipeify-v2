@@ -263,6 +263,7 @@ function tableRenderRow(tableDef, row, rowIndex) {
         String(value),
       );
       cellValue.dataset.colId = column.id;
+      cellValue.dataset.cellValue = 'true';
       if (column.isFixed) {
         cellValue.setAttribute('contenteditable', 'false');
       } else {

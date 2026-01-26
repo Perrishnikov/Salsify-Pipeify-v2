@@ -1,4 +1,5 @@
 import { parsingNormalizeValue } from './parsing.js';
+import { xlsxLoad } from './xlsx.js';
 
 /** @typedef {import('./types.js').V3SpreadsheetData} V3SpreadsheetData */
 
@@ -48,16 +49,6 @@ function importUtilsGetFileType(file) {
 /**
  * @returns {Promise<any>}
  */
-export async function importUtilsLoadXlsx() {
-    if (globalThis && globalThis.XLSX) {
-        return globalThis.XLSX;
-    }
-    const module = await import(
-        'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/xlsx.mjs'
-    );
-    return module.default || module;
-}
-
 /**
  * @param {string} text
  * @returns {string[][]}
@@ -134,7 +125,7 @@ export async function importUtilsReadSpreadsheet(file) {
         };
     }
 
-    const xlsx = await importUtilsLoadXlsx();
+    const xlsx = await xlsxLoad();
     const data = await file.arrayBuffer();
     const workbook = xlsx.read(data, { type: 'array' });
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
@@ -260,11 +251,12 @@ export function importUtilsFindVariantRow(rows, indexMap, rules) {
     const productIdIndex = indexMap[productIdHeader]
         ? indexMap[productIdHeader][0]
         : -1;
-    const variantIndex = indexMap[variantHeader]
-        ? indexMap[variantHeader][0]
-        : -1;
+    const variantIndex =
+        variantHeader && indexMap[variantHeader]
+            ? indexMap[variantHeader][0]
+            : -1;
 
-    if (productIdIndex < 0 || variantIndex < 0) {
+    if (productIdIndex < 0) {
         return null;
     }
 
@@ -274,8 +266,10 @@ export function importUtilsFindVariantRow(rows, indexMap, rules) {
         if (!productId) {
             continue;
         }
-        if (!importUtilsIsVariantValue(row[variantIndex])) {
-            continue;
+        if (variantIndex >= 0) {
+            if (!importUtilsIsVariantValue(row[variantIndex])) {
+                continue;
+            }
         }
         return { row: row, productId: productId };
     }

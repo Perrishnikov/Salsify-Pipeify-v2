@@ -1,8 +1,8 @@
 import { actionsCreateActions } from './actions.js';
 import {
     mappingMapImportToTables,
-    mappingMapTablesToExport,
 } from './mapping.js';
+import { exportMapTablesToExport } from './export.js';
 import { modelsGetTablesForCountry } from './models.js';
 import { livePreviewRender } from './live-preview.js';
 import {
@@ -484,6 +484,10 @@ function initWirePasteHandlers(state, actions, mode) {
         return;
     }
 
+    /**
+     * @param {EventTarget|null} target
+     * @returns {HTMLElement|null}
+     */
     function initGetEventTargetElement(target) {
         if (!target) {
             return null;
@@ -491,9 +495,13 @@ function initWirePasteHandlers(state, actions, mode) {
         if (target.nodeType === Node.TEXT_NODE) {
             return target.parentElement;
         }
-        return target;
+        return target instanceof HTMLElement ? target : null;
     }
 
+    /**
+     * @param {EventTarget|null} target
+     * @returns {boolean}
+     */
     function initIsEditablePasteTarget(target) {
         const element = initGetEventTargetElement(target);
         if (!element) {
@@ -508,7 +516,9 @@ function initWirePasteHandlers(state, actions, mode) {
         }
         if (element.closest) {
             return Boolean(
-                element.closest('.cell-value[contenteditable="true"]')
+                element.closest(
+                    '[data-cell-value][contenteditable="true"]'
+                )
             );
         }
         return false;
@@ -852,7 +862,7 @@ function initWireEditableCells(state) {
         'blur',
         function (event) {
             const target = event.target;
-            if (!target || !target.classList.contains('cell-value')) {
+            if (!target || !target.dataset || !target.dataset.cellValue) {
                 return;
             }
 
@@ -906,7 +916,7 @@ export function initInitV3Page(options) {
         ui: ui,
         mapping: {
             mapImportToTables: mappingMapImportToTables,
-            mapTablesToExport: mappingMapTablesToExport,
+            mapTablesToExport: exportMapTablesToExport,
         },
     });
 
