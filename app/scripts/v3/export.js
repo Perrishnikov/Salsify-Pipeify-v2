@@ -1,10 +1,9 @@
 import {
-    pipeSchemaBuildRowDataList,
     pipeSchemaGetByTableKey,
-    pipeSchemaSerializeRow,
-    pipeSchemaSerializeRows,
+    pipeSchemaRowHasValues,
 } from './pipe-schema.js';
 import { parsingNormalizeValue } from './parsing.js';
+import { livePreviewTrim, livePreviewTrimEnd } from './live-preview.js';
 import { xlsxLoad } from './xlsx.js';
 
 const exportProductIdHeader = 'Product ID';
@@ -46,7 +45,7 @@ function exportGetOtherDescription(rows) {
         if (!cells) {
             continue;
         }
-        const value = parsingNormalizeValue(cells.DESCRIPTION);
+        const value = livePreviewTrimEnd(cells.DESCRIPTION);
         if (value) {
             return value;
         }
@@ -76,18 +75,96 @@ function exportSerializeTableRows(tableKey, rows) {
     if (!schema) {
         return { rows: [], joined: '' };
     }
-    const rowDataList = pipeSchemaBuildRowDataList(rows || [], schema);
+    const rowDataList = exportBuildRowDataList(rows || [], schema);
     if (!rowDataList.length) {
         return { rows: [], joined: '' };
     }
     const serializedRows = rowDataList.map(function (rowData) {
-        return pipeSchemaSerializeRow(rowData, schema);
+        return exportSerializeRowData(rowData, schema);
     });
-    let joined = pipeSchemaSerializeRows(rowDataList, schema);
+    let joined = exportSerializeRows(rowDataList, schema);
     if (joined) {
         joined = exportEnsureTrailingDelimiter(joined, schema.rowDelimiter);
     }
     return { rows: serializedRows, joined: joined };
+}
+
+/**
+ * @param {import('./types.js').V3Row[]} rows
+ * @param {import('./pipe-schema.js').PipeSchema} schema
+ * @returns {import('./pipe-schema.js').PipeRowData[]}
+ */
+function exportBuildRowDataList(rows, schema) {
+    if (!rows || !schema) {
+        return [];
+    }
+    const list = [];
+    rows.forEach(function (row) {
+        if (!row) {
+            return;
+        }
+        const data = {};
+        if (row.pipeData) {
+            Object.keys(row.pipeData).forEach(function (key) {
+                data[key] = row.pipeData[key];
+            });
+        }
+        if (schema.fields && row.cells) {
+            schema.fields.forEach(function (field) {
+                if (!field.uiColumnId) {
+                    return;
+                }
+                if (row.cells[field.uiColumnId] === undefined) {
+                    return;
+                }
+                const raw = row.cells[field.uiColumnId];
+                if (field.id === 'DESCRIPTION') {
+                    data[field.id] = livePreviewTrimEnd(raw);
+                    return;
+                }
+                data[field.id] = livePreviewTrim(raw);
+            });
+        }
+        if (!pipeSchemaRowHasValues(data)) {
+            return;
+        }
+        list.push(data);
+    });
+    return list;
+}
+
+/**
+ * @param {import('./pipe-schema.js').PipeRowData} rowData
+ * @param {import('./pipe-schema.js').PipeSchema} schema
+ * @returns {string}
+ */
+function exportSerializeRowData(rowData, schema) {
+    if (!schema) {
+        return '';
+    }
+    const cells = schema.fields.map(function (field) {
+        const value = rowData ? rowData[field.id] : '';
+        if (field.id === 'DESCRIPTION') {
+            return livePreviewTrimEnd(value);
+        }
+        return livePreviewTrim(value);
+    });
+    return cells.join(schema.cellDelimiter);
+}
+
+/**
+ * @param {import('./pipe-schema.js').PipeRowData[]} rows
+ * @param {import('./pipe-schema.js').PipeSchema} schema
+ * @returns {string}
+ */
+function exportSerializeRows(rows, schema) {
+    if (!rows || !schema) {
+        return '';
+    }
+    const serializedRows = rows.map(function (rowData) {
+        return exportSerializeRowData(rowData, schema);
+    });
+    return serializedRows.join(schema.rowDelimiter || '');
 }
 
 /**

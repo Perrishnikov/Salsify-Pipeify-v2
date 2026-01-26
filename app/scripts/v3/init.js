@@ -4,7 +4,10 @@ import {
 } from './mapping.js';
 import { exportMapTablesToExport } from './export.js';
 import { modelsGetTablesForCountry } from './models.js';
-import { livePreviewRender } from './live-preview.js';
+import {
+    livePreviewBuildLines,
+    livePreviewRenderLines,
+} from './live-preview.js';
 import {
     stateCreateState,
     stateGetTableRows,
@@ -88,6 +91,86 @@ function initUpdateDropAreaText(dropArea, text) {
 }
 
 let initChangeProductIdModal = null;
+let initLivePreviewModal = null;
+
+/**
+ * @param {{id: string, titleId: string, titleText: string}} options
+ * @returns {{body: HTMLElement, footer: HTMLElement, title: HTMLElement, open: (options?: {onClose?: () => void}) => void, close: () => void}}
+ */
+function initCreateModalShell(options) {
+    const config = options || {};
+    const backdrop = document.createElement('div');
+    backdrop.id = config.id;
+    backdrop.className = 'v3-modal-backdrop is-hidden';
+    backdrop.setAttribute('role', 'presentation');
+    backdrop.setAttribute('aria-hidden', 'true');
+
+    const dialog = document.createElement('div');
+    dialog.className = 'v3-modal-dialog';
+    dialog.setAttribute('role', 'dialog');
+    dialog.setAttribute('aria-modal', 'true');
+    dialog.setAttribute('aria-labelledby', config.titleId);
+
+    const header = document.createElement('div');
+    header.className = 'v3-modal-header';
+    const title = document.createElement('h5');
+    title.id = config.titleId;
+    title.textContent = config.titleText || '';
+    header.appendChild(title);
+
+    const body = document.createElement('div');
+    body.className = 'v3-modal-body';
+
+    const footer = document.createElement('div');
+    footer.className = 'v3-modal-footer';
+
+    dialog.appendChild(header);
+    dialog.appendChild(body);
+    dialog.appendChild(footer);
+    backdrop.appendChild(dialog);
+    document.body.appendChild(backdrop);
+
+    let onClose = null;
+
+    function closeModal() {
+        backdrop.classList.add('is-hidden');
+        backdrop.setAttribute('aria-hidden', 'true');
+        if (onClose) {
+            onClose();
+        }
+        onClose = null;
+    }
+
+    function openModal(openOptions) {
+        onClose =
+            openOptions && openOptions.onClose ? openOptions.onClose : null;
+        backdrop.classList.remove('is-hidden');
+        backdrop.setAttribute('aria-hidden', 'false');
+    }
+
+    backdrop.addEventListener('click', function (event) {
+        if (event.target === backdrop) {
+            closeModal();
+        }
+    });
+
+    document.addEventListener('keydown', function (event) {
+        if (
+            event.key === 'Escape' &&
+            !backdrop.classList.contains('is-hidden')
+        ) {
+            closeModal();
+        }
+    });
+
+    return {
+        body: body,
+        footer: footer,
+        title: title,
+        open: openModal,
+        close: closeModal,
+    };
+}
 
 /**
  * @param {import('./types.js').V3State} state
@@ -121,27 +204,13 @@ function initEnsureChangeProductIdModal(ui) {
 
     let onConfirm = null;
 
-    const backdrop = document.createElement('div');
-    backdrop.id = 'product-id-modal';
-    backdrop.className = 'v3-modal-backdrop is-hidden';
-    backdrop.setAttribute('role', 'presentation');
-    backdrop.setAttribute('aria-hidden', 'true');
+    const modal = initCreateModalShell({
+        id: 'product-id-modal',
+        titleId: 'product-id-modal-title',
+        titleText: 'Change Product ID',
+    });
 
-    const dialog = document.createElement('div');
-    dialog.className = 'v3-modal-dialog';
-    dialog.setAttribute('role', 'dialog');
-    dialog.setAttribute('aria-modal', 'true');
-    dialog.setAttribute('aria-labelledby', 'product-id-modal-title');
-
-    const header = document.createElement('div');
-    header.className = 'v3-modal-header';
-    const title = document.createElement('h5');
-    title.id = 'product-id-modal-title';
-    title.textContent = 'Change Product ID';
-    header.appendChild(title);
-
-    const body = document.createElement('div');
-    body.className = 'v3-modal-body';
+    const body = modal.body;
     const currentLabel = document.createElement('div');
     currentLabel.className = 'text-muted small';
     currentLabel.textContent = 'Current Product ID';
@@ -170,8 +239,7 @@ function initEnsureChangeProductIdModal(ui) {
     body.appendChild(input);
     body.appendChild(error);
 
-    const footer = document.createElement('div');
-    footer.className = 'v3-modal-footer';
+    const footer = modal.footer;
     const cancelBtn = document.createElement('button');
     cancelBtn.type = 'button';
     cancelBtn.className = 'btn btn-secondary';
@@ -183,15 +251,8 @@ function initEnsureChangeProductIdModal(ui) {
     footer.appendChild(cancelBtn);
     footer.appendChild(confirmBtn);
 
-    dialog.appendChild(header);
-    dialog.appendChild(body);
-    dialog.appendChild(footer);
-    backdrop.appendChild(dialog);
-    document.body.appendChild(backdrop);
-
     function closeModal() {
-        backdrop.classList.add('is-hidden');
-        backdrop.setAttribute('aria-hidden', 'true');
+        modal.close();
         onConfirm = null;
     }
 
@@ -201,8 +262,7 @@ function initEnsureChangeProductIdModal(ui) {
         input.value = '';
         error.textContent = '';
         onConfirm = options && options.onConfirm ? options.onConfirm : null;
-        backdrop.classList.remove('is-hidden');
-        backdrop.setAttribute('aria-hidden', 'false');
+        modal.open();
         requestAnimationFrame(function () {
             input.focus();
         });
@@ -231,24 +291,57 @@ function initEnsureChangeProductIdModal(ui) {
         closeModal();
     });
 
-    backdrop.addEventListener('click', function (event) {
-        if (event.target === backdrop) {
-            closeModal();
-        }
-    });
-
-    document.addEventListener('keydown', function (event) {
-        if (event.key === 'Escape' && !backdrop.classList.contains('is-hidden')) {
-            closeModal();
-        }
-    });
-
     initChangeProductIdModal = {
         open: openModal,
         close: closeModal,
     };
 
     return initChangeProductIdModal;
+}
+
+/**
+ * @returns {{open: (options: {lines: string[]}) => void, close: () => void}}
+ */
+function initEnsureLivePreviewModal() {
+    if (initLivePreviewModal) {
+        return initLivePreviewModal;
+    }
+
+    const modal = initCreateModalShell({
+        id: 'live-preview-modal',
+        titleId: 'live-preview-modal-title',
+        titleText: 'Live Preview',
+    });
+
+    const body = modal.body;
+    const footer = modal.footer;
+
+    const content = document.createElement('div');
+    content.className = 'v3-preview-modal-body';
+    body.appendChild(content);
+
+    const closeBtn = document.createElement('button');
+    closeBtn.type = 'button';
+    closeBtn.className = 'btn btn-secondary';
+    closeBtn.textContent = 'Close';
+    footer.appendChild(closeBtn);
+
+    closeBtn.addEventListener('click', function () {
+        modal.close();
+    });
+
+    function openModal(options) {
+        const lines = options && options.lines ? options.lines : [];
+        livePreviewRenderLines(content, lines);
+        modal.open();
+    }
+
+    initLivePreviewModal = {
+        open: openModal,
+        close: modal.close,
+    };
+
+    return initLivePreviewModal;
 }
 
 /**
@@ -356,6 +449,7 @@ function initWireActions(countryCode, state, actions, ui) {
     const downloadBtn = initGetById('download-set-btn');
     const clearBtn = initGetById('clear-set-btn');
     const changeIdBtn = initGetById('change-product-id-btn');
+    const livePreviewBtn = initGetById('live-preview-btn');
 
     if (dropArea && fileInput) {
         const label = initGetDropLabel(dropArea);
@@ -400,7 +494,6 @@ function initWireActions(countryCode, state, actions, ui) {
                     return;
                 }
                 initRenderTableShells(state);
-                initUpdateLivePreview(state.countryCode, 'import');
             });
         });
 
@@ -418,7 +511,6 @@ function initWireActions(countryCode, state, actions, ui) {
                     return;
                 }
                 initRenderTableShells(state);
-                initUpdateLivePreview(state.countryCode, 'import');
             });
         });
     }
@@ -438,7 +530,6 @@ function initWireActions(countryCode, state, actions, ui) {
         clearBtn.addEventListener('click', function () {
             actions.clearAllTableData();
             initRenderTableShells(state);
-            initUpdateLivePreview(state.countryCode, 'clear');
         });
     }
 
@@ -452,11 +543,18 @@ function initWireActions(countryCode, state, actions, ui) {
                     const didChange = actions.changeProductId(nextId);
                     if (didChange) {
                         initRenderTableShells(state);
-                        initUpdateLivePreview(state.countryCode, 'change-id');
                     }
                     return didChange;
                 },
             });
+        });
+    }
+
+    if (livePreviewBtn) {
+        livePreviewBtn.addEventListener('click', function () {
+            const modal = initEnsureLivePreviewModal();
+            const lines = livePreviewBuildLines(state, state.countryCode);
+            modal.open({ lines: lines });
         });
     }
 
@@ -544,7 +642,6 @@ function initWirePasteHandlers(state, actions, mode) {
             const didPaste = actions.pasteRowCA(text, tableKey, rowId);
             if (didPaste) {
                 initRenderTableShells(state);
-                initUpdateLivePreview(state.countryCode, 'paste-row');
             }
         });
         return;
@@ -567,7 +664,6 @@ function initWirePasteHandlers(state, actions, mode) {
         const didPaste = actions.pasteTableUS(text, tableKey);
         if (didPaste) {
             initRenderTableShells(state);
-            initUpdateLivePreview(state.countryCode, 'paste-table');
         }
     });
 }
@@ -601,7 +697,6 @@ function initWirePasteButtons(state, actions, ui) {
                     const didPaste = actions.pasteRowCA(text, tableKey, rowId);
                     if (didPaste) {
                         initRenderTableShells(state);
-                        initUpdateLivePreview(state.countryCode, 'paste-row');
                     }
                     return;
                 }
@@ -609,7 +704,6 @@ function initWirePasteButtons(state, actions, ui) {
                 const didPaste = actions.pasteTableUS(text, tableKey);
                 if (didPaste) {
                     initRenderTableShells(state);
-                    initUpdateLivePreview(state.countryCode, 'paste-table');
                 }
             })
             .catch(function () {
@@ -843,7 +937,6 @@ function initWireRowActions(state) {
         closeMenus();
         if (didChange) {
             initRenderTableShells(state);
-            initUpdateLivePreview(state.countryCode, 'row-action');
         }
     });
 }
@@ -882,20 +975,11 @@ function initWireEditableCells(state) {
             }
 
             stateUpdateCell(state, tableKey, rowId, colId, value);
-            initUpdateLivePreview(state.countryCode, 'edit');
         },
         true
     );
 }
 
-/**
- * @param {string} countryCode
- * @param {string} source
- * @returns {void}
- */
-function initUpdateLivePreview(countryCode, source) {
-    livePreviewRender(countryCode, source);
-}
 
 /**
  * @param {{countryCode: string}} options
@@ -923,7 +1007,6 @@ export function initInitV3Page(options) {
     initSetTitle(state.countryCode);
     initRenderTableShells(state);
     initWireActions(state.countryCode, state, actions, ui);
-    initUpdateLivePreview(state.countryCode, 'init');
 
     return state;
 }
