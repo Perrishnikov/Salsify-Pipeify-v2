@@ -87,6 +87,170 @@ function initUpdateDropAreaText(dropArea, text) {
     heading.textContent = text;
 }
 
+let initChangeProductIdModal = null;
+
+/**
+ * @param {import('./types.js').V3State} state
+ * @returns {string}
+ */
+function initGetCurrentProductId(state) {
+    if (!state || !state.tableDefs) {
+        return '';
+    }
+    for (let i = 0; i < state.tableDefs.length; i += 1) {
+        const tableDef = state.tableDefs[i];
+        const rows = stateGetTableRows(state, tableDef.key);
+        for (let j = 0; j < rows.length; j += 1) {
+            const cells = rows[j] && rows[j].cells ? rows[j].cells : null;
+            if (cells && cells.PRODUCT_ID) {
+                return cells.PRODUCT_ID;
+            }
+        }
+    }
+    return '';
+}
+
+/**
+ * @param {import('./types.js').V3Ui} ui
+ * @returns {{open: (options: {currentId: string, onConfirm: (nextId: string) => boolean}) => void, close: () => void}}
+ */
+function initEnsureChangeProductIdModal(ui) {
+    if (initChangeProductIdModal) {
+        return initChangeProductIdModal;
+    }
+
+    let onConfirm = null;
+
+    const backdrop = document.createElement('div');
+    backdrop.id = 'product-id-modal';
+    backdrop.className = 'v3-modal-backdrop is-hidden';
+    backdrop.setAttribute('role', 'presentation');
+    backdrop.setAttribute('aria-hidden', 'true');
+
+    const dialog = document.createElement('div');
+    dialog.className = 'v3-modal-dialog';
+    dialog.setAttribute('role', 'dialog');
+    dialog.setAttribute('aria-modal', 'true');
+    dialog.setAttribute('aria-labelledby', 'product-id-modal-title');
+
+    const header = document.createElement('div');
+    header.className = 'v3-modal-header';
+    const title = document.createElement('h5');
+    title.id = 'product-id-modal-title';
+    title.textContent = 'Change Product ID';
+    header.appendChild(title);
+
+    const body = document.createElement('div');
+    body.className = 'v3-modal-body';
+    const currentLabel = document.createElement('div');
+    currentLabel.className = 'text-muted small';
+    currentLabel.textContent = 'Current Product ID';
+    const currentValue = document.createElement('div');
+    currentValue.className = 'v3-modal-current mb-3';
+    currentValue.id = 'product-id-current';
+
+    const inputLabel = document.createElement('label');
+    inputLabel.className = 'form-label';
+    inputLabel.setAttribute('for', 'product-id-input');
+    inputLabel.textContent = 'New Product ID';
+
+    const input = document.createElement('input');
+    input.id = 'product-id-input';
+    input.className = 'form-control';
+    input.type = 'text';
+    input.autocomplete = 'off';
+    input.placeholder = 'Enter new Product ID';
+
+    const error = document.createElement('div');
+    error.className = 'v3-modal-error text-danger small mt-2';
+
+    body.appendChild(currentLabel);
+    body.appendChild(currentValue);
+    body.appendChild(inputLabel);
+    body.appendChild(input);
+    body.appendChild(error);
+
+    const footer = document.createElement('div');
+    footer.className = 'v3-modal-footer';
+    const cancelBtn = document.createElement('button');
+    cancelBtn.type = 'button';
+    cancelBtn.className = 'btn btn-secondary';
+    cancelBtn.textContent = 'Cancel';
+    const confirmBtn = document.createElement('button');
+    confirmBtn.type = 'button';
+    confirmBtn.className = 'btn btn-primary';
+    confirmBtn.textContent = 'Confirm';
+    footer.appendChild(cancelBtn);
+    footer.appendChild(confirmBtn);
+
+    dialog.appendChild(header);
+    dialog.appendChild(body);
+    dialog.appendChild(footer);
+    backdrop.appendChild(dialog);
+    document.body.appendChild(backdrop);
+
+    function closeModal() {
+        backdrop.classList.add('is-hidden');
+        backdrop.setAttribute('aria-hidden', 'true');
+        onConfirm = null;
+    }
+
+    function openModal(options) {
+        const currentId = options && options.currentId ? options.currentId : '';
+        currentValue.textContent = currentId || 'Not set';
+        input.value = '';
+        error.textContent = '';
+        onConfirm = options && options.onConfirm ? options.onConfirm : null;
+        backdrop.classList.remove('is-hidden');
+        backdrop.setAttribute('aria-hidden', 'false');
+        requestAnimationFrame(function () {
+            input.focus();
+        });
+    }
+
+    cancelBtn.addEventListener('click', function () {
+        closeModal();
+    });
+
+    confirmBtn.addEventListener('click', function () {
+        const nextId = input.value.trim();
+        if (!nextId) {
+            error.textContent = 'Enter a Product ID before confirming.';
+            input.focus();
+            return;
+        }
+        error.textContent = '';
+        if (onConfirm) {
+            const didConfirm = onConfirm(nextId);
+            if (didConfirm === false) {
+                return;
+            }
+        } else {
+            ui.renderStatus('Unable to update Product ID.', 'warning');
+        }
+        closeModal();
+    });
+
+    backdrop.addEventListener('click', function (event) {
+        if (event.target === backdrop) {
+            closeModal();
+        }
+    });
+
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' && !backdrop.classList.contains('is-hidden')) {
+            closeModal();
+        }
+    });
+
+    initChangeProductIdModal = {
+        open: openModal,
+        close: closeModal,
+    };
+
+    return initChangeProductIdModal;
+}
+
 /**
  * @param {import('./types.js').V3State} state
  * @returns {void}
@@ -280,8 +444,19 @@ function initWireActions(countryCode, state, actions, ui) {
 
     if (changeIdBtn) {
         changeIdBtn.addEventListener('click', function () {
-            actions.changeProductId();
-            initUpdateLivePreview(state.countryCode, 'change-id');
+            const modal = initEnsureChangeProductIdModal(ui);
+            const currentId = initGetCurrentProductId(state);
+            modal.open({
+                currentId: currentId,
+                onConfirm: function (nextId) {
+                    const didChange = actions.changeProductId(nextId);
+                    if (didChange) {
+                        initRenderTableShells(state);
+                        initUpdateLivePreview(state.countryCode, 'change-id');
+                    }
+                    return didChange;
+                },
+            });
         });
     }
 

@@ -561,12 +561,30 @@ export function actionsCreateActions(deps) {
   }
 
   /**
-   * @returns {void}
+   * @param {string} nextProductId
+   * @returns {boolean}
    */
-  function changeProductId() {
+  function changeProductId(nextProductId) {
+    const productId = (nextProductId || '').trim();
+    if (!productId) {
+      ui.renderStatus('Enter a Product ID before confirming.', 'warning');
+      return false;
+    }
+    Object.keys(state.tableData || {}).forEach(function (tableKey) {
+      const rows = state.tableData[tableKey];
+      if (!rows) {
+        return;
+      }
+      rows.forEach(function (row) {
+        if (!row || !row.cells) {
+          return;
+        }
+        row.cells.PRODUCT_ID = productId;
+      });
+    });
     state.lastAction = 'change-product-id';
-    ui.renderStatus('Change Product ID stub triggered.', 'info');
-    console.log('[v3] changeProductId stub');
+    ui.renderStatus('Product ID updated.', 'info');
+    return true;
   }
 
   /**

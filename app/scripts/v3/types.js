@@ -69,7 +69,7 @@
  * @property {(tableKey: string) => void} pipeifyTableUS
  * @property {(option: string) => void} pipeifyUS
  * @property {(option: string) => void} pipeifyCA
- * @property {() => void} changeProductId
+ * @property {(nextProductId: string) => boolean} changeProductId
  * @property {() => void} clearAllTableData
  */ //TODO: custom type
 
