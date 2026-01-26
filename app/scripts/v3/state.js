@@ -1,3 +1,9 @@
+import {
+    pipeSchemaCreateEmptyRowData,
+    pipeSchemaGetByTableKey,
+    pipeSchemaUpdateRowDataForCell,
+} from './pipe-schema.js';
+
 /** @typedef {import('./types.js').V3Row} V3Row */
 /** @typedef {import('./types.js').V3State} V3State */
 /** @typedef {import('./types.js').V3TableDef} V3TableDef */
@@ -12,11 +18,16 @@ export function stateCreateEmptyRow(tableDef, rowIndex) {
     tableDef.columns.forEach(function (column) {
         cells[column.id] = '';
     });
-    return {
+    const row = {
         id: 'row-' + rowIndex,
         type: tableDef.rowType,
         cells: cells,
     };
+    const schema = pipeSchemaGetByTableKey(tableDef.key);
+    if (schema) {
+        row.pipeData = pipeSchemaCreateEmptyRowData(schema);
+    }
+    return row;
 }
 
 /**
@@ -72,6 +83,13 @@ export function stateUpdateCell(state, tableKey, rowId, colId, value) {
         return;
     }
     targetRow.cells[colId] = value;
+    const tableDef = stateGetTableDef(state, tableKey);
+    if (tableDef) {
+        const schema = pipeSchemaGetByTableKey(tableDef.key);
+        if (schema) {
+            pipeSchemaUpdateRowDataForCell(targetRow, schema, colId, value);
+        }
+    }
     state.lastAction = 'edit';
 }
 
@@ -128,7 +146,7 @@ function stateNormalizeRows(rows, tableDef) {
  * @param {string} productId
  * @returns {void}
  */
-function stateClearRowCells(row, productId) {
+function stateClearRowCells(row, productId, tableKey) {
     if (!row || !row.cells) {
         return;
     }
@@ -137,6 +155,16 @@ function stateClearRowCells(row, productId) {
     });
     if (productId) {
         row.cells.PRODUCT_ID = productId;
+    }
+    const schema = tableKey ? pipeSchemaGetByTableKey(tableKey) : null;
+    if (schema) {
+        row.pipeData = pipeSchemaCreateEmptyRowData(schema);
+        return;
+    }
+    if (row.pipeData) {
+        Object.keys(row.pipeData).forEach(function (key) {
+            row.pipeData[key] = '';
+        });
     }
 }
 
@@ -197,7 +225,7 @@ export function stateDeleteRow(state, tableKey, rowId) {
     }
     const productId = stateGetTableProductId(state, tableKey);
     if (rows.length === 1) {
-        stateClearRowCells(rows[0], productId);
+        stateClearRowCells(rows[0], productId, tableKey);
         state.lastAction = 'row-clear';
         return true;
     }

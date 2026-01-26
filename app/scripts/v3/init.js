@@ -113,14 +113,35 @@ function initRenderTableShells(state) {
         title.textContent = tableDef.name;
         headerRow.appendChild(title);
 
-        if (tableDef.pasteMode === 'table' && tableDef.rowType !== 'Other') {
-            const pasteButton = document.createElement('button');
-            pasteButton.type = 'button';
-            pasteButton.className = 'btn btn-outline-secondary btn-sm';
-            pasteButton.textContent = 'Paste Table';
-            pasteButton.dataset.pasteAction = 'table';
-            pasteButton.dataset.tableKey = tableDef.key;
-            headerRow.appendChild(pasteButton);
+        const canPasteTable =
+            tableDef.pasteMode === 'table' && tableDef.rowType !== 'Other';
+        const canCopyTable =
+            tableDef.key === 'US_INGREDIENTS' ||
+            tableDef.key === 'US_NUTRIENTS';
+        if (canPasteTable || canCopyTable) {
+            const actionsWrap = document.createElement('div');
+            actionsWrap.className = 'd-flex gap-2';
+            if (canPasteTable) {
+                const pasteButton = document.createElement('button');
+                pasteButton.type = 'button';
+                pasteButton.className =
+                    'btn btn-outline-secondary btn-sm';
+                pasteButton.textContent = 'Paste Table';
+                pasteButton.dataset.pasteAction = 'table';
+                pasteButton.dataset.tableKey = tableDef.key;
+                actionsWrap.appendChild(pasteButton);
+            }
+            if (canCopyTable) {
+                const copyButton = document.createElement('button');
+                copyButton.type = 'button';
+                copyButton.className =
+                    'btn btn-outline-secondary btn-sm';
+                copyButton.textContent = 'Copy Table';
+                copyButton.dataset.copyAction = 'table';
+                copyButton.dataset.tableKey = tableDef.key;
+                actionsWrap.appendChild(copyButton);
+            }
+            headerRow.appendChild(actionsWrap);
         }
 
         section.appendChild(headerRow);
@@ -288,8 +309,41 @@ function initWirePasteHandlers(state, actions, mode) {
         return;
     }
 
+    function initGetEventTargetElement(target) {
+        if (!target) {
+            return null;
+        }
+        if (target.nodeType === Node.TEXT_NODE) {
+            return target.parentElement;
+        }
+        return target;
+    }
+
+    function initIsEditablePasteTarget(target) {
+        const element = initGetEventTargetElement(target);
+        if (!element) {
+            return false;
+        }
+        if (element.isContentEditable) {
+            return true;
+        }
+        const tagName = element.tagName;
+        if (tagName === 'INPUT' || tagName === 'TEXTAREA') {
+            return true;
+        }
+        if (element.closest) {
+            return Boolean(
+                element.closest('.cell-value[contenteditable="true"]')
+            );
+        }
+        return false;
+    }
+
     if (mode === 'row') {
         container.addEventListener('paste', function (event) {
+            if (initIsEditablePasteTarget(event.target)) {
+                return;
+            }
             const text = event.clipboardData
                 ? event.clipboardData.getData('text')
                 : '';
@@ -312,6 +366,9 @@ function initWirePasteHandlers(state, actions, mode) {
     }
 
     container.addEventListener('paste', function (event) {
+        if (initIsEditablePasteTarget(event.target)) {
+            return;
+        }
         const text = event.clipboardData
             ? event.clipboardData.getData('text')
             : '';
@@ -394,7 +451,12 @@ function initWireCopyButtons(actions) {
         if (!target) {
             return;
         }
+        const copyAction = target.dataset.copyAction || '';
         const tableKey = target.dataset.tableKey || '';
+        if (copyAction === 'table') {
+            actions.pipeifyTableUS(tableKey);
+            return;
+        }
         const rowId = target.dataset.rowId || '';
         actions.pipeifyRowCA(tableKey, rowId);
     });

@@ -21,6 +21,7 @@
  * @property {string} id
  * @property {string} type
  * @property {Record<string, string>} cells
+ * @property {Record<string, string>} [pipeData]
  */ //TODO: custom type
 
 /**
@@ -65,6 +66,7 @@
  * @property {(text: string, tableKey?: string, rowId?: string) => boolean} pasteRowCA
  * @property {(text: string, tableKey?: string) => boolean} pasteTableUS
  * @property {(tableKey: string, rowId: string) => void} pipeifyRowCA
+ * @property {(tableKey: string) => void} pipeifyTableUS
  * @property {(option: string) => void} pipeifyUS
  * @property {(option: string) => void} pipeifyCA
  * @property {() => void} changeProductId

@@ -259,6 +259,14 @@ th.v3-col-order {
   white-space: normal;
   width: var(--v3-col-fill-width);
 }
+.v3-table-section table[data-table-key] th[data-col-id='SHORT_DESCRIPTION'],
+.v3-table-section
+  table[data-table-key]
+  td[data-col-id='SHORT_DESCRIPTION'] {
+  min-width: var(--v3-col-definition-min-width);
+  white-space: normal;
+  width: var(--v3-col-definition-min-width);
+}
 .v3-table-section table[data-table-key] th[data-col-id='definition'],
 .v3-table-section table[data-table-key] td[data-col-id='definition'] {
   min-width: var(--v3-col-definition-min-width);
@@ -282,6 +290,10 @@ th.v3-col-order {
   .cell-container,
 .v3-table-section
   table[data-table-key]
+  td[data-col-id='SHORT_DESCRIPTION']
+  .cell-container,
+.v3-table-section
+  table[data-table-key]
   td[data-col-id='definition']
   .cell-container {
   justify-content: flex-start;
@@ -290,6 +302,10 @@ th.v3-col-order {
 .v3-table-section
   table[data-table-key]
   td[data-col-id='DESCRIPTION']
+  .cell-value,
+.v3-table-section
+  table[data-table-key]
+  td[data-col-id='SHORT_DESCRIPTION']
   .cell-value,
 .v3-table-section
   table[data-table-key]

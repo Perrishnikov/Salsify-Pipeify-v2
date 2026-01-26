@@ -4,6 +4,14 @@ import {
   rowsBuildOtherRows,
 } from './rows.js';
 import {
+  pipeSchemaBuildRowDataList,
+  pipeSchemaBuildRowDataFromRow,
+  pipeSchemaGetByTableKey,
+  pipeSchemaRowHasValues,
+  pipeSchemaSerializeRow,
+  pipeSchemaSerializeRows,
+} from './pipe-schema.js';
+import {
   pasteClassifyClipboard,
   pasteFormatClipboardPreview,
 } from './paste.js';
@@ -67,6 +75,46 @@ function actionsGetTableDef(tableDefs, tableKey) {
     }
   }
   return null;
+}
+
+/**
+ * @param {string} text
+ * @param {V3Ui} ui
+ * @returns {Promise<boolean>}
+ */
+function actionsCopyToClipboard(text, ui) {
+  if (!text) {
+    ui.renderStatus('Nothing to copy.', 'warning');
+    return Promise.resolve(false);
+  }
+  if (!navigator.clipboard || !navigator.clipboard.writeText) {
+    ui.renderStatus('Clipboard write not supported.', 'warning');
+    return Promise.resolve(false);
+  }
+  return navigator.clipboard
+    .writeText(text)
+    .then(function () {
+      return true;
+    })
+    .catch(function () {
+      ui.renderStatus('Unable to copy to clipboard.', 'warning');
+      return false;
+    });
+}
+
+/**
+ * @param {import('./types.js').V3Row[]} rows
+ * @param {string} rowId
+ * @returns {import('./types.js').V3Row|null}
+ */
+function actionsFindRowById(rows, rowId) {
+  if (!rows || !rows.length) {
+    return null;
+  }
+  const match = rows.find(function (row) {
+    return row && row.id === rowId;
+  });
+  return match || null;
 }
 
 /**
@@ -390,23 +438,6 @@ export function actionsCreateActions(deps) {
     return true;
   }
 
-  //pipeify CA Ingredients Table (export) and Copy Row, US table (eport) and copy
-  //! Do it here
-  function getCaRowData(rowId) {
-    const { cells } = state.tableData.CA_INGREDIENTS.filter((row) => {
-      return row.id === rowId;
-    })[0]; //first / only array element
-    return cells;
-  }
-
-  function pipeify(cells) {
-    const pipeify = array.join('|');
-  }
-
-  function createIngredientsArray(cells) {
-    const { ORDER, DESCRIPTION } = cells;
-  }
-
   /**
    * @param {string} tableKey
    * @param {string} rowId
@@ -417,15 +448,88 @@ export function actionsCreateActions(deps) {
       ui.renderStatus('Select a row to copy.', 'warning');
       return;
     }
-    console.log(state, rowId);
-    state.lastAction = 'pipeify-row-ca';
+    const tableDef = actionsGetTableDef(state.tableDefs, tableKey);
+    if (!tableDef) {
+      ui.renderStatus(
+        'Missing table definition for copy target.',
+        'danger',
+      );
+      return;
+    }
+    const schema = pipeSchemaGetByTableKey(tableDef.key);
+    if (!schema) {
+      ui.renderStatus('Missing pipe schema for copy target.', 'danger');
+      return;
+    }
+    const rows = state.tableData[tableKey] || [];
+    const row = actionsFindRowById(rows, rowId);
+    if (!row) {
+      ui.renderStatus('Select a row to copy.', 'warning');
+      return;
+    }
+    const rowData = pipeSchemaBuildRowDataFromRow(row, schema);
+    if (!pipeSchemaRowHasValues(rowData)) {
+      ui.renderStatus('Row is empty.', 'warning');
+      return;
+    }
+    const text = pipeSchemaSerializeRow(rowData, schema);
+    actionsCopyToClipboard(text, ui).then(function (didCopy) {
+      if (!didCopy) {
+        return;
+      }
+      state.lastAction = 'pipeify-row-ca';
+      ui.renderStatus('Row copied to clipboard.', 'info');
+    });
+  }
 
-    const rowData = getCaRowData(rowId);
-
-    console.log('rowData', rowData);
-
-    ui.renderStatus('Row copy ready (stub) for CA.', 'info');
-    console.log('[v3] pipeifyRowCA stub', tableKey, rowId);
+  /**
+   * @param {string} tableKey
+   * @returns {void}
+   */
+  function pipeifyTableUS(tableKey) {
+    if (!tableKey) {
+      ui.renderStatus('Select a table to copy.', 'warning');
+      return;
+    }
+    const tableDef = actionsGetTableDef(state.tableDefs, tableKey);
+    if (!tableDef) {
+      ui.renderStatus(
+        'Missing table definition for copy target.',
+        'danger',
+      );
+      return;
+    }
+    const schema = pipeSchemaGetByTableKey(tableDef.key);
+    if (!schema) {
+      ui.renderStatus('Missing pipe schema for copy target.', 'danger');
+      return;
+    }
+    const rows = state.tableData[tableKey] || [];
+    const rowDataList = pipeSchemaBuildRowDataList(rows, schema);
+    if (!rowDataList.length) {
+      ui.renderStatus('Table is empty.', 'warning');
+      return;
+    }
+    const rowDelimiterWithNewline = schema.rowDelimiter
+      ? schema.rowDelimiter + '\n'
+      : '';
+    let text = pipeSchemaSerializeRows(rowDataList, schema, {
+      rowDelimiter: rowDelimiterWithNewline,
+    });
+    if (
+      rowDelimiterWithNewline &&
+      rowDataList.length === 1 &&
+      text.indexOf(rowDelimiterWithNewline) === -1
+    ) {
+      text += rowDelimiterWithNewline;
+    }
+    actionsCopyToClipboard(text, ui).then(function (didCopy) {
+      if (!didCopy) {
+        return;
+      }
+      state.lastAction = 'pipeify-table-us';
+      ui.renderStatus('Table copied to clipboard.', 'info');
+    });
   }
 
   /**
@@ -480,6 +584,7 @@ export function actionsCreateActions(deps) {
     pasteRowCA: pasteRowCA,
     pasteTableUS: pasteTableUS,
     pipeifyRowCA: pipeifyRowCA,
+    pipeifyTableUS: pipeifyTableUS,
     pipeifyUS: pipeifyUS,
     pipeifyCA: pipeifyCA,
     changeProductId: changeProductId,

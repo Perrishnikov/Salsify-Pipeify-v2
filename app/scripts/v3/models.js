@@ -8,6 +8,8 @@ const modelsColumnBase = {
   productId: { id: 'PRODUCT_ID', label: 'Product ID', isFixed: true },
   order: { id: 'ORDER', label: 'Order' },
   description: { id: 'DESCRIPTION', label: 'Description' },
+  shortDescription: { id: 'SHORT_DESCRIPTION', label: 'Short Description' },
+  longDescription: { id: 'DESCRIPTION', label: 'Long Description' },
   quantity: { id: 'QTY', label: 'Qty' },
   uom: { id: 'UOM', label: 'UOM' },
   dv: { id: 'DV', label: 'DV' },
@@ -35,7 +37,7 @@ function modelsIngredientColumns(options) {
   columns.push(
     modelsColumnBase.productId,
     modelsColumnBase.order,
-    modelsColumnBase.description,
+    modelsColumnBase.longDescription,
     modelsColumnBase.quantity,
     modelsColumnBase.uom,
     modelsColumnBase.symbol,
@@ -60,7 +62,8 @@ function modelsNutrientColumns(options) {
   columns.push(
     modelsColumnBase.productId,
     modelsColumnBase.order,
-    modelsColumnBase.description,
+    modelsColumnBase.shortDescription,
+    modelsColumnBase.longDescription,
     modelsColumnBase.quantity,
     modelsColumnBase.uom,
     modelsColumnBase.dv,

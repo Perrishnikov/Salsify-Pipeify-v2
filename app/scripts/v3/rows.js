@@ -1,4 +1,10 @@
 import { parsingNormalizeValue, parsingParseDelimitedTable } from './parsing.js';
+import {
+    pipeSchemaApplyRowDataToCells,
+    pipeSchemaGetByTableKey,
+    pipeSchemaParseRows,
+    pipeSchemaRowHasValues,
+} from './pipe-schema.js';
 import { stateCreateEmptyRow } from './state.js';
 
 /** @typedef {import('./types.js').V3Row} V3Row */
@@ -52,22 +58,42 @@ export function rowsBuildIngredientRows(
 ) {
     const config = options || {};
     const rows = [];
-    const parsedRows = parsingParseDelimitedTable(text);
-
-    parsedRows.forEach(function (cells) {
-        const values = {
-            ORDER: parsingNormalizeValue(cells[0]),
-            DESCRIPTION: parsingNormalizeValue(cells[1]),
-            QTY: parsingNormalizeValue(cells[2]),
-            UOM: parsingNormalizeValue(cells[3]),
-            SYMBOL: parsingNormalizeValue(cells[4]),
-            definition: parsingNormalizeValue(cells[5]),
-        };
-        if (!rowsHasValues(values)) {
-            return;
-        }
-        rows.push(rowsCreateRow(tableDef, rows.length + 1, productId, values));
-    });
+    const schema = pipeSchemaGetByTableKey(tableDef.key);
+    if (schema) {
+        const parsedRows = pipeSchemaParseRows(text, schema);
+        parsedRows.forEach(function (rowData) {
+            if (!pipeSchemaRowHasValues(rowData)) {
+                return;
+            }
+            const row = rowsCreateRow(
+                tableDef,
+                rows.length + 1,
+                productId,
+                {}
+            );
+            row.pipeData = rowData;
+            pipeSchemaApplyRowDataToCells(row, schema);
+            rows.push(row);
+        });
+    } else {
+        const parsedRows = parsingParseDelimitedTable(text);
+        parsedRows.forEach(function (cells) {
+            const values = {
+                ORDER: parsingNormalizeValue(cells[0]),
+                DESCRIPTION: parsingNormalizeValue(cells[1]),
+                QTY: parsingNormalizeValue(cells[2]),
+                UOM: parsingNormalizeValue(cells[3]),
+                SYMBOL: parsingNormalizeValue(cells[4]),
+                definition: parsingNormalizeValue(cells[5]),
+            };
+            if (!rowsHasValues(values)) {
+                return;
+            }
+            rows.push(
+                rowsCreateRow(tableDef, rows.length + 1, productId, values)
+            );
+        });
+    }
 
     if (config.ensureRow && rows.length === 0) {
         rows.push(rowsCreateRow(tableDef, rows.length + 1, productId, {}));
@@ -86,27 +112,45 @@ export function rowsBuildIngredientRows(
 export function rowsBuildNutrientRows(tableDef, productId, text, options) {
     const config = options || {};
     const rows = [];
-    const parsedRows = parsingParseDelimitedTable(text);
-
-    parsedRows.forEach(function (cells) {
-        const description =
-            parsingNormalizeValue(cells[2]) ||
-            parsingNormalizeValue(cells[1]);
-        const values = {
-            ORDER: parsingNormalizeValue(cells[0]),
-            DESCRIPTION: description,
-            QTY: parsingNormalizeValue(cells[3]),
-            UOM: parsingNormalizeValue(cells[4]),
-            DV: parsingNormalizeValue(cells[5]),
-            PCT: parsingNormalizeValue(cells[6]),
-            SYMBOL: parsingNormalizeValue(cells[7]),
-            definition: parsingNormalizeValue(cells[8]),
-        };
-        if (!rowsHasValues(values)) {
-            return;
-        }
-        rows.push(rowsCreateRow(tableDef, rows.length + 1, productId, values));
-    });
+    const schema = pipeSchemaGetByTableKey(tableDef.key);
+    if (schema) {
+        const parsedRows = pipeSchemaParseRows(text, schema);
+        parsedRows.forEach(function (rowData) {
+            if (!pipeSchemaRowHasValues(rowData)) {
+                return;
+            }
+            const row = rowsCreateRow(
+                tableDef,
+                rows.length + 1,
+                productId,
+                {}
+            );
+            row.pipeData = rowData;
+            pipeSchemaApplyRowDataToCells(row, schema);
+            rows.push(row);
+        });
+    } else {
+        const parsedRows = parsingParseDelimitedTable(text);
+        parsedRows.forEach(function (cells) {
+            const values = {
+                ORDER: parsingNormalizeValue(cells[0]),
+                SHORT_DESCRIPTION: parsingNormalizeValue(cells[1]),
+                DESCRIPTION: parsingNormalizeValue(cells[2]),
+                QTY: parsingNormalizeValue(cells[3]),
+                UOM: parsingNormalizeValue(cells[4]),
+                DV: parsingNormalizeValue(cells[5]),
+                PCT: parsingNormalizeValue(cells[6]),
+                SYMBOL: parsingNormalizeValue(cells[7]),
+                definition: parsingNormalizeValue(cells[8]),
+            };
+            if (!rowsHasValues(values)) {
+                return;
+            }
+            rows.push(
+                rowsCreateRow(tableDef, rows.length + 1, productId, values)
+            );
+        });
+    }
 
     if (config.ensureRow && rows.length === 0) {
         rows.push(rowsCreateRow(tableDef, 1, productId, {}));

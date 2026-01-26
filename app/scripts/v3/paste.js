@@ -14,12 +14,31 @@
  * @property {PasteRowInfo[]} rowInfo
  */ //TODO: custom type
 
+import { pipeSchemaGetByTableKey } from './pipe-schema.js';
+
 const pasteRowDelimiter = '~';
 const pasteCellDelimiter = '|';
-const pasteIngredientMinPipes = 6;
-const pasteIngredientMaxPipes = 8;
-const pasteNutrientMinPipes = 7;
-const pasteNutrientMaxPipes = 9;
+const pasteIngredientSchemaCA = pipeSchemaGetByTableKey('CA_INGREDIENTS');
+const pasteIngredientSchemaUS = pipeSchemaGetByTableKey('US_INGREDIENTS');
+const pasteIngredientPipeRangeCA =
+  pasteIngredientSchemaCA && pasteIngredientSchemaCA.pipeCountRange
+    ? pasteIngredientSchemaCA.pipeCountRange
+    : { min: 6, max: 8 };
+const pasteIngredientPipeRangeUS =
+  pasteIngredientSchemaUS && pasteIngredientSchemaUS.pipeCountRange
+    ? pasteIngredientSchemaUS.pipeCountRange
+    : { min: 6, max: 6 };
+const pasteIngredientMinPipesCA = pasteIngredientPipeRangeCA.min;
+const pasteIngredientMaxPipesCA = pasteIngredientPipeRangeCA.max;
+const pasteIngredientMinPipesUS = pasteIngredientPipeRangeUS.min;
+const pasteIngredientMaxPipesUS = pasteIngredientPipeRangeUS.max;
+const pasteNutrientSchemaUS = pipeSchemaGetByTableKey('US_NUTRIENTS');
+const pasteNutrientPipeRangeUS =
+  pasteNutrientSchemaUS && pasteNutrientSchemaUS.pipeCountRange
+    ? pasteNutrientSchemaUS.pipeCountRange
+    : { min: 7, max: 9 };
+const pasteNutrientMinPipesUS = pasteNutrientPipeRangeUS.min;
+const pasteNutrientMaxPipesUS = pasteNutrientPipeRangeUS.max;
 
 /**
  * @param {string} value
@@ -139,8 +158,8 @@ export function pasteClassifyClipboard(text) {
     if (
       pasteIsPipeCountInRange(
         pipeCounts[0],
-        pasteIngredientMinPipes,
-        pasteIngredientMaxPipes
+        pasteIngredientMinPipesCA,
+        pasteIngredientMaxPipesCA
       )
     ) {
       matches.push('ca-ingredient-row');
@@ -155,8 +174,8 @@ export function pasteClassifyClipboard(text) {
       pipeCounts.every(function (count) {
         return pasteIsPipeCountInRange(
           count,
-          pasteIngredientMinPipes,
-          pasteIngredientMaxPipes
+          pasteIngredientMinPipesUS,
+          pasteIngredientMaxPipesUS
         );
       })
     ) {
@@ -166,8 +185,8 @@ export function pasteClassifyClipboard(text) {
       pipeCounts.every(function (count) {
         return pasteIsPipeCountInRange(
           count,
-          pasteNutrientMinPipes,
-          pasteNutrientMaxPipes
+          pasteNutrientMinPipesUS,
+          pasteNutrientMaxPipesUS
         );
       })
     ) {
