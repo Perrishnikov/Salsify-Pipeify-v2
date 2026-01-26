@@ -79,10 +79,15 @@ function modelsNutrientColumns(options) {
  * @returns {V3Column[]}
  */
 function modelsOtherColumns(options) {
-  return [
+  const config = options || {};
+  const columns = [
     modelsColumnBase.productId,
     modelsColumnBase.description,
   ];
+  if (config.includeCopy) {
+    columns.push(modelsColumnBase.copy);
+  }
+  return columns;
 }
 
 /** @type {Record<string, V3TableDef[]>} */
@@ -131,7 +136,9 @@ const modelsTablesByCountry = {
       tableId: 'LABEL_DATASET_OTHER_INGREDS_A',
       rowType: 'Other',
       pasteMode: 'row',
-      columns: modelsOtherColumns(),
+      columns: modelsOtherColumns({
+        includeCopy: true,
+      }),
     },
   ],
 };

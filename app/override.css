@@ -535,6 +535,13 @@ button.icon {
   margin-right: 0 !important;
   margin-left: 0 !important;
 }
+#page-errors {
+  position: sticky;
+  top: 0.75rem;
+  z-index: 1025;
+  background: var(--bs-body-bg);
+  padding: 0.25rem 0;
+}
 .toast-container {
   position: fixed;
   /* bottom: 20px; Adjust as needed */

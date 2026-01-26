@@ -85,6 +85,16 @@ const pipeSchemaNutrientUS = {
   ],
 };
 
+/** @type {PipeSchema} */
+const pipeSchemaOther = {
+  id: 'other',
+  rowType: 'Other',
+  rowDelimiter: '~',
+  cellDelimiter: '|',
+  pipeCountRange: { min: 0, max: 0 },
+  fields: [{ id: 'DESCRIPTION', uiColumnId: 'DESCRIPTION' }],
+};
+
 /**
  * @param {string} rowType
  * @returns {PipeSchema|null}
@@ -95,6 +105,9 @@ export function pipeSchemaGetByRowType(rowType) {
   }
   if (rowType === pipeSchemaNutrientUS.rowType) {
     return pipeSchemaNutrientUS;
+  }
+  if (rowType === pipeSchemaOther.rowType) {
+    return pipeSchemaOther;
   }
   return null;
 }
@@ -112,6 +125,9 @@ export function pipeSchemaGetByTableKey(tableKey) {
   }
   if (tableKey === 'US_NUTRIENTS') {
     return pipeSchemaNutrientUS;
+  }
+  if (tableKey === 'CA_OTHER' || tableKey === 'US_OTHER') {
+    return pipeSchemaOther;
   }
   return null;
 }

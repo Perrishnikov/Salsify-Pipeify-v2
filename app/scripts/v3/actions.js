@@ -27,7 +27,7 @@ import { stateGetTableProductId, stateResetTables } from './state.js';
  * @property {V3Ui} ui
  * @property {{
  *   mapImportToTables: (file: File, countryCode: string, tableDefs: import('./types.js').V3TableDef[]) => Promise<import('./types.js').V3ImportResult>,
- *   mapTablesToExport: (tableData: Object, countryCode: string, option: string) => Object
+ *   mapTablesToExport: (tableData: Object, countryCode: string, option: string) => Promise<{ok: boolean, errors?: string[], fileName?: string}>
  * }} mapping
  */
 
@@ -540,10 +540,22 @@ export function actionsCreateActions(deps) {
       state.tableData,
       'US',
       option || 'keep',
-    );
-    state.lastAction = 'pipeify-us';
-    ui.renderStatus('Download set ready (stub) for US.', 'info');
-    console.log('[v3] pipeifyUS stub', option);
+    )
+      .then(function (result) {
+        if (!result || !result.ok) {
+          const message =
+            result && result.errors && result.errors.length
+              ? result.errors[0]
+              : 'Unable to export US download set.';
+          ui.renderStatus(message, 'danger');
+          return;
+        }
+        state.lastAction = 'pipeify-us';
+        ui.renderStatus('Download set ready for US.', 'success');
+      })
+      .catch(function () {
+        ui.renderStatus('Unable to export US download set.', 'danger');
+      });
   }
 
   /**
@@ -554,10 +566,22 @@ export function actionsCreateActions(deps) {
       state.tableData,
       'CA',
       option || 'keep',
-    );
-    state.lastAction = 'pipeify-ca';
-    ui.renderStatus('Download set ready (stub) for CA.', 'info');
-    console.log('[v3] pipeifyCA stub', option);
+    )
+      .then(function (result) {
+        if (!result || !result.ok) {
+          const message =
+            result && result.errors && result.errors.length
+              ? result.errors[0]
+              : 'Unable to export CA download set.';
+          ui.renderStatus(message, 'danger');
+          return;
+        }
+        state.lastAction = 'pipeify-ca';
+        ui.renderStatus('Download set ready for CA.', 'success');
+      })
+      .catch(function () {
+        ui.renderStatus('Unable to export CA download set.', 'danger');
+      });
   }
 
   /**

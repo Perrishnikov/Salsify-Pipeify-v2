@@ -48,7 +48,7 @@ function importUtilsGetFileType(file) {
 /**
  * @returns {Promise<any>}
  */
-async function importUtilsLoadXlsx() {
+export async function importUtilsLoadXlsx() {
     if (globalThis && globalThis.XLSX) {
         return globalThis.XLSX;
     }
